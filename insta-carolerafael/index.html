@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Insta momentos - Carolina Milan</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
+    <style>
+        .aba-comentarios { position: absolute; bottom: 0; width: 100%; height: 55%; background: #fff; border-radius: 20px 20px 0 0; display: none; flex-direction: column; z-index: 2100; box-shadow: 0 -5px 15px rgba(0,0,0,0.3); animation: subir 0.3s ease; }
+        @keyframes subir { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .comentarios-header { padding: 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; color: #333; }
+        .comentarios-lista { flex: 1; overflow-y: auto; padding: 15px; list-style: none; text-align: left; width: 100%; }
+        .comentario-item { margin-bottom: 12px; font-size: 0.9rem; color: #333; padding-bottom: 8px; border-bottom: 1px dashed #eee; }
+        .comentarios-input-area { padding: 15px; border-top: 1px solid #eee; display: flex; flex-direction: column; gap: 8px; background: #f9f9f9; }
+        .input-comentario { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid #ddd; outline: none; }
+        .btn-enviar-comentario { background: var(--cor-destaque); color: white; border: none; padding: 10px; border-radius: 10px; font-weight: bold; }
+        :root { --cor-fundo: #F8F9FA; --cor-texto: #333333; --cor-destaque: #212d51; --cor-secundaria: #8E8E8E; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
+        body { background-color: var(--cor-fundo); color: var(--cor-texto); min-height: 100dvh; display: flex; flex-direction: column; }
+        .header-perfil { background-color: #fff; padding-bottom: 20px; border-bottom: 1px solid #dbdbdb; }
+        .banner { width: 100%; height: 180px; background-color: #e0e0e0; background-size: cover; background-position: center; display: block; }
+        .info-perfil { display: flex; flex-direction: column; align-items: center; margin-top: -50px; text-align: center; padding: 0 20px; }
+        .avatar { width: 100px; height: 100px; border-radius: 50%; border: 4px solid #fff; background-color: #ccc; object-fit: cover; margin-bottom: 10px; }
+        .estatisticas { display: flex; justify-content: center; gap: 30px; margin-bottom: 20px; }
+        .stat-item { display: flex; flex-direction: column; align-items: center; }
+        .stat-numero { font-weight: bold; font-size: 1.1rem; }
+        .stat-label { font-size: 0.8rem; color: var(--cor-secundaria); }
+        .btn-principal-festa { width: 90%; max-width: 300px; margin: 10px auto; display: block; padding: 15px; background-color: var(--cor-destaque); color: #ffffff; border: none; border-radius: 12px; font-size: 1rem; font-weight: bold; cursor: pointer; }
+        .galeria-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; padding: 8px; background-color: #f4f4f4; }
+        .post-container { position: relative; background: #fff; border-radius: 12px; overflow: hidden; }
+        .media-wrapper { position: relative; width: 100%; aspect-ratio: 9 / 16; background-color: #000; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .media-wrapper img { width: 100%; height: 100%; object-fit: contain; }
+        .interacoes-feed { position: absolute; bottom: 8px; right: 8px; background-color: rgba(0, 0, 0, 0.6); color: white; padding: 4px 10px; border-radius: 15px; font-size: 0.75rem; display: flex; align-items: center; gap: 8px; pointer-events: none; }
+        .camera-container { position: fixed; inset: 0; height: 100dvh; background-color: #000; z-index: 1000; display: none; overflow: hidden; }
+        .video-wrapper { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; }
+        #videoElement { width: 100%; height: 100%; object-fit: cover; }
+        #molduraOverlay { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; z-index: 2; }
+        .camera-header { position: absolute; top: 0; width: 100%; padding: 20px; z-index: 10; background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent); }
+        .camera-controles { position: absolute; bottom: 0; width: 100%; padding: 40px 20px; z-index: 10; background: linear-gradient(to top, rgba(0,0,0,0.6), transparent); display: flex; flex-direction: column; gap: 25px; }
+        .filtros { display: flex; gap: 10px; justify-content: center; }
+        .btn-filtro { background-color: rgba(255,255,255,0.2); color: #fff; border: 1px solid rgba(255,255,255,0.4); padding: 8px 15px; border-radius: 20px; backdrop-filter: blur(5px); }
+        .btn-filtro.ativo { background-color: var(--cor-destaque); border-color: var(--cor-destaque); }
+        .acoes-principais { display: flex; justify-content: space-around; align-items: center; }
+        .btn-acao-camera { background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; display: flex; flex-direction: column; align-items: center; width: 60px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .btn-acao-camera span { font-size: 0.65rem; color: #fff; margin-top: 4px; font-weight: bold; }
+        .btn-capturar-final { width: 75px; height: 75px; border-radius: 50%; background-color: #fff; border: 5px solid rgba(255,255,255,0.3); cursor: pointer; }
+        .modal-foto { position: fixed; inset: 0; background-color: rgba(0,0,0,0.95); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        .btn-fechar-modal { position: absolute; top: 25px; left: 20px; background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer; z-index: 2010; }
+        .img-expandida { max-width: 90%; max-height: 70dvh; object-fit: contain; border-radius: 8px; margin-bottom: 20px; }
+        .aviso-redirecionar { background: white; padding: 25px; border-radius: 20px; width: 85%; max-width: 400px; text-align: center; }
+        .btn-confirmar-sair { background-color: #25d366; color: white; border: none; padding: 12px 25px; border-radius: 10px; font-weight: bold; margin-top: 20px; width: 100%; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div id="sessaoFeed">
+    <header class="header-perfil">
+        <div class="banner"></div>
+        <div class="info-perfil">
+            <img src="" class="avatar" id="avatarEvento">
+            <h1 class="titulo-evento" id="nomeEvento">Carregando...</h1>
+            <p class="data-evento" id="dataEvento"></p>
+            <p class="descricao" id="descricaoEvento"></p>
+            <div class="estatisticas">
+                <div class="stat-item"><span class="stat-numero" id="totalFotos">0</span><span class="stat-label">Fotos</span></div>
+                <div class="stat-item"><span class="stat-numero" id="totalCurtidas">0</span><span class="stat-label">Curtidas</span></div>
+                <div class="stat-item"><span class="stat-numero" id="totalComentariosGeral">0</span><span class="stat-label">Comentários</span></div>
+            </div>
+            <button class="btn-principal-festa" id="btnAbrirCamera">📸 Adicionar Foto</button>
+        </div>
+    </header>
+    <main class="galeria-grid" id="feedGaleria"></main>
+</div>
+
+<div id="cameraContainer" class="camera-container">
+    <div class="camera-header">
+        <button id="btnFecharCamera" class="btn-fechar">❌ Voltar</button>
+    </div>
+    <div class="video-wrapper">
+        <video id="videoElement" autoplay playsinline></video>
+        <img id="molduraOverlay" src="" alt="Moldura">
+    </div>
+    <div class="camera-controles">
+        <div class="filtros">
+            <button id="btnFiltroNormal" class="btn-filtro ativo">Normal</button>
+            <button id="btnFiltroPB" class="btn-filtro">P&B</button>
+        </div>
+        <div class="acoes-principais">
+            <button id="btnUploadFoto" class="btn-acao-camera">🖼️<span>Galeria</span></button>
+            <input type="file" id="inputUploadArquivo" accept="image/*" style="display: none;">
+            <button id="btnFlash" class="btn-acao-camera">⚡<span>Flash OFF</span></button>
+            <button id="btnCapturarFinal" class="btn-capturar-final"></button>
+            <button id="btnVideoLink" class="btn-acao-camera" style="color: #FFD700;">🎬<span>Vídeo</span></button>
+            <button id="btnInverterCamera" class="btn-acao-camera">🔄<span>Inverter</span></button>
+        </div>
+    </div>
+</div>
+
+<div id="modalFoto" class="modal-foto">
+    <button onclick="window.fecharModal()" class="btn-fechar-modal">❌ Voltar</button>
+    <img id="imgModalExpandida" class="img-expandida" src="">
+    <div class="modal-acoes">
+        <button id="btnModalCurtir" class="btn-acao-modal" style="background-color:#333; color:white; padding:12px 20px; border-radius:25px; border:none; font-weight:bold;">❤️ <span id="contadorModalCurtidas">0</span></button>
+        <button id="btnAbrirComentarios" class="btn-acao-modal" style="background-color:#333; color:white; padding:12px 20px; border-radius:25px; border:none; font-weight:bold;">💬 <span id="contadorModalComentarios">0</span></button>
+        <a id="btnModalBaixar" class="btn-acao-modal" href="#" style="text-decoration:none; background-color:#333; color:white; padding:12px 20px; border-radius:25px; font-weight:bold;">⬇️ Baixar</a>
+        <button id="btnModalDeletar" class="btn-acao-modal" style="background-color:#333; color:white; padding:12px 20px; border-radius:25px; border:none; font-weight:bold;">🗑️</button>
+    </div>
+    <div id="abaComentarios" class="aba-comentarios">
+        <div class="comentarios-header">
+            <strong>Comentários</strong>
+            <button onclick="document.getElementById('abaComentarios').style.display='none'" style="border:none; background:none; font-size:1.2rem;">✖️</button>
+        </div>
+        <ul id="listaComentarios" class="comentarios-lista"></ul>
+        <div class="comentarios-input-area">
+            <input type="text" id="inputNomeComentario" class="input-comentario" placeholder="Seu Nome">
+            <input type="text" id="inputTextoComentario" class="input-comentario" placeholder="Escreva uma mensagem...">
+            <button id="btnEnviarComentario" class="btn-enviar-comentario">Publicar</button>
+        </div>
+    </div>
+</div>
+
+<div id="modalEstudio" class="modal-foto" style="z-index: 3000;">
+    <h3 style="color: white; margin-bottom: 15px;">Ajuste sua foto</h3>
+    <div style="width: 90%; max-width: 380px; aspect-ratio: 9 / 16; background-color: #000; overflow: hidden; border-radius: 12px; position: relative;">
+        <img id="imagemParaCortar" src="" style="display: block; max-width: 100%;">
+        <img id="molduraEstudio" src="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; z-index: 3010;">
+    </div>
+    <div class="modal-acoes" style="margin-top: 20px;">
+        <button id="btnCancelarCorte" style="background-color:#ff4444; color:white; padding:12px 25px; border-radius:25px; border:none; font-weight:bold;">❌</button>
+        <button id="btnConfirmarCorte" style="background-color:var(--cor-destaque); color:white; padding:12px 25px; border-radius:25px; border:none; font-weight:bold;">✅ Enviar</button>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc, increment, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAtNXDsbUbcE0v3Mog0UdXEWuXWtHFFKsM",
+        authDomain: "insta-momentos-by-carol.firebaseapp.com",
+        projectId: "insta-momentos-by-carol",
+        storageBucket: "insta-momentos-by-carol.firebasestorage.app",
+        messagingSenderId: "305461265991",
+        appId: "1:305461265991:web:fd0e2755224057cf535362"
+    };
+    
+    const IMGBB_API_KEY = "b72af0187ed2187cf43d6bdf9bc8c779";
+    const EVENTO_ID = "casamento_carol_rafael"; 
+    const LINK_VIDEO_EXTERNO = "https://byfestacomacarol.com.br/filtro-casamento-carolerafael";
+
+    try {
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const videoElement = document.getElementById('videoElement');
+        const cameraContainer = document.getElementById('cameraContainer');
+        const molduraOverlay = document.getElementById('molduraOverlay');
+        let stream = null;
+        let usandoCameraFrontal = false;
+        let cropper = null;
+
+        document.getElementById('btnAbrirCamera').onclick = async () => {
+            document.getElementById('sessaoFeed').style.display = 'none';
+            cameraContainer.style.display = 'block';
+            const modo = usandoCameraFrontal ? "user" : "environment";
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: modo } });
+                videoElement.srcObject = stream;
+            } catch (err) { alert("Erro ao abrir câmera"); fecharInterface(); }
+        };
+
+        function fecharInterface() {
+            if (stream) stream.getTracks().forEach(t => t.stop());
+            cameraContainer.style.display = 'none';
+            document.getElementById('sessaoFeed').style.display = 'block';
+        }
+
+        document.getElementById('btnFecharCamera').onclick = fecharInterface;
+        
+        document.getElementById('btnInverterCamera').onclick = () => { 
+            usandoCameraFrontal = !usandoCameraFrontal; 
+            fecharInterface(); 
+            document.getElementById('btnAbrirCamera').click(); 
+        };
+
+        document.getElementById('btnFiltroNormal').onclick = () => {
+            videoElement.style.filter = "none";
+            document.getElementById('btnFiltroNormal').classList.add('ativo');
+            document.getElementById('btnFiltroPB').classList.remove('ativo');
+        };
+        
+        document.getElementById('btnFiltroPB').onclick = () => {
+            videoElement.style.filter = "grayscale(100%)";
+            document.getElementById('btnFiltroPB').classList.add('ativo');
+            document.getElementById('btnFiltroNormal').classList.remove('ativo');
+        };
+
+        onSnapshot(doc(db, "configuracoes", EVENTO_ID), (d) => {
+            if (d.exists()) {
+                const data = d.data();
+                document.getElementById('nomeEvento').textContent = data.nome || "";
+                document.getElementById('dataEvento').textContent = data.data || "";
+                document.getElementById('descricaoEvento').textContent = data.texto || "";
+                if (data.url_avatar) document.getElementById('avatarEvento').src = data.url_avatar;
+                if (data.url_banner) document.querySelector('.banner').style.backgroundImage = "url('" + data.url_banner + "')";
+                
+                // =========================================================
+                // CORREÇÃO CIRÚRGICA: DESTRAVAR CORS DO GITHUB
+                // =========================================================
+                if (data.url_moldura) {
+                    let urlSegura = data.url_moldura;
+                    if (urlSegura.includes("github.com") && urlSegura.includes("/blob/")) {
+                        urlSegura = urlSegura.replace("github.com", "raw.githubusercontent.com").replace("/blob/", "/").split("?")[0];
+                    }
+                    molduraOverlay.crossOrigin = "anonymous";
+                    molduraOverlay.src = urlSegura;
+                    
+                    const molduraEstudio = document.getElementById('molduraEstudio');
+                    if (molduraEstudio) {
+                        molduraEstudio.crossOrigin = "anonymous";
+                        molduraEstudio.src = urlSegura;
+                    }
+                }
+            } else {
+                alert("🚨 ALERTA: O Sistema não encontrou a pasta '" + EVENTO_ID + "' em 'configuracoes'. Verifique o Firebase!");
+                console.error("Documento configuracoes/" + EVENTO_ID + " não existe!");
+            }
+        });
+
+        onSnapshot(query(collection(db, "eventos/" + EVENTO_ID + "/postagens"), orderBy("data_envio", "desc")), (snap) => {
+            const feed = document.getElementById('feedGaleria');
+            feed.innerHTML = "";
+            let totalC = 0, totalComent = 0;
+
+            snap.forEach(docSnap => {
+                const p = docSnap.data();
+                totalC += (p.curtidas || 0);
+                totalComent += (p.total_comentarios || 0);
+                const card = document.createElement('div');
+                card.className = 'post-container';
+                card.innerHTML = '<div class="media-wrapper" style="cursor: pointer;" onclick="window.abrirModal(\'' + p.url_imagem + '\', \'' + docSnap.id + '\', ' + (p.curtidas || 0) + ')">' +
+                    '<img src="' + p.url_imagem + '">' +
+                    '<div class="interacoes-feed">' +
+                    '<span>❤️ ' + (p.curtidas || 0) + '</span><span>💬 ' + (p.total_comentarios || 0) + '</span>' +
+                    '</div></div>';
+                feed.appendChild(card);
+            });
+
+            document.getElementById('totalFotos').textContent = snap.size;
+            document.getElementById('totalCurtidas').textContent = totalC;
+            document.getElementById('totalComentariosGeral').textContent = totalComent;
+        });
+
+        window.abrirModal = (url, id, curtidas) => {
+            document.getElementById('imgModalExpandida').src = url;
+            document.getElementById('contadorModalCurtidas').textContent = curtidas;
+            const aba = document.getElementById('abaComentarios');
+            aba.style.display = 'none';
+
+            const lista = document.getElementById('listaComentarios');
+            const inputNome = document.getElementById('inputNomeComentario');
+            const inputTexto = document.getElementById('inputTextoComentario');
+
+            if (localStorage.getItem('nomeConvidado')) inputNome.value = localStorage.getItem('nomeConvidado');
+
+            onSnapshot(query(collection(db, "eventos/" + EVENTO_ID + "/postagens/" + id + "/comentarios"), orderBy("data_envio", "asc")), (snap) => {
+                lista.innerHTML = "";
+                document.getElementById('contadorModalComentarios').textContent = snap.size;
+                snap.forEach(docSnap => {
+                    const c = docSnap.data();
+                    const li = document.createElement('li');
+                    li.className = 'comentario-item';
+                    li.innerHTML = '<strong style="color:var(--cor-destaque)">' + c.nome + ':</strong> ' + c.texto;
+                    lista.appendChild(li);
+                });
+                lista.scrollTop = lista.scrollHeight;
+            });
+
+            document.getElementById('btnAbrirComentarios').onclick = () => { aba.style.display = aba.style.display === 'none' ? 'flex' : 'none'; };
+
+            document.getElementById('btnEnviarComentario').onclick = async () => {
+                if (!inputNome.value.trim() || !inputTexto.value.trim()) return alert("Preencha nome e mensagem!");
+                const nomeConvidado = inputNome.value.trim();
+                const textoComentario = inputTexto.value.trim();
+                localStorage.setItem('nomeConvidado', nomeConvidado);
+                
+                await addDoc(collection(db, "eventos/" + EVENTO_ID + "/postagens/" + id + "/comentarios"), { nome: nomeConvidado, texto: textoComentario, data_envio: serverTimestamp() });
+                await updateDoc(doc(db, "eventos/" + EVENTO_ID + "/postagens", id), { total_comentarios: increment(1) });
+                inputTexto.value = ""; 
+            };
+
+            const btnBaixar = document.getElementById('btnModalBaixar');
+            btnBaixar.onclick = async (e) => {
+                e.preventDefault();
+                btnBaixar.textContent = "⏳ Processando...";
+                
+                try {
+                    const urlLimpa = url + "?nocache=" + new Date().getTime();
+                    const res = await fetch(urlLimpa);
+                    const blob = await res.blob();
+                    
+                    const link = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = link; 
+                    a.download = "Instamomentos_" + new Date().getTime() + ".jpg"; 
+                    document.body.appendChild(a); 
+                    a.click(); 
+                    
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(link);
+                    
+                    alert("sua foto foi baixada com sucesso, verifique sua galeria.");
+                    btnBaixar.innerHTML = "⬇️ Baixar";
+                    
+                } catch(err) { 
+                    alert("Para salvar, segure o dedo na foto e escolha 'Salvar na Galeria'.");
+                    window.open(url, '_blank'); 
+                    btnBaixar.innerHTML = "⬇️ Baixar";
+                }
+            };
+
+            document.getElementById('btnModalCurtir').onclick = (e) => { 
+                e.stopPropagation(); 
+                updateDoc(doc(db, "eventos/" + EVENTO_ID + "/postagens", id), { curtidas: increment(1) });
+                const contador = document.getElementById('contadorModalCurtidas');
+                contador.textContent = parseInt(contador.textContent) + 1;
+            };
+
+            document.getElementById('btnModalDeletar').onclick = (e) => { 
+                e.stopPropagation(); 
+                const senhaDigitada = prompt("Senha para excluir:");
+                if (senhaDigitada === "4321") {
+                    if(confirm("Deseja realmente apagar esta foto?")) { deleteDoc(doc(db, "eventos/" + EVENTO_ID + "/postagens", id)); window.fecharModal(); }
+                } else if (senhaDigitada !== null) { alert("Senha incorreta!"); }
+            };
+
+            document.getElementById('modalFoto').style.display = 'flex';
+        };
+
+        window.fecharModal = () => document.getElementById('modalFoto').style.display = 'none';
+
+        // =========================================================
+        // CORREÇÃO CIRÚRGICA: BLINDAGEM BOTÃO CAPTURA
+        // =========================================================
+        document.getElementById('btnCapturarFinal').onclick = async () => {
+            const btn = document.getElementById('btnCapturarFinal');
+            btn.disabled = true;
+            try {
+                const canvas = document.createElement('canvas');
+                canvas.width = 1080; canvas.height = 1920;
+                const ctx = canvas.getContext('2d');
+                if (document.getElementById('btnFiltroPB').classList.contains('ativo')) ctx.filter = 'grayscale(100%)';
+                if (usandoCameraFrontal) { ctx.translate(canvas.width, 0); ctx.scale(-1, 1); }
+                ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+                ctx.filter = 'none'; ctx.setTransform(1,0,0,1,0,0);
+                
+                if (molduraOverlay.complete && molduraOverlay.naturalWidth > 0) {
+                    ctx.drawImage(molduraOverlay, 0, 0, canvas.width, canvas.height);
+                }
+
+                const base64 = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
+                const form = new FormData(); form.append('image', base64);
+                const res = await fetch("https://api.imgbb.com/1/upload?key=" + IMGBB_API_KEY, { method: 'POST', body: form });
+                const imgData = await res.json();
+                if (imgData.success) {
+                   await addDoc(collection(db, "eventos/" + EVENTO_ID + "/postagens"), { url_imagem: imgData.data.url, curtidas: 0, data_envio: serverTimestamp() });
+                    fecharInterface();
+                }
+            } catch(e) {
+                alert("Aviso do Sistema: Erro ao enviar foto. " + e.message);
+            } finally {
+                btn.disabled = false;
+            }
+        };
+
+        const inputUploadArquivo = document.getElementById('inputUploadArquivo');
+        document.getElementById('btnUploadFoto').onclick = () => inputUploadArquivo.click();
+
+        inputUploadArquivo.onchange = (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+            if (cropper) { cropper.destroy(); cropper = null; }
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const imagem = document.getElementById('imagemParaCortar');
+                document.getElementById('modalEstudio').style.display = 'flex';
+                document.getElementById('molduraEstudio').src = molduraOverlay.src;
+                imagem.src = e.target.result;
+                imagem.onload = () => {
+                    setTimeout(() => {
+                        cropper = new Cropper(imagem, {
+                            aspectRatio: 9 / 16, viewMode: 1, dragMode: 'move', autoCropArea: 1, background: false, guides: false, center: false, highlight: false, cropBoxMovable: false, cropBoxResizable: false, toggleDragModeOnDblclick: false,
+                            ready() { this.cropper.setCropBoxData({ left: 0, top: 0, width: this.cropper.getContainerData().width, height: this.cropper.getContainerData().height }); }
+                        });
+                    }, 300); 
+                };
+            };
+            reader.readAsDataURL(file);
+        };
+
+        document.getElementById('btnCancelarCorte').onclick = () => {
+            document.getElementById('modalEstudio').style.display = 'none';
+            if (cropper) cropper.destroy();
+            inputUploadArquivo.value = "";
+        };
+
+        // =========================================================
+        // CORREÇÃO CIRÚRGICA: BLINDAGEM BOTÃO GALERIA (ENVIAR)
+        // =========================================================
+        document.getElementById('btnConfirmarCorte').onclick = async () => {
+            const btn = document.getElementById('btnConfirmarCorte');
+            const textoOriginal = btn.innerHTML;
+            btn.innerHTML = "⏳ Enviando...";
+            btn.disabled = true;
+            try {
+                const canvas = cropper.getCroppedCanvas({ width: 1080, height: 1920 });
+                const ctx = canvas.getContext('2d');
+                
+                if (molduraOverlay.complete && molduraOverlay.naturalWidth > 0) {
+                    ctx.drawImage(molduraOverlay, 0, 0, canvas.width, canvas.height);
+                }
+                
+                const base64 = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
+                const form = new FormData(); form.append('image', base64);
+                const res = await fetch("https://api.imgbb.com/1/upload?key=" + IMGBB_API_KEY, { method: 'POST', body: form });
+                const imgData = await res.json();
+                if (imgData.success) {
+                   await addDoc(collection(db, "eventos/" + EVENTO_ID + "/postagens"), { url_imagem: imgData.data.url, curtidas: 0, data_envio: serverTimestamp() }); 
+                    document.getElementById('modalEstudio').style.display = 'none'; 
+                    fecharInterface();
+                }
+            } catch(e) {
+                alert("Aviso do Sistema: Erro ao enviar foto da galeria. " + e.message);
+            } finally {
+                btn.innerHTML = textoOriginal;
+                btn.disabled = false;
+            }
+        };
+
+        window.avisarSaida = () => {
+            const modalAviso = document.createElement('div');
+            Object.assign(modalAviso.style, { position: "fixed", inset: "0", backgroundColor: "rgba(0,0,0,0.8)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: "9999" });
+            modalAviso.innerHTML = '<div class="aviso-redirecionar"><p style="font-weight:bold; font-size:1.2rem; margin-bottom:15px; color:#333;">🎬 Vídeo</p><p>Saindo para gerar o vídeo com moldura.</p><button class="btn-confirmar-sair" id="confirmarSair">Ir para o Filtro</button><button id="cancelarSair" style="background:none; border:none; color:#888; margin-top:15px; cursor:pointer;">Cancelar</button></div>';
+            document.body.appendChild(modalAviso);
+            document.getElementById('confirmarSair').onclick = () => { window.open(LINK_VIDEO_EXTERNO, "_blank"); modalAviso.remove(); };
+            document.getElementById('cancelarSair').onclick = () => modalAviso.remove();
+        };
+        document.getElementById('btnVideoLink').onclick = window.avisarSaida;
+
+        let flashAtivado = false;
+        document.getElementById('btnFlash').onclick = async () => {
+            if (!stream) return;
+            const track = stream.getVideoTracks()[0];
+            const btnFlash = document.getElementById('btnFlash');
+            try {
+                const capabilities = track.getCapabilities();
+                if (!capabilities.torch) { alert("Flash não suportado."); return; }
+                flashAtivado = !flashAtivado;
+                await track.applyConstraints({ advanced: [{ torch: flashAtivado }] });
+                btnFlash.style.color = flashAtivado ? "#FFD700" : "#fff";
+                btnFlash.querySelector('span').textContent = flashAtivado ? "Flash ON" : "Flash OFF";
+            } catch (err) { alert("Erro ao ativar flash."); }
+        };
+    } catch(erroGeral) {
+        console.error("Erro Crítico no Sistema:", erroGeral);
+        alert("Ocorreu um erro ao inicializar o sistema. Verifique a aba Console no Inspecionar Elemento.");
+    }
+</script>
+</body>
+</html>
