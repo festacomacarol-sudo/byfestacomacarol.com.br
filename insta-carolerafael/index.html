@@ -198,7 +198,7 @@
             document.getElementById('btnFiltroNormal').classList.remove('ativo');
         };
 
-        onSnapshot(doc(db, "configuracoes", EVENTO_ID), (d) => {
+        onSnapshot(doc(db, "configurações", EVENTO_ID), (d) => {
             if (d.exists()) {
                 const data = d.data();
                 document.getElementById('nomeEvento').textContent = data.nome || "";
