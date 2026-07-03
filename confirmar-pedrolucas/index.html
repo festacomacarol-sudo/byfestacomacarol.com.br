@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmar - Pedro Lucas 1 ano</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Montserrat:wght@400;700&family=Poppins:wght@400;700&family=Roboto:wght@400;700&family=Fredoka:wght@400;600&family=Great+Vibes&display=swap');
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Poppins', sans-serif; background-color: #fcf8f4; margin: 0 auto; max-width: 480px; min-height: 100dvh; display: flex; flex-direction: column; color: #333; }
+        .banner { width: 100%; aspect-ratio: 1080 / 500; object-fit: cover; display: block; }
+        .content { padding: 20px; flex: 1; }
+        .card { background: white; border-radius: 18px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.05); }
+        .btn-3d { display: block; width: 100%; text-align: center; padding: 16px; border-radius: 12px; text-decoration: none; font-weight: 700; border: none; cursor: pointer; transition: 0.2s; background: #7bd7fd; color: white; box-shadow: 0 4px 0 rgba(0,0,0,0.2); margin-bottom: 12px; }
+        .btn-3d:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0,0,0,0.2); }
+        .tabs { display: flex; background: #eee; border-radius: 12px; padding: 4px; margin-bottom: 15px; }
+        .tab { flex: 1; text-align: center; padding: 10px; border-radius: 10px; cursor: pointer; font-weight: 600; color: #777; }
+        .tab.active { background: white; color: #7bd7fd; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .form-section { display: none; } .form-section.active { display: block; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 10px; font-family: inherit; }
+        .admin-area { background: #f9f9f9; border-radius: 15px; padding: 15px; text-align: center; margin-top: 20px; border: 1px dashed #ccc; }
+        .list-hidden { display: none; text-align: left; margin-top: 15px; }
+        body.adm .list-hidden { display: block; } body.adm .login-box { display: none; }
+        .item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+        footer { padding: 30px; text-align: center; font-size: 0.8rem; color: #999; }
+    </style>
+</head>
+<body>
+    <img src="https://res.cloudinary.com/dtshawz5x/image/upload/v1782403870/minha-arte_3_c7dq8h.jpg" class="banner">
+    <div class="content">
+        <h1 style="text-align:center; color:#7bd7fd">Pedro Lucas 1 ano</h1>
+        <div class="card">
+            <p>📅 <b>27 de junho de 2026, Horário: às 15h </b></p>
+            <p>📍 MilMar Gelateria e Cafeteria em Salvador</p>
+            <a href="https://maps.app.goo.gl/HFHwpFUTUmKPLjcHA" target="_blank" class="btn-3d" style="background:#eee; color:#333; box-shadow: 0 4px 0 #ccc;">📍 Abrir Mapa</a>
+        </div>
+        
+        <div class="card">
+            <h3 style="margin-top:0; font-size: 1.1rem; color:#7bd7fd; text-align: center;">Mimos e Presentes</h3>
+            <p style="text-align: center; font-size: 0.9rem; color: #555; margin-bottom: 20px;">Sua presença é nosso maior presente!</p>
+            <a href="https://drive.google.com/file/d/1uVi2Y9VwHhCSCQxThkIe8PY9Fl4JqpEP/view?usp=sharing" target="_blank" class="btn-3d" style="background:#fff3e0; color:#e65100; box-shadow:0 4px 0 #ffe0b2">🎁 Lista de Presentes</a>
+            <button onclick="copyPix()" class="btn-3d" style="background:#e0f2f1; color:#00695c; box-shadow:0 4px 0 #b2dfdb">💰 Copiar Chave Pix</button>
+            <a href="https://crispoparte.com.br/slidepedrolucas" target="_blank" class="btn-3d" style="background:#e1f5fe; color:#0288d1; box-shadow:0 4px 0 #b3e5fc">📸 Galeria de Fotos</a>
+        </div>
+
+        <div class="card">
+            <div class="tabs">
+                <div class="tab active" id="tA" onclick="st('A')">Adulto</div>
+                <div class="tab" id="tK" onclick="st('K')">Criança</div>
+            </div>
+           <div id="fA" class="form-section active">
+                <h3 style="margin-top:0; font-size: 1.1rem; color:#7bd7fd; text-align: center;">Atenção:</h3>
+                <p style="text-align: center; font-size: 0.9rem; color: #555; margin-bottom: 20px;">Para garantir seu acesso ao evento, é indispensável confirmar sua presença informando o nome completo para o controle da portaria.</p>
+                <input type="text" id="nA" placeholder="Seu Nome Completo">
+                <button class="btn-3d" onclick="svA()">Confirmar Presença</button>
+            </div>
+            <div id="fK" class="form-section">
+                <h3 style="margin-top:0; font-size: 1.1rem; color:#7bd7fd; text-align: center;">Crianças até 12 anos</h3>
+                <p style="text-align: center; font-size: 0.9rem; color: #555; margin-bottom: 20px;">Para garantir a organização do evento, será considerado criança até os 12 anos. Acima preencher na lista de adulto.</p>
+                <input type="text" id="nK" placeholder="Nome da Criança - Idade">
+                <select id="rK"><option value="">Quem é o responsável?</option></select>
+                <button class="btn-3d" style="background:#f39c12; color:white;" onclick="svK()">Confirmar Criança</button>
+            </div>
+        </div>
+
+        <div class="admin-area">
+            <div class="login-box">
+                <p>🔐 Painel Administrativo</p>
+                <input type="password" id="pass" placeholder="Senha">
+                <button class="btn-3d" style="background:#333; color:white;" onclick="auth()">Ver Lista</button>
+            </div>
+            <div class="list-hidden">
+                <button class="btn-3d" style="background:#25D366; color:white;" onclick="copyL()">📋 Copiar para WhatsApp</button>
+                <div id="lA"></div><div id="lK"></div>
+            </div>
+        </div>
+    </div>
+    <footer>
+        🚀 Criado por Crispoparte | Status: <span id="st-db">Conectando...</span>
+    </footer>
+
+    <script type="module">
+       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyC-OpVyOWL3_AtoTom_18e6Ksmmi7lObY0",
+            authDomain: "formulario-tempo-real-carol.firebaseapp.com",
+            projectId: "formulario-tempo-real-carol",
+            storageBucket: "formulario-tempo-real-carol.firebasestorage.app",
+            messagingSenderId: "1081255456749",
+            appId: "1:1081255456749:web:6595d1fa31737e67b441e4"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const colA = collection(db, "festa-pedro_A");
+        const colK = collection(db, "festa-pedro_K");
+
+        window.svA = async () => {
+            const n = document.getElementById('nA').value; if(!n) return alert('Digite seu nome!');
+            try {
+                await addDoc(colA, { n, t: Date.now() }); document.getElementById('nA').value = ''; alert('Confirmado!');
+            } catch (e) { alert('Erro ao salvar no banco. Verifique as chaves.'); }
+        };
+        window.svK = async () => {
+            const n = document.getElementById('nK').value; const r = document.getElementById('rK').value;
+            if(!n || !r) return alert('Preencha tudo!');
+            try {
+                await addDoc(colK, { n, r, t: Date.now() }); document.getElementById('nK').value = ''; alert('Criança Confirmada!');
+            } catch (e) { alert('Erro ao salvar no banco.'); }
+        };
+
+        window.delA = async (id) => {
+            if(confirm('Remover este adulto da lista?')) {
+                await deleteDoc(doc(db, "festa-pedro_A", id));
+            }
+        };
+
+        window.delK = async (id) => {
+            if(confirm('Remover esta criança da lista?')) {
+                await deleteDoc(doc(db, "festa-pedro_K", id));
+            }
+        };
+
+        let ad = []; let ki = [];
+        onSnapshot(query(colA, orderBy("t")), (s) => {
+           document.getElementById('st-db').innerText = "🟢 Online";
+            const l = document.getElementById('lA'); const sel = document.getElementById('rK');
+            l.innerHTML = '<h4>Adultos (' + s.size + ')</h4>'; sel.innerHTML = '<option value="">Responsável...</option>';
+            ad = []; s.forEach(docSnap => { 
+                const x = docSnap.data(); ad.push(x.n);
+                l.innerHTML += `<div class="item"><span>${ad.length}. ${x.n}</span> <span style="cursor:pointer; color:red; font-size:1.1rem;" onclick="delA('${docSnap.id}')" title="Excluir">❌</span></div>`;
+                sel.innerHTML += `<option value="${x.n}">${x.n}</option>`;
+            });
+        }, (e) => { document.getElementById('st-db').innerText = "🔴 Erro de Conexão"; });
+
+        onSnapshot(query(colK, orderBy("t")), (s) => {
+            const l = document.getElementById('lK'); l.innerHTML = '<br><h4>Crianças (' + s.size + ')</h4>'; ki = [];
+            s.forEach(docSnap => { 
+                const x = docSnap.data(); ki.push(x.n + " (com " + x.r + ")"); 
+                l.innerHTML += `<div class="item"><span>${ki.length}. ${x.n} (com ${x.r})</span> <span style="cursor:pointer; color:red; font-size:1.1rem;" onclick="delK('${docSnap.id}')" title="Excluir">❌</span></div>`; 
+            });
+        });
+
+        window.copyL = () => {
+            const t = "*Lista Pedro Lucas 1 ano*\n\n*Adultos:*\n" + ad.join("\n") + "\n\n*Crianças:*\n" + ki.join("\n");
+            navigator.clipboard.writeText(t).then(()=>alert('Lista Copiada!'));
+        };
+    </script>
+    <script>
+        function st(t){
+            document.getElementById('fA').classList.toggle('active', t==='A');
+            document.getElementById('fK').classList.toggle('active', t==='K');
+            document.getElementById('tA').classList.toggle('active', t==='A');
+            document.getElementById('tK').classList.toggle('active', t==='K');
+        }
+        function auth(){ if(document.getElementById('pass').value === '1234') document.body.classList.add('adm'); else alert('Senha Incorreta!'); }
+        function copyPix(){ navigator.clipboard.writeText('71993233142').then(()=>alert('Pix Copiado!')); }
+    </script>
+</body>
+</html>
