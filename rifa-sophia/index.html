@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Chá Rifa Digital </title>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background: #e2e8f0; display: flex; justify-content: center; align-items: center; min-height: 100dvh; margin: 0; color: #f8fafc; }
+        #app-frame {
+    width:100%;
+    height:100dvh;
+
+    position:relative;
+
+    overflow:hidden;
+
+    background:#efefef;
+}
+        
+        .page { width: 100%; height: 100%; display: none; overflow-y: auto; overflow-x: hidden; position: absolute; top: 0; left: 0; }
+        .page.active { display: block; }
+        .page:not(#p1) { background-color: #0f172a; }
+        
+        /* Box P1 - Impede vazamentos (overflow hidden) e centraliza a arte */
+       #p1{
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    width:100%;
+
+    height:100dvh;
+
+    background:#efefef;
+
+    overflow:hidden;
+}
+        
+        /* A Caixa que prende a arte e os botões juntos na exata proporção 9:16 */
+      .capa-aspect-box{
+
+    position:relative;
+
+    aspect-ratio:9/16;
+
+    width:min(100vw,56.25vh);
+
+    height:auto;
+
+    max-height:100dvh;
+
+    background-size:contain;
+
+    background-repeat:no-repeat;
+
+    background-position:center;
+
+    background-color:white;
+
+}
+        
+        /* Botões posicionados absolutamente DENTRO da arte, nunca vazam */
+        .btn-audio{
+
+    position:absolute;
+
+    left:5%;
+
+    bottom:5%;
+
+    width:52px;
+
+    height:52px;
+
+    border-radius:50%;
+
+    border:none;
+
+    background:rgba(0,0,0,.28);
+
+    color:white;
+
+    font-size:22px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    backdrop-filter:blur(6px);
+
+}
+        .btn-proximo{
+
+    position:absolute;
+
+    right:5%;
+
+    bottom:5%;
+
+    padding:15px 32px;
+
+    border-radius:40px;
+
+    border:none;
+
+    background:#2f80ed;
+
+    color:white;
+
+    font-size:16px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    box-shadow:0 10px 25px rgba(0,0,0,.18);
+
+}
+        
+        #p2 { padding: 20px; }
+        .grid-header { margin-bottom: 20px; text-align: center; }
+        .grid-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; max-width: 500px; margin: 0 auto; padding-bottom: 40px; }
+        .num-box { aspect-ratio: 1; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #000; cursor: pointer; font-size: 14px; transition: transform 0.1s; }
+        .num-box:active { transform: scale(0.9); }
+        
+        .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100dvh; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
+        .modal-content { background: #1e293b; padding: 25px; border-radius: 12px; width: 100%; max-width: 380px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+        .modal-content input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #475569; background: #0f172a; color: white; border-radius: 6px; }
+        .modal-btn { background: #10b981; color: white; border: none; padding: 12px; width:100%; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        
+        .admin-auth { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .admin-dashboard { max-width: 600px; margin: 0 auto; display: none; padding: 20px; }
+        .lista-pedidos { background: #1e293b; border-radius: 8px; padding: 15px; margin-top: 20px; }
+        .pedido-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #334155; font-size: 14px; }
+        .btn-adm-status { padding: 6px 12px; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: bold; }
+        .btn-sortear { background: #6366f1; color: white; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; border: none; cursor: pointer; font-size: 18px; margin-top: 30px; }
+        .sorteio-roleta { font-size: 48px; font-weight: 900; color: #ff4757; text-align: center; margin: 20px 0; min-height: 60px; }
+        
+        .sucesso-box { padding: 20px; text-align: center; padding-top: 50px; }
+        .btn-whatsapp { display:inline-block; background:#25D366; color:white; padding:15px 25px; border-radius:8px; text-decoration:none; font-weight:bold; }
+        
+        .legendas{
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            gap:18px;
+            flex-wrap:wrap;
+            margin:0 0 20px;
+        }
+
+        .leg-item{
+            display:flex;
+            align-items:center;
+            gap:6px;
+            color:#cbd5e1;
+            font-size:13px;
+            font-weight:500;
+        }
+
+        .leg-cor{
+            width:14px;
+            height:14px;
+            border-radius:4px;
+            border:1px solid rgba(255,255,255,.25);
+            flex-shrink:0;
+        }
+    </style>
+</head>
+<body>
+    <audio id="bg-audio" loop src="audio.mp3" playsinline></audio>
+    <div id="app-frame">
+        <div class="page active" id="p1">
+            <div class="capa-aspect-box" style="background-image: url('https://res.cloudinary.com/dtshawz5x/image/upload/v1782567689/capa_xjg87w.gif');">
+                <button class="btn-audio" onclick="toggleAudio()">🔊</button>
+                <button class="btn-proximo" onclick="irPara(2)">Participar ➔</button>
+            </div>
+        </div>
+        <div class="page" id="p2">
+            <div class="grid-header">
+                <h1 style="color: #fff; font-size: 24px; margin-bottom: 5px;">Chá Rifa Digital </h1>
+                <p style="color: #cbd5e1; margin-bottom: 15px; font-size: 14px;">Participe e concorra ao prémio de R$ 200,00</p>
+                
+                <div class="legendas">
+                    <div class="leg-item">
+                        <span class="leg-cor" style="background:#cbd5e1"></span>
+                        <span>Livre</span>
+                    </div>
+                    <div class="leg-item">
+                        <span class="leg-cor" style="background:#f59e0b"></span>
+                        <span>Reservado</span>
+                    </div>
+                    <div class="leg-item">
+                        <span class="leg-cor" style="background:#10b981"></span>
+                        <span>Pago</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-container" id="container-numbers"></div>
+        </div>
+
+        <div class="page" id="p3">
+            <div class="sucesso-box">
+                <h1 style="color:#10b981;">Reserva Confirmada!</h1>
+                <div id="sucesso-detalhes" style="font-weight:bold; font-size:18px; margin:20px 0; color:#f59e0b;"></div>
+                <a href="#" id="lnk-whatsapp" target="_blank" class="btn-whatsapp">Enviar Comprovante via WhatsApp</a>
+            </div>
+        </div>
+        <div class="page" id="p4">
+            <div class="admin-auth" id="adm-login-box">
+                <h2>Acesso Restrito - Admin</h2>
+                <input type="password" id="adm-pass" placeholder="Introduza a Senha" style="width:100%; padding:12px; margin:15px 0; background:#1e293b; color:white; border:1px solid #475569; border-radius:6px;">
+                <button class="modal-btn" onclick="autenticarAdmin()">Entrar no Painel</button>
+            </div>
+            <div class="admin-dashboard" id="adm-dash-box">
+                <h2>Painel de Gestão da Rifa</h2>
+                <button class="btn-sortear" onclick="realizarSorteio()">🎲 REALIZAR SORTEIO ALEATÓRIO</button>
+                <div class="sorteio-roleta" id="roleta-num">...</div>
+                <div class="lista-pedidos" id="adm-pedidos-lista"></div>
+            </div>
+        </div>
+        <div class="modal" id="modal-cadastro">
+            <div class="modal-content">
+                <h3>Reservar Número <span id="modal-num-display">0</span></h3>
+                <input type="text" id="user-nome" placeholder="Nome Completo">
+                <input type="text" id="user-tel" placeholder="Telefone">
+                <button class="modal-btn" onclick="confirmarReserva()">Confirmar Escolha</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        const idCliente = "sophia";
+        const refPath = 'rifa_numeros/' + idCliente + '/';
+        const fbConfig = { apiKey: " API Key:AIzaSyDK0-thqvvPURl7fMCzUdJNmzVnw5A_phU", databaseURL: "https://gerador-rifa-digital-carol-default-rtdb.firebaseio.com/", projectId: "gerador-rifa-digital-carol" };
+        const qtdTotal = parseInt("50");
+        const whatsappAdmin = "5511958042920";
+        const senhaMaster = "1234";
+        let numeroSelecionadoAtual = null;
+        let localDB = {};
+        if(fbConfig.apiKey && fbConfig.databaseURL) { firebase.initializeApp(fbConfig); var database = firebase.database(); }
+        function irPara(idPagina) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById('p' + idPagina).classList.add('active'); if(idPagina === 2) renderizarGrid(); }
+        function toggleAudio() { const audio = document.getElementById('bg-audio'); if (audio.paused) { audio.play(); document.querySelector('.btn-audio').innerText = "🔊"; } else { audio.pause(); document.querySelector('.btn-audio').innerText = "🔇"; } }
+        if(database) { database.ref(refPath).on('value', (snapshot) => { localDB = snapshot.val() || {}; if(document.getElementById('p2').classList.contains('active')) renderizarGrid(); if(document.getElementById('adm-dash-box').style.display === 'block') atualizarDashboardAdmin(); }); }
+        function renderizarGrid() { const container = document.getElementById('container-numbers'); container.innerHTML = ''; for(let i = 1; i <= qtdTotal; i++) { const box = document.createElement('div'); box.className = 'num-box'; box.innerText = i; const dadosNum = localDB[i] || { status: 'disponivel' }; if(dadosNum.status === 'pago') { box.style.background = '#10b981'; box.style.color = '#fff'; } else if(dadosNum.status === 'reservado') { box.style.background = '#f59e0b'; box.style.color = '#fff'; } else { box.style.background = '#cbd5e1'; } box.onclick = () => clicarNumero(i, dadosNum.status); container.appendChild(box); } }
+        function clicarNumero(num, status) { if(status !== 'disponivel') { alert('Este número já se encontra ocupado!'); return; } numeroSelecionadoAtual = num; document.getElementById('modal-num-display').innerText = num; document.getElementById('modal-cadastro').style.display = 'flex'; }
+        function confirmarReserva() { const nome = document.getElementById('user-nome').value.trim(); const tel = document.getElementById('user-tel').value.trim(); if(!nome || !tel) { alert('Preencha todos os campos!'); return; } if(database) { database.ref(refPath + numeroSelecionadoAtual).set({ status: 'reservado', nome: nome, telefone: tel }).then(() => { document.getElementById('modal-cadastro').style.display = 'none'; document.getElementById('sucesso-detalhes').innerText = "Número: " + numeroSelecionadoAtual + " | Nome: " + nome; const txtZap = "Olá Administrador, escolhi o número " + numeroSelecionadoAtual + " (" + nome + "). Segue o comprovante de pagamento em anexo."; document.getElementById('lnk-whatsapp').href = "https://api.whatsapp.com/send?phone=" + whatsappAdmin + "&text=" + encodeURIComponent(txtZap); irPara(3); }); } }
+        function autenticarAdmin() { const pass = document.getElementById('adm-pass').value; if(pass === senhaMaster) { document.getElementById('adm-login-box').style.display = 'none'; document.getElementById('adm-dash-box').style.display = 'block'; atualizarDashboardAdmin(); } else { alert('Senha Incorreta!'); } }
+        function atualizarDashboardAdmin() { const container = document.getElementById('adm-pedidos-lista'); container.innerHTML = ''; let temPedidos = false; for(let i = 1; i <= qtdTotal; i++) { if(localDB[i] && localDB[i].status !== 'disponivel') { temPedidos = true; const item = localDB[i]; const row = document.createElement('div'); row.className = 'pedido-row'; row.innerHTML = "<div><strong>#" + i + "</strong> - " + item.nome + " (" + item.telefone + ") [" + item.status.toUpperCase() + "]</div>"; const btnStatus = document.createElement('button'); btnStatus.className = 'btn-adm-status'; if(item.status === 'reservado') { btnStatus.innerText = "Confirmar Pago"; btnStatus.style.background = '#10b981'; btnStatus.style.color = '#fff'; btnStatus.onclick = () => alterarStatusNumero(i, 'pago'); } else { btnStatus.innerText = "Liberar Número"; btnStatus.style.background = '#ef4444'; btnStatus.style.color = '#fff'; btnStatus.onclick = () => alterarStatusNumero(i, 'disponivel'); } row.appendChild(btnStatus); container.appendChild(row); } } if(!temPedidos) container.innerHTML = '<p style="color:#94a3b8; font-size:14px;">Nenhuma reserva efetuada até ao momento.</p>'; }
+        function alterarStatusNumero(num, novoStatus) { if(database) { if(novoStatus === 'disponivel') { database.ref(refPath + num).remove(); } else { database.ref(refPath + num + '/status').set(novoStatus); } } }
+        function realizarSorteio() { let pagos = []; for(let i = 1; i <= qtdTotal; i++) { if(localDB[i] && localDB[i].status === 'pago') { pagos.push({ numero: i, nome: localDB[i].nome }); } } if(pagos.length === 0) { alert('Não existem números com status PAGO para realizar o sorteio!'); return; } let duracaoAnimacao = 3000; let intervaloRoleta = setInterval(() => { let numeroAleatorioSimulado = Math.floor(Math.random() * qtdTotal) + 1; document.getElementById('roleta-num').innerText = "#" + numeroAleatorioSimulado; }, 70); setTimeout(() => { clearInterval(intervaloRoleta); let sorteado = pagos[Math.floor(Math.random() * pagos.length)]; document.getElementById('roleta-num').innerHTML = "<span style='color:#10b981;'>Vencedor: #" + sorteado.numero + "</span><br><span style='font-size:20px; color:white;'>" + sorteado.nome + "</span>"; }, duracaoAnimacao); }
+        if(window.location.hash === '#admin') irPara(4);
+    </script>
+</body>
+</html>
