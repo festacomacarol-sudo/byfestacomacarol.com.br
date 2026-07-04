@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Insta momentos - Festa com a Carol</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
+    <style>
+        .aba-comentarios { position: absolute; bottom: 0; width: 100%; height: 55%; background: #fff; border-radius: 20px 20px 0 0; display: none; flex-direction: column; z-index: 2100; box-shadow: 0 -5px 15px rgba(0,0,0,0.3); animation: subir 0.3s ease; }
+        @keyframes subir { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .comentarios-header { padding: 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; color: #333; }
+        .comentarios-lista { flex: 1; overflow-y: auto; padding: 15px; list-style: none; text-align: left; width: 100%; }
+        .comentario-item { margin-bottom: 12px; font-size: 0.9rem; color: #333; padding-bottom: 8px; border-bottom: 1px dashed #eee; }
+        .comentarios-input-area { padding: 15px; border-top: 1px solid #eee; display: flex; flex-direction: column; gap: 8px; background: #f9f9f9; }
+        .input-comentario { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid #ddd; outline: none; }
+        .btn-enviar-comentario { background: var(--cor-destaque); color: white; border: none; padding: 10px; border-radius: 10px; font-weight: bold; }
+        :root { --cor-fundo: #F8F9FA; --cor-texto: #333333; --cor-destaque: #f38743; --cor-secundaria: #8E8E8E; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
+        body { background-color: var(--cor-fundo); color: var(--cor-texto); min-height: 100dvh; display: flex; flex-direction: column; }
+        .header-perfil { background-color: #fff; padding-bottom: 20px; border-bottom: 1px solid #dbdbdb; }
+        .banner { width: 100%; height: 180px; background-color: #e0e0e0; background-size: cover; background-position: center; display: block; }
+        .info-perfil { display: flex; flex-direction: column; align-items: center; margin-top: -50px; text-align: center; padding: 0 20px; }
+        .avatar { width: 100px; height: 100px; border-radius: 50%; border: 4px solid #fff; background-color: #ccc; object-fit: cover; margin-bottom: 10px; }
+        .titulo-evento { color: var(--cor-destaque); }
+        .estatisticas { display: flex; justify-content: center; gap: 30px; margin-bottom: 20px; }
+        .stat-item { display: flex; flex-direction: column; align-items: center; }
+        .stat-numero { font-weight: bold; font-size: 1.1rem; }
+        .stat-label { font-size: 0.8rem; color: var(--cor-secundaria); }
+        .botoes-principais { display: flex; gap: 10px; justify-content: center; width: 90%; max-width: 340px; margin: 10px auto 0; }
+        .btn-principal-festa { flex: 1; padding: 11px 8px; background-color: var(--cor-destaque); color: #ffffff; border: none; border-radius: 12px; font-size: 0.85rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .btn-secundario-festa { flex: 1; padding: 11px 8px; background-color: #ffffff; color: var(--cor-destaque); border: 1.5px solid var(--cor-destaque); border-radius: 12px; font-size: 0.85rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .galeria-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; padding: 8px; background-color: #f4f4f4; }
+        .post-container { position: relative; background: #fff; border-radius: 12px; overflow: hidden; }
+        .media-wrapper { position: relative; width: 100%; aspect-ratio: 9 / 16; background-color: #000; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .media-wrapper img { width: 100%; height: 100%; object-fit: contain; }
+        .interacoes-feed { position: absolute; bottom: 8px; right: 8px; background-color: rgba(0, 0, 0, 0.6); color: white; padding: 4px 10px; border-radius: 15px; font-size: 0.75rem; display: flex; align-items: center; gap: 8px; pointer-events: none; }
+        .camera-container { position: fixed; inset: 0; height: 100dvh; background-color: #000; z-index: 1000; display: none; overflow: hidden; }
+        .video-wrapper { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; }
+        #videoElement { width: 100%; height: 100%; object-fit: cover; }
+        #molduraOverlay { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; z-index: 2; }
+        .camera-header { position: absolute; top: 0; width: 100%; padding: 20px; z-index: 10; background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent); }
+        .camera-controles { position: absolute; bottom: 0; width: 100%; padding: 40px 20px; z-index: 10; background: linear-gradient(to top, rgba(0,0,0,0.6), transparent); display: flex; flex-direction: column; gap: 25px; }
+        .filtros { display: flex; gap: 10px; justify-content: center; }
+        .btn-filtro { background-color: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.5); padding: 7px 18px; border-radius: 20px; backdrop-filter: blur(5px); font-size: 0.8rem; font-weight: 500; }
+        .btn-filtro.ativo { background-color: #fff; color: #111; border-color: #fff; font-weight: bold; }
+        .acoes-principais { display: flex; justify-content: space-around; align-items: center; }
+        .btn-acao-camera { background: none; border: none; color: #fff; cursor: pointer; display: flex; flex-direction: column; align-items: center; width: 60px; }
+        .btn-acao-camera svg { width: 24px; height: 24px; stroke: #fff; }
+        .btn-acao-camera span { font-size: 0.65rem; color: #fff; margin-top: 4px; font-weight: 500; }
+        .btn-capturar-final { width: 75px; height: 75px; border-radius: 50%; background-color: #fff; border: 5px solid rgba(255,255,255,0.3); cursor: pointer; }
+        .modal-foto { position: fixed; inset: 0; background-color: rgba(0,0,0,0.95); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        .btn-fechar-modal { position: absolute; top: 25px; left: 20px; background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer; z-index: 2010; }
+        .img-expandida { max-width: 90%; max-height: 70dvh; object-fit: contain; border-radius: 8px; margin-bottom: 20px; }
+        .aviso-redirecionar { background: white; padding: 25px; border-radius: 20px; width: 85%; max-width: 400px; text-align: center; }
+        .btn-confirmar-sair { background-color: #25d366; color: white; border: none; padding: 12px 25px; border-radius: 10px; font-weight: bold; margin-top: 20px; width: 100%; cursor: pointer; }
+        .modal-acoes { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+        .btn-toggle-moldura { margin-top: 15px; background-color: #333; color: white; padding: 10px 20px; border-radius: 20px; border: none; font-weight: bold; cursor: pointer; }
+        .btn-toggle-moldura.desativada { background-color: #777; }
+    </style>
+</head>
+<body>
+
+<div id="sessaoFeed">
+    <header class="header-perfil">
+        <div class="banner"></div>
+        <div class="info-perfil">
+            <img src="" class="avatar" id="avatarEvento">
+            <h1 class="titulo-evento" id="nomeEvento">Carregando...</h1>
+            <p class="data-evento" id="dataEvento"></p>
+            <p class="descricao" id="descricaoEvento"></p>
+            <div class="estatisticas">
+                <div class="stat-item"><span class="stat-numero" id="totalFotos">0</span><span class="stat-label">Fotos</span></div>
+                <div class="stat-item"><span class="stat-numero" id="totalCurtidas">0</span><span class="stat-label">Curtidas</span></div>
+                <div class="stat-item"><span class="stat-numero" id="totalComentariosGeral">0</span><span class="stat-label">Comentários</span></div>
+            </div>
+            <div class="botoes-principais">
+                <button class="btn-principal-festa" id="btnAbrirCamera">Tire sua Foto</button>
+                <button class="btn-secundario-festa" id="btnAbrirGaleriaDireto">Adicionar da Galeria</button>
+                <input type="file" id="inputUploadArquivoDireto" accept="image/*" style="display: none;">
+            </div>
+        </div>
+    </header>
+    <main class="galeria-grid" id="feedGaleria"></main>
+</div>
+
+<div id="cameraContainer" class="camera-container">
+    <div class="camera-header">
+        <button id="btnFecharCamera" class="btn-fechar" style="background:none;border:none;color:#fff;display:flex;align-items:center;gap:6px;font-weight:500;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            Voltar
+        </button>
+    </div>
+    <div class="video-wrapper">
+        <video id="videoElement" autoplay playsinline></video>
+        <img id="molduraOverlay" src="" alt="Moldura">
+    </div>
+    <div class="camera-controles">
+        <div class="filtros">
+            <button id="btnFiltroNormal" class="btn-filtro ativo">Normal</button>
+            <button id="btnFiltroPB" class="btn-filtro">P&B</button>
+        </div>
+        <div class="acoes-principais">
+            <button id="btnUploadFoto" class="btn-acao-camera">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                <span>Galeria</span>
+            </button>
+            <input type="file" id="inputUploadArquivo" accept="image/*" style="display: none;">
+            <button id="btnFlash" class="btn-acao-camera">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                <span>Flash OFF</span>
+            </button>
+            <button id="btnCapturarFinal" class="btn-capturar-final"></button>
+            <button id="btnInverterCamera" class="btn-acao-camera">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                <span>Inverter</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="modalFoto" class="modal-foto">
+    <button onclick="window.fecharModal()" class="btn-fechar-modal" style="display:flex; align-items:center; gap:6px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        Voltar
+    </button>
+    <img id="imgModalExpandida" class="img-expandida" src="">
+    <div class="modal-acoes">
+        <button id="btnModalCurtir" class="btn-acao-modal" style="background-color:#333; color:white; padding:12px 20px; border-radius:25px; border:none; font-weight:bold; display:flex; align-items:center; gap:6px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"></path></svg>
+            <span id="contadorModalCurtidas">0</span>
+        </button>
+        <button id="btnAbrirComentarios" class="btn-acao-modal" style="background-color:#333; color:white; padding:12px 20px; border-radius:25px; border:none; font-weight:bold; display:flex; align-items:center; gap:6px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-8.9 8.4 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8A8.4 8.4 0 0 1 12.5 3 8.4 8.4 0 0 1 21 11.5z"></path></svg>
+            <span id="contadorModalComentarios">0</span>
+        </button>
+        <a id="btnModalBaixar" class="btn-acao-modal" href="#" style="text-decoration:none; background-color:#333; color:white; padding:12px 20px; border-radius:25px; font-weight:bold; display:flex; align-items:center; gap:6px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Baixar
+        </a>
+        <button id="btnModalCompartilhar" class="btn-acao-modal" style="background-color:#25d366; color:white; padding:12px 20px; border-radius:25px; border:none; font-weight:bold; display:flex; align-items:center; gap:6px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"></line><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"></line></svg>
+            Compartilhar
+        </button>
+        <button id="btnModalDeletar" class="btn-acao-modal" style="background-color:#333; color:white; padding:12px 20px; border-radius:25px; border:none; font-weight:bold; display:flex; align-items:center;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+        </button>
+    </div>
+    <div id="abaComentarios" class="aba-comentarios">
+        <div class="comentarios-header">
+            <strong>Comentários</strong>
+            <button onclick="document.getElementById('abaComentarios').style.display='none'" style="border:none; background:none; display:flex; align-items:center;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+        <ul id="listaComentarios" class="comentarios-lista"></ul>
+        <div class="comentarios-input-area">
+            <input type="text" id="inputNomeComentario" class="input-comentario" placeholder="Seu Nome">
+            <input type="text" id="inputTextoComentario" class="input-comentario" placeholder="Escreva uma mensagem...">
+            <button id="btnEnviarComentario" class="btn-enviar-comentario">Publicar</button>
+        </div>
+    </div>
+</div>
+
+<div id="modalEstudio" class="modal-foto" style="z-index: 3000;">
+    <h3 style="color: white; margin-bottom: 15px;">Ajuste sua foto</h3>
+    <div style="width: 90%; max-width: 380px; aspect-ratio: 9 / 16; background-color: #000; overflow: hidden; border-radius: 12px; position: relative;">
+        <img id="imagemParaCortar" src="" style="display: block; max-width: 100%;">
+        <img id="molduraEstudio" src="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; z-index: 3010;">
+    </div>
+    <button id="btnToggleMoldura" class="btn-toggle-moldura">Moldura: Ativada</button>
+    <div class="modal-acoes" style="margin-top: 20px;">
+        <button id="btnCancelarCorte" style="background-color:#ff4444; color:white; padding:12px 25px; border-radius:25px; border:none; font-weight:bold; display:flex; align-items:center;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+        <button id="btnConfirmarCorte" style="background-color:var(--cor-destaque); color:white; padding:12px 25px; border-radius:25px; border:none; font-weight:bold; display:flex; align-items:center; gap:6px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Enviar
+        </button>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc, increment, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAtNXDsbUbcE0v3Mog0UdXEWuXWtHFFKsM",
+        authDomain: "insta-momentos-by-carol.firebaseapp.com",
+        projectId: "insta-momentos-by-carol",
+        storageBucket: "insta-momentos-by-carol.firebasestorage.app",
+        messagingSenderId: "305461265991",
+        appId: "1:305461265991:web:fd0e2755224057cf535362"
+    };
+    
+    const IMGBB_API_KEY = "b72af0187ed2187cf43d6bdf9bc8c779";
+    const EVENTO_ID = "casamentonicoleerafael"; 
+
+    try {
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const videoElement = document.getElementById('videoElement');
+        const cameraContainer = document.getElementById('cameraContainer');
+        const molduraOverlay = document.getElementById('molduraOverlay');
+        let stream = null;
+        let usandoCameraFrontal = false;
+        let cropper = null;
+
+        // Controla se a moldura será aplicada nas fotos enviadas pela Galeria
+        let usarMolduraGaleria = true;
+
+        document.getElementById('btnAbrirCamera').onclick = async () => {
+            document.getElementById('sessaoFeed').style.display = 'none';
+            cameraContainer.style.display = 'block';
+            const modo = usandoCameraFrontal ? "user" : "environment";
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: modo } });
+                videoElement.srcObject = stream;
+            } catch (err) { alert("Erro ao abrir câmera"); fecharInterface(); }
+        };
+
+        function fecharInterface() {
+            if (stream) stream.getTracks().forEach(t => t.stop());
+            cameraContainer.style.display = 'none';
+            document.getElementById('sessaoFeed').style.display = 'block';
+        }
+
+        document.getElementById('btnFecharCamera').onclick = fecharInterface;
+        
+        document.getElementById('btnInverterCamera').onclick = () => { 
+            usandoCameraFrontal = !usandoCameraFrontal; 
+            fecharInterface(); 
+            document.getElementById('btnAbrirCamera').click(); 
+        };
+
+        document.getElementById('btnFiltroNormal').onclick = () => {
+            videoElement.style.filter = "none";
+            document.getElementById('btnFiltroNormal').classList.add('ativo');
+            document.getElementById('btnFiltroPB').classList.remove('ativo');
+        };
+        
+        document.getElementById('btnFiltroPB').onclick = () => {
+            videoElement.style.filter = "grayscale(100%)";
+            document.getElementById('btnFiltroPB').classList.add('ativo');
+            document.getElementById('btnFiltroNormal').classList.remove('ativo');
+        };
+
+        onSnapshot(doc(db, "configurações", EVENTO_ID), (d) => {
+            if (d.exists()) {
+                const data = d.data();
+                document.getElementById('nomeEvento').textContent = data.nome || "";
+                document.getElementById('dataEvento').textContent = data.data || "";
+                document.getElementById('descricaoEvento').textContent = data.texto || "";
+                if (data.url_avatar) document.getElementById('avatarEvento').src = data.url_avatar;
+                if (data.url_banner) document.querySelector('.banner').style.backgroundImage = "url('" + data.url_banner + "')";
+                
+                // =========================================================
+                // CORREÇÃO CIRÚRGICA: DESTRAVAR CORS DO GITHUB
+                // =========================================================
+                if (data.url_moldura) {
+                    let urlSegura = data.url_moldura;
+                    if (urlSegura.includes("github.com") && urlSegura.includes("/blob/")) {
+                        urlSegura = urlSegura.replace("github.com", "raw.githubusercontent.com").replace("/blob/", "/").split("?")[0];
+                    }
+                    molduraOverlay.crossOrigin = "anonymous";
+                    molduraOverlay.src = urlSegura;
+                    
+                    const molduraEstudio = document.getElementById('molduraEstudio');
+                    if (molduraEstudio) {
+                        molduraEstudio.crossOrigin = "anonymous";
+                        molduraEstudio.src = urlSegura;
+                    }
+                }
+            } else {
+                alert("Alerta: o sistema não encontrou a pasta '" + EVENTO_ID + "' em 'configuracoes'. Verifique o Firebase.");
+                console.error("Documento configuracoes/" + EVENTO_ID + " não existe!");
+            }
+        });
+
+        const ICONE_CORACAO = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"></path></svg>';
+        const ICONE_COMENTARIO = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-8.9 8.4 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8A8.4 8.4 0 0 1 12.5 3 8.4 8.4 0 0 1 21 11.5z"></path></svg>';
+
+        onSnapshot(query(collection(db, "eventos/" + EVENTO_ID + "/postagens"), orderBy("data_envio", "desc")), (snap) => {
+            console.log("[Feed] Postagens recebidas:", snap.size);
+            const feed = document.getElementById('feedGaleria');
+            feed.innerHTML = "";
+            let totalC = 0, totalComent = 0;
+
+            snap.forEach(docSnap => {
+                const p = docSnap.data();
+                if (!p.url_imagem) {
+                    console.warn("[Feed] Postagem " + docSnap.id + " sem campo 'url_imagem', pulando.", p);
+                    return;
+                }
+                totalC += (p.curtidas || 0);
+                totalComent += (p.total_comentarios || 0);
+
+                const card = document.createElement('div');
+                card.className = 'post-container';
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'media-wrapper';
+                wrapper.style.cursor = 'pointer';
+                wrapper.addEventListener('click', () => window.abrirModal(p.url_imagem, docSnap.id, p.curtidas || 0));
+
+                const img = document.createElement('img');
+                img.src = p.url_imagem;
+                img.loading = 'lazy';
+                img.onerror = () => console.error("[Feed] Falha ao carregar imagem:", p.url_imagem);
+
+                const interacoes = document.createElement('div');
+                interacoes.className = 'interacoes-feed';
+                interacoes.innerHTML = '<span>' + ICONE_CORACAO + ' ' + (p.curtidas || 0) + '</span><span>' + ICONE_COMENTARIO + ' ' + (p.total_comentarios || 0) + '</span>';
+
+                wrapper.appendChild(img);
+                wrapper.appendChild(interacoes);
+                card.appendChild(wrapper);
+                feed.appendChild(card);
+            });
+
+            document.getElementById('totalFotos').textContent = snap.size;
+            document.getElementById('totalCurtidas').textContent = totalC;
+            document.getElementById('totalComentariosGeral').textContent = totalComent;
+        });
+
+        window.abrirModal = (url, id, curtidas) => {
+            document.getElementById('imgModalExpandida').src = url;
+            document.getElementById('contadorModalCurtidas').textContent = curtidas;
+            const aba = document.getElementById('abaComentarios');
+            aba.style.display = 'none';
+
+            const lista = document.getElementById('listaComentarios');
+            const inputNome = document.getElementById('inputNomeComentario');
+            const inputTexto = document.getElementById('inputTextoComentario');
+
+            if (localStorage.getItem('nomeConvidado')) inputNome.value = localStorage.getItem('nomeConvidado');
+
+            onSnapshot(query(collection(db, "eventos/" + EVENTO_ID + "/postagens/" + id + "/comentarios"), orderBy("data_envio", "asc")), (snap) => {
+                lista.innerHTML = "";
+                document.getElementById('contadorModalComentarios').textContent = snap.size;
+                snap.forEach(docSnap => {
+                    const c = docSnap.data();
+                    const li = document.createElement('li');
+                    li.className = 'comentario-item';
+                    li.innerHTML = '<strong style="color:var(--cor-destaque)">' + c.nome + ':</strong> ' + c.texto;
+                    lista.appendChild(li);
+                });
+                lista.scrollTop = lista.scrollHeight;
+            });
+
+            document.getElementById('btnAbrirComentarios').onclick = () => { aba.style.display = aba.style.display === 'none' ? 'flex' : 'none'; };
+
+            document.getElementById('btnEnviarComentario').onclick = async () => {
+                if (!inputNome.value.trim() || !inputTexto.value.trim()) return alert("Preencha nome e mensagem!");
+                const nomeConvidado = inputNome.value.trim();
+                const textoComentario = inputTexto.value.trim();
+                localStorage.setItem('nomeConvidado', nomeConvidado);
+                
+                await addDoc(collection(db, "eventos/" + EVENTO_ID + "/postagens/" + id + "/comentarios"), { nome: nomeConvidado, texto: textoComentario, data_envio: serverTimestamp() });
+                await updateDoc(doc(db, "eventos/" + EVENTO_ID + "/postagens", id), { total_comentarios: increment(1) });
+                inputTexto.value = ""; 
+            };
+
+            const ICONE_DOWNLOAD = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Baixar';
+            const btnBaixar = document.getElementById('btnModalBaixar');
+            btnBaixar.onclick = async (e) => {
+                e.preventDefault();
+                btnBaixar.textContent = "Processando...";
+                
+                try {
+                    const urlLimpa = url + "?nocache=" + new Date().getTime();
+                    const res = await fetch(urlLimpa);
+                    const blob = await res.blob();
+                    
+                    const link = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = link; 
+                    a.download = "Instamomentos_" + new Date().getTime() + ".jpg"; 
+                    document.body.appendChild(a); 
+                    a.click(); 
+                    
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(link);
+                    
+                    alert("Sua foto foi baixada com sucesso, verifique sua galeria.");
+                    btnBaixar.innerHTML = ICONE_DOWNLOAD;
+                    
+                } catch(err) { 
+                    alert("Para salvar, segure o dedo na foto e escolha 'Salvar na Galeria'.");
+                    window.open(url, '_blank'); 
+                    btnBaixar.innerHTML = ICONE_DOWNLOAD;
+                }
+            };
+
+            // =========================================================
+            // NOVO: BOTÃO DE COMPARTILHAR (compartilhamento nativo do celular)
+            // =========================================================
+            const btnCompartilhar = document.getElementById('btnModalCompartilhar');
+            btnCompartilhar.onclick = async (e) => {
+                e.preventDefault();
+                const textoOriginal = btnCompartilhar.innerHTML;
+                btnCompartilhar.textContent = "Preparando...";
+                btnCompartilhar.disabled = true;
+
+                try {
+                    const urlLimpa = url + "?nocache=" + new Date().getTime();
+                    const res = await fetch(urlLimpa);
+                    const blob = await res.blob();
+                    const nomeArquivo = "Instamomentos_" + new Date().getTime() + ".jpg";
+                    const arquivo = new File([blob], nomeArquivo, { type: blob.type || "image/jpeg" });
+
+                    if (navigator.canShare && navigator.canShare({ files: [arquivo] })) {
+                        await navigator.share({
+                            files: [arquivo],
+                            title: 'Minha lembrança',
+                            text: 'Olha essa foto da festa!'
+                        });
+                    } else {
+                        alert("Seu navegador não suporta o compartilhamento direto.\nUse o botão Baixar e compartilhe pelo app de Galeria/Fotos do celular.");
+                    }
+                } catch (err) {
+                    // usuário cancelou o compartilhamento nativo — não faz nada
+                } finally {
+                    btnCompartilhar.innerHTML = textoOriginal;
+                    btnCompartilhar.disabled = false;
+                }
+            };
+
+            document.getElementById('btnModalCurtir').onclick = (e) => { 
+                e.stopPropagation(); 
+                updateDoc(doc(db, "eventos/" + EVENTO_ID + "/postagens", id), { curtidas: increment(1) });
+                const contador = document.getElementById('contadorModalCurtidas');
+                contador.textContent = parseInt(contador.textContent) + 1;
+            };
+
+            document.getElementById('btnModalDeletar').onclick = (e) => { 
+                e.stopPropagation(); 
+                const senhaDigitada = prompt("Senha para excluir:");
+                if (senhaDigitada === "4321") {
+                    if(confirm("Deseja realmente apagar esta foto?")) { deleteDoc(doc(db, "eventos/" + EVENTO_ID + "/postagens", id)); window.fecharModal(); }
+                } else if (senhaDigitada !== null) { alert("Senha incorreta!"); }
+            };
+
+            document.getElementById('modalFoto').style.display = 'flex';
+        };
+
+        window.fecharModal = () => document.getElementById('modalFoto').style.display = 'none';
+
+        // =========================================================
+        // CORREÇÃO CIRÚRGICA: BLINDAGEM BOTÃO CAPTURA
+        // =========================================================
+        document.getElementById('btnCapturarFinal').onclick = async () => {
+            const btn = document.getElementById('btnCapturarFinal');
+            btn.disabled = true;
+            try {
+                const canvas = document.createElement('canvas');
+                canvas.width = 1080; canvas.height = 1920;
+                const ctx = canvas.getContext('2d');
+                if (document.getElementById('btnFiltroPB').classList.contains('ativo')) ctx.filter = 'grayscale(100%)';
+                if (usandoCameraFrontal) { ctx.translate(canvas.width, 0); ctx.scale(-1, 1); }
+                ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+                ctx.filter = 'none'; ctx.setTransform(1,0,0,1,0,0);
+                
+                if (molduraOverlay.complete && molduraOverlay.naturalWidth > 0) {
+                    ctx.drawImage(molduraOverlay, 0, 0, canvas.width, canvas.height);
+                }
+
+                const base64 = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
+                const form = new FormData(); form.append('image', base64);
+                const res = await fetch("https://api.imgbb.com/1/upload?key=" + IMGBB_API_KEY, { method: 'POST', body: form });
+                const imgData = await res.json();
+                if (imgData.success) {
+                   await addDoc(collection(db, "eventos/" + EVENTO_ID + "/postagens"), { url_imagem: imgData.data.url, curtidas: 0, data_envio: serverTimestamp() });
+                    fecharInterface();
+                }
+            } catch(e) {
+                alert("Aviso do Sistema: Erro ao enviar foto. " + e.message);
+            } finally {
+                btn.disabled = false;
+            }
+        };
+
+        const inputUploadArquivo = document.getElementById('inputUploadArquivo');
+        document.getElementById('btnUploadFoto').onclick = () => inputUploadArquivo.click();
+
+        const molduraEstudioEl = document.getElementById('molduraEstudio');
+        const btnToggleMoldura = document.getElementById('btnToggleMoldura');
+
+        function atualizarBotaoToggleMoldura() {
+            if (usarMolduraGaleria) {
+                btnToggleMoldura.textContent = "Moldura: Ativada";
+                btnToggleMoldura.classList.remove('desativada');
+                molduraEstudioEl.style.display = 'block';
+            } else {
+                btnToggleMoldura.textContent = "Moldura: Desativada";
+                btnToggleMoldura.classList.add('desativada');
+                molduraEstudioEl.style.display = 'none';
+            }
+        }
+
+        btnToggleMoldura.onclick = () => {
+            usarMolduraGaleria = !usarMolduraGaleria;
+            atualizarBotaoToggleMoldura();
+        };
+
+        function processarArquivoSelecionado(file) {
+            if (!file) return;
+            if (cropper) { cropper.destroy(); cropper = null; }
+
+            // Sempre reabre a opção de escolher moldura, começando ativada (com a moldura do evento)
+            usarMolduraGaleria = true;
+            atualizarBotaoToggleMoldura();
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const imagem = document.getElementById('imagemParaCortar');
+                document.getElementById('modalEstudio').style.display = 'flex';
+                molduraEstudioEl.src = molduraOverlay.src;
+                imagem.src = e.target.result;
+                imagem.onload = () => {
+                    setTimeout(() => {
+                        cropper = new Cropper(imagem, {
+                            aspectRatio: 9 / 16, viewMode: 1, dragMode: 'move', autoCropArea: 1, background: false, guides: false, center: false, highlight: false, cropBoxMovable: false, cropBoxResizable: false, toggleDragModeOnDblclick: false,
+                            ready() { this.cropper.setCropBoxData({ left: 0, top: 0, width: this.cropper.getContainerData().width, height: this.cropper.getContainerData().height }); }
+                        });
+                    }, 300); 
+                };
+            };
+            reader.readAsDataURL(file);
+        }
+
+        inputUploadArquivo.onchange = (event) => processarArquivoSelecionado(event.target.files[0]);
+
+        // Botão "Adicionar da Galeria" da tela principal (fora da câmera)
+        const inputUploadArquivoDireto = document.getElementById('inputUploadArquivoDireto');
+        document.getElementById('btnAbrirGaleriaDireto').onclick = () => inputUploadArquivoDireto.click();
+        inputUploadArquivoDireto.onchange = (event) => {
+            processarArquivoSelecionado(event.target.files[0]);
+            inputUploadArquivoDireto.value = "";
+        };
+
+        document.getElementById('btnCancelarCorte').onclick = () => {
+            document.getElementById('modalEstudio').style.display = 'none';
+            if (cropper) cropper.destroy();
+            inputUploadArquivo.value = "";
+            inputUploadArquivoDireto.value = "";
+        };
+
+        // =========================================================
+        // CORREÇÃO CIRÚRGICA: BLINDAGEM BOTÃO GALERIA (ENVIAR)
+        // Agora respeita a escolha de usar ou não a moldura
+        // =========================================================
+        document.getElementById('btnConfirmarCorte').onclick = async () => {
+            const btn = document.getElementById('btnConfirmarCorte');
+            const textoOriginal = btn.innerHTML;
+            btn.textContent = "Enviando...";
+            btn.disabled = true;
+            try {
+                const canvas = cropper.getCroppedCanvas({ width: 1080, height: 1920 });
+                const ctx = canvas.getContext('2d');
+                
+                if (usarMolduraGaleria && molduraOverlay.complete && molduraOverlay.naturalWidth > 0) {
+                    ctx.drawImage(molduraOverlay, 0, 0, canvas.width, canvas.height);
+                }
+                
+                const base64 = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
+                const form = new FormData(); form.append('image', base64);
+                const res = await fetch("https://api.imgbb.com/1/upload?key=" + IMGBB_API_KEY, { method: 'POST', body: form });
+                const imgData = await res.json();
+                if (imgData.success) {
+                   await addDoc(collection(db, "eventos/" + EVENTO_ID + "/postagens"), { url_imagem: imgData.data.url, curtidas: 0, data_envio: serverTimestamp() }); 
+                    document.getElementById('modalEstudio').style.display = 'none'; 
+                    fecharInterface();
+                }
+            } catch(e) {
+                alert("Aviso do Sistema: Erro ao enviar foto da galeria. " + e.message);
+            } finally {
+                btn.innerHTML = textoOriginal;
+                btn.disabled = false;
+            }
+        };
+
+        let flashAtivado = false;
+        document.getElementById('btnFlash').onclick = async () => {
+            if (!stream) return;
+            const track = stream.getVideoTracks()[0];
+            const btnFlash = document.getElementById('btnFlash');
+            try {
+                const capabilities = track.getCapabilities();
+                if (!capabilities.torch) { alert("Flash não suportado."); return; }
+                flashAtivado = !flashAtivado;
+                await track.applyConstraints({ advanced: [{ torch: flashAtivado }] });
+                const corAtiva = flashAtivado ? "#FFD700" : "#fff";
+                btnFlash.querySelector('svg').style.stroke = corAtiva;
+                btnFlash.querySelector('span').style.color = corAtiva;
+                btnFlash.querySelector('span').textContent = flashAtivado ? "Flash ON" : "Flash OFF";
+            } catch (err) { alert("Erro ao ativar flash."); }
+        };
+    } catch(erroGeral) {
+        console.error("Erro Crítico no Sistema:", erroGeral);
+        alert("Ocorreu um erro ao inicializar o sistema. Verifique a aba Console no Inspecionar Elemento.");
+    }
+</script>
+</body>
+</html>
