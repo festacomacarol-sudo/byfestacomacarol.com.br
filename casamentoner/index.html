@@ -116,7 +116,6 @@ Lei 9.610/98 – Direitos Autorais.
     <div id="resultUI">
         <div class="actions-box">
             <button id="shareBtn" class="btn-res" style="background:#fff; color:#333;"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v14"/></svg>COMPARTILHAR / SALVAR</button>
-            <button id="downloadBtn" class="btn-res" style="background:#fff; color:#333;"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><path d="M8 12l4 4 4-4"/><path d="M12 2v14"/></svg>BAIXAR AGORA</button>
             <button id="newBtn" class="btn-res" style="background:#444;"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>VOLTAR</button>
         </div>
     </div>
@@ -483,10 +482,6 @@ function showResult(url, type) {
         videoPreview.style.display = 'block'; 
         videoPreview.src = url; 
         videoPreview.play();
-        
-        setTimeout(() => {
-            document.getElementById('downloadBtn').click();
-        }, 500);
     }
     
     // Descobre a extensão certa a partir do tipo real do arquivo gerado
@@ -495,32 +490,6 @@ function showResult(url, type) {
         const mime = (currentBlob && currentBlob.type) || '';
         return mime.includes('mp4') ? 'mp4' : 'webm';
     }
-
-    const downloadBtn = document.getElementById('downloadBtn');
-    downloadBtn.onclick = () => {
-        const textoOriginal = downloadBtn.innerHTML;
-        downloadBtn.innerHTML = "Baixando...";
-        downloadBtn.style.pointerEvents = "none";
-        
-        const a = document.createElement('a'); 
-        a.style.display = 'none';
-        a.href = url;
-        a.download = `meu_registro_${Date.now()}.${getExtension()}`;
-        
-        document.body.appendChild(a); 
-        a.click();
-        document.body.removeChild(a);
-        
-        setTimeout(() => {
-            downloadBtn.innerHTML = "Concluído!";
-            alert("Arquivo baixado com sucesso!\nVerifique a sua Galeria, pasta de Downloads ou Arquivos para abrir.");
-            
-            setTimeout(() => {
-                downloadBtn.innerHTML = textoOriginal;
-                downloadBtn.style.pointerEvents = "auto";
-            }, 3000);
-        }, 800);
-    };
 
     // Botão de COMPARTILHAR: abre o menu nativo do celular (WhatsApp, Instagram,
     // Salvar em Fotos/Galeria, etc). É o mecanismo padrão da web para "salvar na galeria",
@@ -545,7 +514,7 @@ function showResult(url, type) {
                 // usuário cancelou o compartilhamento — não faz nada
             }
         } else {
-            alert("Este navegador não permite compartilhar diretamente.\nUse o botão BAIXAR e depois compartilhe pelo app de Galeria/Fotos do celular.");
+            alert("Este navegador não permite compartilhar diretamente.\nTente abrir esta página no Chrome (Android) ou Safari (iPhone) atualizado.");
         }
     };
 }
