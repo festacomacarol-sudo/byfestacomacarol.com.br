@@ -37,20 +37,6 @@
         .media-wrapper { position: relative; width: 100%; aspect-ratio: 9 / 16; background-color: #000; display: flex; align-items: center; justify-content: center; overflow: hidden; }
         .media-wrapper img { width: 100%; height: 100%; object-fit: contain; }
         .interacoes-feed { position: absolute; bottom: 8px; right: 8px; background-color: rgba(0, 0, 0, 0.6); color: white; padding: 4px 10px; border-radius: 15px; font-size: 0.75rem; display: flex; align-items: center; gap: 8px; pointer-events: none; }
-        .camera-container { position: fixed; inset: 0; height: 100dvh; background-color: #000; z-index: 1000; display: none; overflow: hidden; }
-        .video-wrapper { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; }
-        #videoElement { width: 100%; height: 100%; object-fit: cover; }
-        #molduraOverlay { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; z-index: 2; }
-        .camera-header { position: absolute; top: 0; width: 100%; padding: 20px; z-index: 10; background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent); }
-        .camera-controles { position: absolute; bottom: 0; width: 100%; padding: 40px 20px; z-index: 10; background: linear-gradient(to top, rgba(0,0,0,0.6), transparent); display: flex; flex-direction: column; gap: 25px; }
-        .filtros { display: flex; gap: 10px; justify-content: center; }
-        .btn-filtro { background-color: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.5); padding: 7px 18px; border-radius: 20px; backdrop-filter: blur(5px); font-size: 0.8rem; font-weight: 500; }
-        .btn-filtro.ativo { background-color: #fff; color: #111; border-color: #fff; font-weight: bold; }
-        .acoes-principais { display: flex; justify-content: space-around; align-items: center; }
-        .btn-acao-camera { background: none; border: none; color: #fff; cursor: pointer; display: flex; flex-direction: column; align-items: center; width: 60px; }
-        .btn-acao-camera svg { width: 24px; height: 24px; stroke: #fff; }
-        .btn-acao-camera span { font-size: 0.65rem; color: #fff; margin-top: 4px; font-weight: 500; }
-        .btn-capturar-final { width: 75px; height: 75px; border-radius: 50%; background-color: #fff; border: 5px solid rgba(255,255,255,0.3); cursor: pointer; }
         .modal-foto { position: fixed; inset: 0; background-color: rgba(0,0,0,0.95); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; }
         .btn-fechar-modal { position: absolute; top: 25px; left: 20px; background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer; z-index: 2010; }
         .img-expandida { max-width: 90%; max-height: 70dvh; object-fit: contain; border-radius: 8px; margin-bottom: 20px; }
@@ -86,40 +72,10 @@
     <main class="galeria-grid" id="feedGaleria"></main>
 </div>
 
-<div id="cameraContainer" class="camera-container">
-    <div class="camera-header">
-        <button id="btnFecharCamera" class="btn-fechar" style="background:none;border:none;color:#fff;display:flex;align-items:center;gap:6px;font-weight:500;">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-            Voltar
-        </button>
-    </div>
-    <div class="video-wrapper">
-        <video id="videoElement" autoplay playsinline></video>
-        <img id="molduraOverlay" src="" alt="Moldura">
-    </div>
-    <div class="camera-controles">
-        <div class="filtros">
-            <button id="btnFiltroNormal" class="btn-filtro ativo">Normal</button>
-            <button id="btnFiltroPB" class="btn-filtro">P&B</button>
-        </div>
-        <div class="acoes-principais">
-            <button id="btnUploadFoto" class="btn-acao-camera">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                <span>Galeria</span>
-            </button>
-            <input type="file" id="inputUploadArquivo" accept="image/*" style="display: none;">
-            <button id="btnFlash" class="btn-acao-camera">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                <span>Flash OFF</span>
-            </button>
-            <button id="btnCapturarFinal" class="btn-capturar-final"></button>
-            <button id="btnInverterCamera" class="btn-acao-camera">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
-                <span>Inverter</span>
-            </button>
-        </div>
-    </div>
-</div>
+<!-- Imagem da moldura mantida oculta: usada para carregar o arquivo da moldura
+     e desenhá-lo sobre a foto enviada pela galeria (ver processarArquivoSelecionado /
+     btnConfirmarCorte no script abaixo) -->
+<img id="molduraOverlay" src="" alt="Moldura" style="display:none;">
 
 <div id="modalFoto" class="modal-foto">
     <button onclick="window.fecharModal()" class="btn-fechar-modal" style="display:flex; align-items:center; gap:6px;">
@@ -202,51 +158,11 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        const videoElement = document.getElementById('videoElement');
-        const cameraContainer = document.getElementById('cameraContainer');
         const molduraOverlay = document.getElementById('molduraOverlay');
-        let stream = null;
-        let usandoCameraFrontal = false;
         let cropper = null;
 
         // Controla se a moldura será aplicada nas fotos enviadas pela Galeria
         let usarMolduraGaleria = true;
-
-        document.getElementById('btnAbrirCamera').onclick = async () => {
-            document.getElementById('sessaoFeed').style.display = 'none';
-            cameraContainer.style.display = 'block';
-            const modo = usandoCameraFrontal ? "user" : "environment";
-            try {
-                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: modo } });
-                videoElement.srcObject = stream;
-            } catch (err) { alert("Erro ao abrir câmera"); fecharInterface(); }
-        };
-
-        function fecharInterface() {
-            if (stream) stream.getTracks().forEach(t => t.stop());
-            cameraContainer.style.display = 'none';
-            document.getElementById('sessaoFeed').style.display = 'block';
-        }
-
-        document.getElementById('btnFecharCamera').onclick = fecharInterface;
-        
-        document.getElementById('btnInverterCamera').onclick = () => { 
-            usandoCameraFrontal = !usandoCameraFrontal; 
-            fecharInterface(); 
-            document.getElementById('btnAbrirCamera').click(); 
-        };
-
-        document.getElementById('btnFiltroNormal').onclick = () => {
-            videoElement.style.filter = "none";
-            document.getElementById('btnFiltroNormal').classList.add('ativo');
-            document.getElementById('btnFiltroPB').classList.remove('ativo');
-        };
-        
-        document.getElementById('btnFiltroPB').onclick = () => {
-            videoElement.style.filter = "grayscale(100%)";
-            document.getElementById('btnFiltroPB').classList.add('ativo');
-            document.getElementById('btnFiltroNormal').classList.remove('ativo');
-        };
 
         onSnapshot(doc(db, "configurações", EVENTO_ID), (d) => {
             if (d.exists()) {
@@ -449,43 +365,6 @@
 
         window.fecharModal = () => document.getElementById('modalFoto').style.display = 'none';
 
-        // =========================================================
-        // CORREÇÃO CIRÚRGICA: BLINDAGEM BOTÃO CAPTURA
-        // =========================================================
-        document.getElementById('btnCapturarFinal').onclick = async () => {
-            const btn = document.getElementById('btnCapturarFinal');
-            btn.disabled = true;
-            try {
-                const canvas = document.createElement('canvas');
-                canvas.width = 1080; canvas.height = 1920;
-                const ctx = canvas.getContext('2d');
-                if (document.getElementById('btnFiltroPB').classList.contains('ativo')) ctx.filter = 'grayscale(100%)';
-                if (usandoCameraFrontal) { ctx.translate(canvas.width, 0); ctx.scale(-1, 1); }
-                ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
-                ctx.filter = 'none'; ctx.setTransform(1,0,0,1,0,0);
-                
-                if (molduraOverlay.complete && molduraOverlay.naturalWidth > 0) {
-                    ctx.drawImage(molduraOverlay, 0, 0, canvas.width, canvas.height);
-                }
-
-                const base64 = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
-                const form = new FormData(); form.append('image', base64);
-                const res = await fetch("https://api.imgbb.com/1/upload?key=" + IMGBB_API_KEY, { method: 'POST', body: form });
-                const imgData = await res.json();
-                if (imgData.success) {
-                   await addDoc(collection(db, "eventos/" + EVENTO_ID + "/postagens"), { url_imagem: imgData.data.url, curtidas: 0, data_envio: serverTimestamp() });
-                    fecharInterface();
-                }
-            } catch(e) {
-                alert("Aviso do Sistema: Erro ao enviar foto. " + e.message);
-            } finally {
-                btn.disabled = false;
-            }
-        };
-
-        const inputUploadArquivo = document.getElementById('inputUploadArquivo');
-        document.getElementById('btnUploadFoto').onclick = () => inputUploadArquivo.click();
-
         const molduraEstudioEl = document.getElementById('molduraEstudio');
         const btnToggleMoldura = document.getElementById('btnToggleMoldura');
 
@@ -532,9 +411,7 @@
             reader.readAsDataURL(file);
         }
 
-        inputUploadArquivo.onchange = (event) => processarArquivoSelecionado(event.target.files[0]);
-
-        // Botão "Adicionar da Galeria" da tela principal (fora da câmera)
+        // Botão "Adicionar da Galeria" da tela principal
         const inputUploadArquivoDireto = document.getElementById('inputUploadArquivoDireto');
         document.getElementById('btnAbrirGaleriaDireto').onclick = () => inputUploadArquivoDireto.click();
         inputUploadArquivoDireto.onchange = (event) => {
@@ -542,10 +419,33 @@
             inputUploadArquivoDireto.value = "";
         };
 
+        // =========================================================
+        // BOTÃO "TIRE SUA FOTO": abre o site externo da moldura.
+        // O usuário tira a foto lá (com a moldura) e a salva na
+        // galeria do celular. Quando ele volta para esta aba, o app
+        // detecta o retorno e oferece a OPÇÃO de escolher essa foto
+        // e salvá-la no feed do Firebase (mesmo fluxo de recorte +
+        // moldura usado em "Adicionar da Galeria").
+        // =========================================================
+        let aguardandoFotoExterna = false;
+
+        document.getElementById('btnAbrirCamera').onclick = () => {
+            window.open('https://byfestacomacarol.com.br/casamentoner/', '_blank');
+            aguardandoFotoExterna = true;
+        };
+
+        window.addEventListener('focus', () => {
+            if (aguardandoFotoExterna) {
+                aguardandoFotoExterna = false;
+                if (confirm('Já tirou sua foto com a moldura?\n\nToque em OK para escolher a foto e salvar no feed.')) {
+                    inputUploadArquivoDireto.click();
+                }
+            }
+        });
+
         document.getElementById('btnCancelarCorte').onclick = () => {
             document.getElementById('modalEstudio').style.display = 'none';
             if (cropper) cropper.destroy();
-            inputUploadArquivo.value = "";
             inputUploadArquivoDireto.value = "";
         };
 
@@ -573,7 +473,6 @@
                 if (imgData.success) {
                    await addDoc(collection(db, "eventos/" + EVENTO_ID + "/postagens"), { url_imagem: imgData.data.url, curtidas: 0, data_envio: serverTimestamp() }); 
                     document.getElementById('modalEstudio').style.display = 'none'; 
-                    fecharInterface();
                 }
             } catch(e) {
                 alert("Aviso do Sistema: Erro ao enviar foto da galeria. " + e.message);
@@ -581,23 +480,6 @@
                 btn.innerHTML = textoOriginal;
                 btn.disabled = false;
             }
-        };
-
-        let flashAtivado = false;
-        document.getElementById('btnFlash').onclick = async () => {
-            if (!stream) return;
-            const track = stream.getVideoTracks()[0];
-            const btnFlash = document.getElementById('btnFlash');
-            try {
-                const capabilities = track.getCapabilities();
-                if (!capabilities.torch) { alert("Flash não suportado."); return; }
-                flashAtivado = !flashAtivado;
-                await track.applyConstraints({ advanced: [{ torch: flashAtivado }] });
-                const corAtiva = flashAtivado ? "#FFD700" : "#fff";
-                btnFlash.querySelector('svg').style.stroke = corAtiva;
-                btnFlash.querySelector('span').style.color = corAtiva;
-                btnFlash.querySelector('span').textContent = flashAtivado ? "Flash ON" : "Flash OFF";
-            } catch (err) { alert("Erro ao ativar flash."); }
         };
     } catch(erroGeral) {
         console.error("Erro Crítico no Sistema:", erroGeral);
