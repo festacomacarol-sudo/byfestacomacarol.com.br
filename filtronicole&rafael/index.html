@@ -125,6 +125,7 @@ Lei 9.610/98 – Direitos Autorais.
     <div id="resultUI">
         <div id="previewLabel" style="background:rgba(0,0,0,0.55); padding:6px 16px; border-radius:20px; margin-bottom:16px; font-size:13px; text-align:center;">Confira seu registro antes de salvar</div>
         <div class="actions-box">
+            <button id="salvarGaleriaBtn" class="btn-res" style="background:#fff; color:#333;"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;"><path d="M20 6 9 17l-5-5"/></svg>SALVAR NA GALERIA DOS NOIVOS</button>
             <button id="shareBtn" class="btn-res" style="background:#fff; color:#333;"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v14"/></svg>COMPARTILHAR / SALVAR</button>
             <button id="downloadBtn" class="btn-res" style="background:var(--accent); display:none;"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>BAIXAR NO CELULAR</button>
             <button id="newBtn" class="btn-res" style="background:#444;"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>VOLTAR</button>
@@ -144,6 +145,7 @@ let currentBlob = null; // guarda o arquivo real (necessário para compartilhar)
 const uaString = navigator.userAgent || '';
 const isIOS = /iPad|iPhone|iPod/.test(uaString) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const isAndroid = /Android/.test(uaString);
+const isWindows = /Windows/.test(uaString);
 
 // Conversão segura de canvas para Blob. Alguns navegadores/webviews mais fracos
 // (comuns em celulares de entrada) podem falhar ou nunca chamar o callback do
@@ -551,7 +553,15 @@ function showResult(url, type) {
     // também um botão de download direto, que salva o arquivo na pasta Downloads
     // do celular (o Android normalmente indexa fotos/vídeos baixados na Galeria
     // automaticamente em poucos segundos).
-    downloadBtn.style.display = isAndroid ? 'block' : 'none';
+    downloadBtn.style.display = (isAndroid || isWindows) ? 'block' : 'none';
+
+    // "Salvar na galeria" só aparece para fotos: a galeria do Instamomentos
+    // (feed dos noivos) só exibe imagens, não vídeos.
+    const salvarGaleriaBtn = document.getElementById('salvarGaleriaBtn');
+    salvarGaleriaBtn.style.display = (type === 'image') ? 'block' : 'none';
+    salvarGaleriaBtn.disabled = false;
+    salvarGaleriaBtn.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;"><path d="M20 6 9 17l-5-5"/></svg>SALVAR NA GALERIA DOS NOIVOS';
+    salvarGaleriaBtn.onclick = () => enviarFotoParaGaleriaComFeedback(salvarGaleriaBtn);
 
     // Download direto via link com atributo "download". Funciona de forma
     // consistente no Chrome/Android; no Safari/iOS o Compartilhar já resolve
@@ -604,6 +614,30 @@ function showResult(url, type) {
         }
     };
 }
+function enviarFotoParaGaleriaComFeedback(btn) {
+    if (!btn) btn = document.getElementById('salvarGaleriaBtn');
+    const textoOriginal = btn ? btn.innerHTML : '';
+
+    if (typeof window.enviarFotoParaGaleriaInstamomentos !== 'function' || !currentBlob) {
+        alert('Não deu para enviar para a galeria agora. Tente novamente em instantes.');
+        return;
+    }
+
+    if (btn) { btn.disabled = true; btn.textContent = 'Enviando...'; }
+
+    window.enviarFotoParaGaleriaInstamomentos(currentBlob).then((res) => {
+        if (!btn) return;
+        if (res && res.ok) {
+            btn.disabled = true;
+            btn.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;"><path d="M20 6 9 17l-5-5"/></svg>ENVIADO PARA A GALERIA DOS NOIVOS';
+        } else {
+            btn.disabled = false;
+            btn.innerHTML = textoOriginal;
+            alert('Não foi possível enviar para a galeria. Tente novamente.');
+        }
+    });
+}
+
 function resetAll() {
     isEditingGallery = false; cancelAnimationFrame(animId);
     currentBlob = null;
@@ -619,6 +653,65 @@ function resetAll() {
 }
 
 function switchCamera() { usingFrontCamera = !usingFrontCamera; initCamera(); }
+</script>
+
+<script type="module">
+    // =========================================================
+    // ENVIO AUTOMÁTICO PARA A GALERIA DO INSTAMOMENTOS
+    // Mesmo backend (Firebase + imgbb) usado em byfestacomacarol.com.br,
+    // evento "casamentonicoleerafael". Assim que uma foto é tirada aqui,
+    // ela é enviada sozinha para a galeria dos noivos, sem passo manual.
+    // =========================================================
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAtNXDsbUbcE0v3Mog0UdXEWuXWtHFFKsM",
+        authDomain: "insta-momentos-by-carol.firebaseapp.com",
+        projectId: "insta-momentos-by-carol",
+        storageBucket: "insta-momentos-by-carol.firebasestorage.app",
+        messagingSenderId: "305461265991",
+        appId: "1:305461265991:web:fd0e2755224057cf535362"
+    };
+    const IMGBB_API_KEY = "b72af0187ed2187cf43d6bdf9bc8c779";
+    const EVENTO_ID = "casamentonicoleerafael";
+
+    let dbGaleria = null;
+    try {
+        const appGaleria = initializeApp(firebaseConfig, "galeriaInstamomentos");
+        dbGaleria = getFirestore(appGaleria);
+    } catch (e) {
+        console.error("Erro ao conectar com a galeria do Instamomentos:", e);
+    }
+
+    window.enviarFotoParaGaleriaInstamomentos = async function (blob) {
+        if (!dbGaleria) return { ok: false };
+        try {
+            const base64 = await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(String(reader.result).split(',')[1]);
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+            });
+
+            const form = new FormData();
+            form.append('image', base64);
+            const res = await fetch("https://api.imgbb.com/1/upload?key=" + IMGBB_API_KEY, { method: 'POST', body: form });
+            const imgData = await res.json();
+            if (!imgData.success) throw new Error('Falha no upload da imagem para o imgbb');
+
+            await addDoc(collection(dbGaleria, "eventos/" + EVENTO_ID + "/postagens"), {
+                url_imagem: imgData.data.url,
+                curtidas: 0,
+                data_envio: serverTimestamp()
+            });
+
+            return { ok: true };
+        } catch (e) {
+            console.error("Erro ao enviar foto para a galeria do Instamomentos:", e);
+            return { ok: false };
+        }
+    };
 </script>
 </body>
 </html>
