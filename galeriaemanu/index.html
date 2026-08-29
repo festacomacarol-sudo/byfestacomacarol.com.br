@@ -128,7 +128,11 @@
 </div>
 
 <div id="modalEstudio" class="modal-foto" style="z-index: 3000;">
-    <h3 id="tituloEstudio" style="color: white; margin-bottom: 15px;">Ajuste sua foto</h3>
+    <h3 id="tituloEstudio" style="color: white; margin-bottom: 10px;">Ajuste sua foto</h3>
+    <label id="labelToggleMoldura" style="display:flex; align-items:center; gap:10px; color:white; background:rgba(0,0,0,0.4); padding:8px 16px; border-radius:20px; margin-bottom:15px; cursor:pointer; font-size:0.9rem;">
+        <input type="checkbox" id="chkMoldura" checked style="width:20px; height:20px; accent-color: var(--cor-destaque); cursor:pointer;">
+        Usar moldura da festa
+    </label>
     <div style="width: 90%; max-width: 380px; aspect-ratio: 9 / 16; background-color: #000; overflow: hidden; border-radius: 12px; position: relative;">
         <img id="imagemParaCortar" src="" style="display: block; max-width: 100%;">
         <img id="molduraEstudio" src="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; z-index: 3010;">
@@ -167,14 +171,8 @@
         let usandoCameraFrontal = false;
         let cropper = null;
 
-        document.getElementById('btnAbrirCamera').onclick = async () => {
-            document.getElementById('sessaoFeed').style.display = 'none';
-            cameraContainer.style.display = 'block';
-            const modo = usandoCameraFrontal ? "user" : "environment";
-            try {
-                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: modo } });
-                videoElement.srcObject = stream;
-            } catch (err) { alert("Erro ao abrir câmera"); fecharInterface(); }
+        document.getElementById('btnAbrirCamera').onclick = () => {
+            document.getElementById('inputUploadArquivo').click();
         };
 
         function fecharInterface() {
@@ -403,12 +401,19 @@
             }
         }
 
+        const chkMoldura = document.getElementById('chkMoldura');
+        chkMoldura.onchange = () => {
+            document.getElementById('molduraEstudio').style.display = chkMoldura.checked ? 'block' : 'none';
+        };
+
         function abrirEditorParaArquivo(file) {
             if (cropper) { cropper.destroy(); cropper = null; }
             const reader = new FileReader();
             reader.onload = (e) => {
                 const imagem = document.getElementById('imagemParaCortar');
                 document.getElementById('modalEstudio').style.display = 'flex';
+                chkMoldura.checked = true;
+                document.getElementById('molduraEstudio').style.display = 'block';
                 document.getElementById('molduraEstudio').src = molduraOverlay.src;
                 atualizarTituloEstudio();
                 imagem.src = e.target.result;
@@ -467,7 +472,7 @@
                 const canvas = cropper.getCroppedCanvas({ width: 1080, height: 1920 });
                 const ctx = canvas.getContext('2d');
                 
-                if (molduraOverlay.complete && molduraOverlay.naturalWidth > 0) {
+                if (chkMoldura.checked && molduraOverlay.complete && molduraOverlay.naturalWidth > 0) {
                     ctx.drawImage(molduraOverlay, 0, 0, canvas.width, canvas.height);
                 }
                 
