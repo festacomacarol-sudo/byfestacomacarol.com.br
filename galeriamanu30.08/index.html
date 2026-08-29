@@ -23,12 +23,16 @@
         .header-perfil { background-color: #fff; padding-bottom: 20px; border-bottom: 1px solid #dbdbdb; }
         .banner { width: 100%; height: 180px; background-color: #e0e0e0; background-size: cover; background-position: center; display: block; }
         .info-perfil { display: flex; flex-direction: column; align-items: center; margin-top: -50px; text-align: center; padding: 0 20px; }
+        .titulo-evento { margin: 14px 0 6px; }
+        .data-evento { margin: 0 0 10px; }
+        .descricao { margin: 0 0 16px; }
         .avatar { width: 100px; height: 100px; border-radius: 50%; border: 4px solid #fff; background-color: #ccc; object-fit: cover; margin-bottom: 10px; }
         .estatisticas { display: flex; justify-content: center; gap: 30px; margin-bottom: 20px; }
         .stat-item { display: flex; flex-direction: column; align-items: center; }
         .stat-numero { font-weight: bold; font-size: 1.1rem; }
         .stat-label { font-size: 0.8rem; color: var(--cor-secundaria); }
         .btn-principal-festa { width: 90%; max-width: 300px; margin: 10px auto; display: block; padding: 15px; background-color: var(--cor-destaque); color: #ffffff; border: none; border-radius: 12px; font-size: 1rem; font-weight: bold; cursor: pointer; }
+        .btn-secundario-festa { width: 90%; max-width: 300px; margin: 0 auto 15px; display: block; padding: 15px; background-color: #fff; color: var(--cor-destaque); border: 2px solid var(--cor-destaque); border-radius: 12px; font-size: 1rem; font-weight: bold; cursor: pointer; text-decoration: none; text-align: center; }
         .galeria-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; padding: 8px; background-color: #f4f4f4; }
         .post-container { position: relative; background: #fff; border-radius: 12px; overflow: hidden; }
         .media-wrapper { position: relative; width: 100%; aspect-ratio: 9 / 16; background-color: #000; display: flex; align-items: center; justify-content: center; overflow: hidden; }
@@ -70,6 +74,7 @@
                 <div class="stat-item"><span class="stat-numero" id="totalComentariosGeral">0</span><span class="stat-label">Comentários</span></div>
             </div>
             <button class="btn-principal-festa" id="btnAbrirCamera">📸 Adicionar Foto</button>
+            <a class="btn-secundario-festa" id="btnCameraExterna" href="https://byfestacomacarol.com.br/molduramanu30.08/" target="_blank" rel="noopener">📷 Tire sua foto</a>
         </div>
     </header>
     <main class="galeria-grid" id="feedGaleria"></main>
