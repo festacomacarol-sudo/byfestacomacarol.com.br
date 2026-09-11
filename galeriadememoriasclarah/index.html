@@ -114,6 +114,10 @@
   .recado-card img{ width:100%; height:100%; object-fit:cover; display:block; }
   .sem-foto{ color: var(--gold-soft); font-size:0.8rem; font-family:'Cormorant Garamond', serif; font-style:italic; }
 
+  .recado-card .video-wrap{ width:100%; aspect-ratio: 16/9; background:#000; }
+  .recado-card video{ width:100%; height:100%; object-fit:contain; display:block; }
+  .recado-audio{ width:100%; margin: 4px 0 10px; height:38px; }
+
   .recado-body{ padding:16px 16px 18px; display:block; }
   .recado-nome{
     font-family:'Jost', sans-serif;
@@ -135,9 +139,10 @@
     margin:0 0 8px;
   }
 
-  .recado-actions{ display:flex; gap:8px; margin-top:12px; }
+  .recado-actions{ display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
   .recado-actions a, .recado-actions button{
     flex:1;
+    min-width:110px;
     text-align:center;
     font-family:'Jost', sans-serif;
     font-size:0.78rem;
@@ -252,19 +257,35 @@
         const card = document.createElement("div");
         card.className = "recado-card";
 
-        const fotoHtml = r.foto_url
-          ? `<img src="${r.foto_url}" alt="Foto enviada por ${escapeHtml(r.nome)}">`
-          : `<span class="sem-foto">Sem foto</span>`;
+        const temFoto = !!r.foto_url;
+        const temAudio = !!r.audio_url;
+        const temVideo = !!r.video_url;
+
+        let midiaTopoHtml;
+        if (temFoto) {
+          midiaTopoHtml = `<div class="foto-wrap"><img src="${r.foto_url}" alt="Foto enviada por ${escapeHtml(r.nome)}"></div>`;
+        } else if (temVideo) {
+          midiaTopoHtml = `<div class="video-wrap"><video controls src="${r.video_url}"></video></div>`;
+        } else {
+          midiaTopoHtml = `<div class="foto-wrap"><span class="sem-foto">Sem foto</span></div>`;
+        }
+
+        const audioHtml = temAudio
+          ? `<audio class="recado-audio" controls src="${r.audio_url}"></audio>`
+          : "";
 
         card.innerHTML = `
-          <div class="foto-wrap">${fotoHtml}</div>
+          ${midiaTopoHtml}
           <div class="recado-body">
             <div class="recado-nome">${escapeHtml(r.nome || "Sem nome")}</div>
             <div class="recado-data">${formatarData(r.data_envio)}</div>
             <div class="recado-msg">${escapeHtml(r.mensagem || "")}</div>
+            ${audioHtml}
             <div class="recado-actions">
               <button class="copiar" data-id="${docSnap.id}">Copiar mensagem</button>
-              ${r.foto_url ? `<a href="${r.foto_url}" target="_blank" rel="noopener">Ver / baixar foto</a>` : ""}
+              ${temFoto ? `<a href="${r.foto_url}" target="_blank" rel="noopener">Baixar foto</a>` : ""}
+              ${temVideo ? `<a href="${r.video_url}" target="_blank" rel="noopener">Baixar vídeo</a>` : ""}
+              ${temAudio ? `<a href="${r.audio_url}" target="_blank" rel="noopener">Baixar áudio</a>` : ""}
               <button class="excluir" data-id="${docSnap.id}">Excluir</button>
             </div>
           </div>
