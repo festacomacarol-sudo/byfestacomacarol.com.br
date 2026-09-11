@@ -144,6 +144,23 @@
     display:block;
     border-radius:11px;
   }
+  .preview-video{
+    width:100%;
+    max-height:340px;
+    display:block;
+    border-radius:11px;
+    background:#000;
+  }
+  .photo-field.has-audio{
+    padding:16px;
+    border-style:solid;
+    cursor:default;
+  }
+  .photo-field.has-audio input{ display:none; }
+  .preview-audio{
+    width:100%;
+    height:40px;
+  }
   .remove-photo{
     position:absolute;
     top:10px;
@@ -259,6 +276,35 @@
         </div>
       </div>
 
+      <div>
+        <label>ÁUDIO (OPCIONAL)</label>
+        <div class="photo-field" id="audioField">
+          <input type="file" id="audio" name="audio" accept="audio/*">
+          <div class="photo-placeholder" id="audioPlaceholder">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Z" stroke="currentColor" stroke-width="1.3"/>
+              <path d="M6 11.5a6 6 0 0 0 12 0" stroke="currentColor" stroke-width="1.3"/>
+              <path d="M12 17.5v3" stroke="currentColor" stroke-width="1.3"/>
+            </svg>
+            <span>Toque para gravar ou escolher um áudio</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <label>VÍDEO (OPCIONAL)</label>
+        <div class="photo-field" id="videoField">
+          <input type="file" id="video" name="video" accept="video/*">
+          <div class="photo-placeholder" id="videoPlaceholder">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="3" y="6" width="13" height="12" rx="2" stroke="currentColor" stroke-width="1.3"/>
+              <path d="M16 10.5L21 8v8l-5-2.5" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+            </svg>
+            <span>Toque para gravar ou escolher um vídeo</span>
+          </div>
+        </div>
+      </div>
+
       <button type="submit" class="submit" id="submitBtn">Enviar memória</button>
       <div class="status" id="status"></div>
     </form>
@@ -296,6 +342,11 @@
   // 2) Cole aqui a API Key do imgbb (passo 4)
   const IMGBB_API_KEY = "b72af0187ed2187cf43d6bdf9bc8c779";
 
+  // 3) Cole aqui o "Cloud name" e o nome do "upload preset" que você criou
+  //    no Cloudinary (usados para enviar áudio e vídeo).
+  const CLOUDINARY_CLOUD_NAME = "COLE_AQUI_SEU_CLOUD_NAME";
+  const CLOUDINARY_UPLOAD_PRESET = "COLE_AQUI_SEU_UPLOAD_PRESET";
+
   // Nome da "gaveta" onde os recados vão ficar guardados no Firestore.
   const NOME_DA_COLECAO = "recados-clarah-18-anos";
 
@@ -319,39 +370,60 @@
   const fotoInput = document.getElementById("foto");
   const photoField = document.getElementById("photoField");
   const photoPlaceholder = document.getElementById("photoPlaceholder");
+  const audioInput = document.getElementById("audio");
+  const audioField = document.getElementById("audioField");
+  const audioPlaceholder = document.getElementById("audioPlaceholder");
+  const videoInput = document.getElementById("video");
+  const videoField = document.getElementById("videoField");
+  const videoPlaceholder = document.getElementById("videoPlaceholder");
   const formScreen = document.getElementById("formScreen");
   const successScreen = document.getElementById("successScreen");
 
-  let previewEl = null;
+  function configurarPreviewMidia({ input, field, placeholder, tag, previewClass, activeClass }) {
+    let previewEl = null;
+    input.addEventListener("change", () => {
+      const file = input.files[0];
+      if (!file) return;
+      const url = URL.createObjectURL(file);
+      placeholder.style.display = "none";
+      field.classList.add(activeClass);
+      if (previewEl) previewEl.remove();
+      previewEl = document.createElement(tag);
+      previewEl.className = previewClass;
+      previewEl.src = url;
+      if (tag !== "img") previewEl.controls = true;
+      field.appendChild(previewEl);
 
-  fotoInput.addEventListener("change", () => {
-    const file = fotoInput.files[0];
-    if (!file) return;
-    const url = URL.createObjectURL(file);
-    photoPlaceholder.style.display = "none";
-    photoField.classList.add("has-image");
-    if (previewEl) previewEl.remove();
-    previewEl = document.createElement("img");
-    previewEl.className = "preview-img";
-    previewEl.src = url;
-    photoField.appendChild(previewEl);
+      if (!field.querySelector(".remove-photo")) {
+        const removeBtn = document.createElement("button");
+        removeBtn.type = "button";
+        removeBtn.className = "remove-photo";
+        removeBtn.innerHTML = "&times;";
+        removeBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          input.value = "";
+          previewEl.remove();
+          previewEl = null;
+          removeBtn.remove();
+          field.classList.remove(activeClass);
+          placeholder.style.display = "flex";
+        });
+        field.appendChild(removeBtn);
+      }
+    });
+  }
 
-    if (!photoField.querySelector(".remove-photo")) {
-      const removeBtn = document.createElement("button");
-      removeBtn.type = "button";
-      removeBtn.className = "remove-photo";
-      removeBtn.innerHTML = "&times;";
-      removeBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        fotoInput.value = "";
-        previewEl.remove();
-        previewEl = null;
-        removeBtn.remove();
-        photoField.classList.remove("has-image");
-        photoPlaceholder.style.display = "flex";
-      });
-      photoField.appendChild(removeBtn);
-    }
+  configurarPreviewMidia({
+    input: fotoInput, field: photoField, placeholder: photoPlaceholder,
+    tag: "img", previewClass: "preview-img", activeClass: "has-image"
+  });
+  configurarPreviewMidia({
+    input: audioInput, field: audioField, placeholder: audioPlaceholder,
+    tag: "audio", previewClass: "preview-audio", activeClass: "has-audio"
+  });
+  configurarPreviewMidia({
+    input: videoInput, field: videoField, placeholder: videoPlaceholder,
+    tag: "video", previewClass: "preview-video", activeClass: "has-image"
   });
 
   async function uploadParaImgbb(file) {
@@ -375,6 +447,20 @@
     return data.data.url;
   }
 
+  async function uploadParaCloudinary(file) {
+    const body = new FormData();
+    body.append("file", file);
+    body.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+
+    const resp = await fetch(
+      `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/video/upload`,
+      { method: "POST", body }
+    );
+    const data = await resp.json();
+    if (!data.secure_url) throw new Error("Falha ao enviar o arquivo.");
+    return data.secure_url;
+  }
+
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     statusEl.textContent = "";
@@ -388,12 +474,26 @@
 
       const nome = document.getElementById("nome").value.trim();
       const mensagem = document.getElementById("mensagem").value.trim();
-      const file = fotoInput.files[0];
+      const fotoFile = fotoInput.files[0];
+      const audioFile = audioInput.files[0];
+      const videoFile = videoInput.files[0];
 
       let fotoUrl = "";
-      if (file) {
+      if (fotoFile) {
         statusEl.textContent = "Enviando foto...";
-        fotoUrl = await uploadParaImgbb(file);
+        fotoUrl = await uploadParaImgbb(fotoFile);
+      }
+
+      let audioUrl = "";
+      if (audioFile) {
+        statusEl.textContent = "Enviando áudio...";
+        audioUrl = await uploadParaCloudinary(audioFile);
+      }
+
+      let videoUrl = "";
+      if (videoFile) {
+        statusEl.textContent = "Enviando vídeo...";
+        videoUrl = await uploadParaCloudinary(videoFile);
       }
 
       statusEl.textContent = "Salvando memória...";
@@ -401,6 +501,8 @@
         nome,
         mensagem,
         foto_url: fotoUrl,
+        audio_url: audioUrl,
+        video_url: videoUrl,
         data_envio: serverTimestamp()
       });
 
