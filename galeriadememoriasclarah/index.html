@@ -110,7 +110,23 @@
   .recado-card img{ width:100%; height:100%; object-fit:cover; display:block; }
   .sem-foto{ color: var(--gold-soft); font-size:0.8rem; font-family:'Cormorant Garamond', serif; font-style:italic; }
 
-  .recado-card .video-wrap{ width:100%; aspect-ratio: 16/9; background:#000; }
+  .recado-card .video-wrap{ width:100%; aspect-ratio: 16/9; background:#000; position:relative; cursor:pointer; }
+  .recado-card .video-wrap img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .video-play-btn{
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    width:54px; height:54px; border-radius:50%;
+    background: rgba(0,0,0,0.55);
+    border:1px solid rgba(255,255,255,0.55);
+    display:flex; align-items:center; justify-content:center;
+    pointer-events:none;
+  }
+  .video-play-btn::after{
+    content:"";
+    border-style: solid;
+    border-width: 9px 0 9px 15px;
+    border-color: transparent transparent transparent #fff;
+    margin-left:4px;
+  }
   .recado-card video{ width:100%; height:100%; object-fit:contain; display:block; }
   .recado-audio{ width:100%; margin: 4px 0 10px; height:38px; }
 
@@ -230,6 +246,22 @@
 
   const mensagensPorId = {};
 
+  // Gera a URL de uma miniatura (frame do vídeo) a partir da URL de vídeo do
+  // Cloudinary, sem precisar baixar o vídeo inteiro só pra mostrar a prévia.
+  function cloudinaryVideoThumb(url, width) {
+    try {
+      const marcador = "/video/upload/";
+      const idx = url.indexOf(marcador);
+      if (idx === -1) return null;
+      const antes = url.slice(0, idx + marcador.length);
+      let depois = url.slice(idx + marcador.length);
+      depois = depois.replace(/\.[a-zA-Z0-9]+($|\?.*$)/, "");
+      return `${antes}so_0,w_${width},c_fill,q_auto,f_jpg/${depois}.jpg`;
+    } catch (err) {
+      return null;
+    }
+  }
+
   function formatarData(timestamp) {
     if (!timestamp) return "";
     const d = timestamp.toDate();
@@ -257,15 +289,21 @@
 
         let midiaTopoHtml;
         if (temFoto) {
-          midiaTopoHtml = `<div class="foto-wrap"><img src="${r.foto_url}" alt="Foto enviada por ${escapeHtml(r.nome)}"></div>`;
+          midiaTopoHtml = `<div class="foto-wrap"><img src="${r.foto_url}" alt="Foto enviada por ${escapeHtml(r.nome)}" loading="lazy" decoding="async"></div>`;
         } else if (temVideo) {
-          midiaTopoHtml = `<div class="video-wrap"><video controls src="${r.video_url}"></video></div>`;
+          const thumbUrl = cloudinaryVideoThumb(r.video_url, 480);
+          midiaTopoHtml = thumbUrl
+            ? `<div class="video-wrap video-thumb" data-video-url="${r.video_url}">
+                 <img src="${thumbUrl}" alt="Prévia do vídeo enviado por ${escapeHtml(r.nome)}" loading="lazy" decoding="async">
+                 <div class="video-play-btn"></div>
+               </div>`
+            : `<div class="video-wrap"><video controls preload="none" src="${r.video_url}"></video></div>`;
         } else {
           midiaTopoHtml = `<div class="foto-wrap"><span class="sem-foto">Sem foto</span></div>`;
         }
 
         const audioHtml = temAudio
-          ? `<audio class="recado-audio" controls src="${r.audio_url}"></audio>`
+          ? `<audio class="recado-audio" controls preload="none" src="${r.audio_url}"></audio>`
           : "";
 
         card.innerHTML = `
@@ -293,6 +331,13 @@
 
       lista.querySelectorAll(".copiar").forEach((btn) => {
         btn.addEventListener("click", () => copiarMensagem(btn));
+      });
+
+      lista.querySelectorAll(".video-thumb").forEach((wrap) => {
+        wrap.addEventListener("click", () => {
+          const url = wrap.dataset.videoUrl;
+          wrap.outerHTML = `<div class="video-wrap"><video controls autoplay playsinline src="${url}"></video></div>`;
+        });
       });
     });
   }
