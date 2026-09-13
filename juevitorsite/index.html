@@ -321,7 +321,7 @@
   @media (max-width:1000px){
     .wrap{ padding:0 32px; }
     .topbar{ padding:16px 24px; }
-    .hero{ padding:0 0 70px; min-height:auto; }
+    .hero{ padding:0 0 8px; min-height:auto; }
     .band-cols{ flex-direction:column; gap:34px; }
     .band-divider{ display:none; }
     .band-col{ padding:0 24px; }
@@ -940,6 +940,14 @@
     color:var(--terracotta);
     text-decoration:underline;
     text-underline-offset:3px;
+  }
+
+  @media (max-width:700px){
+    .mapa-modal{ padding:14px; }
+    .mapa-modal-inner{ padding:32px 18px 26px; border-radius:16px; }
+    .mapa-title{ font-size:13px; margin-bottom:18px; }
+    .mapa-illus{ margin-bottom:22px; }
+    .mapa-gmaps-wrap iframe{ height:240px; }
   }
 </style>
 </head>
