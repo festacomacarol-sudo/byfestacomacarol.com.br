@@ -359,6 +359,11 @@
       </div>
 
       <div class="field">
+        <label for="cpf">CPF</label>
+        <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" inputmode="numeric" maxlength="14" required>
+      </div>
+
+      <div class="field">
         <label for="nascimento">Data de nascimento</label>
         <input type="date" id="nascimento" name="nascimento" required>
       </div>
@@ -426,29 +431,46 @@
     lockedView.classList.remove('show');
   }
 
-  // Consulta a planilha via JSONP para saber se a confirmação deste dispositivo
-  // ainda existe lá. Se alguém apagar a linha na planilha, o formulário volta
-  // a ficar disponível para essa pessoa confirmar de novo.
-  function checkDeviceOnServer(deviceId) {
-    const callbackName = 'clarah18Check_' + Date.now();
+  // Chamada via JSONP (tag <script>) em vez de fetch: assim dá pra ler a
+  // resposta do Apps Script sem esbarrar em bloqueio de CORS.
+  function jsonp(url, onSuccess, onError) {
+    const callbackName = 'clarah18Cb_' + Date.now() + '_' + Math.floor(Math.random() * 1e6);
     const script = document.createElement('script');
+    let done = false;
+
+    function cleanup() {
+      delete window[callbackName];
+      if (script.parentNode) script.remove();
+    }
 
     window[callbackName] = function(response) {
-      if (response && response.exists === false) {
-        showForm();
-      }
-      delete window[callbackName];
-      script.remove();
+      done = true;
+      cleanup();
+      onSuccess(response);
     };
 
     script.onerror = function() {
-      // Sem conexão ou script fora do ar: mantém o estado atual (falha segura)
-      delete window[callbackName];
-      script.remove();
+      if (done) return;
+      cleanup();
+      onError();
     };
 
-    script.src = SCRIPT_URL + '?deviceId=' + encodeURIComponent(deviceId) + '&callback=' + callbackName;
+    script.src = url + (url.indexOf('?') === -1 ? '?' : '&') + 'callback=' + callbackName;
     document.body.appendChild(script);
+  }
+
+  // Consulta a planilha para saber se a confirmação deste dispositivo ainda
+  // existe lá. Se alguém apagar a linha na planilha, o formulário volta a
+  // ficar disponível para essa pessoa confirmar de novo.
+  function checkDeviceOnServer(deviceId) {
+    const url = SCRIPT_URL + '?action=check&deviceId=' + encodeURIComponent(deviceId);
+    jsonp(url, function(response) {
+      if (response && response.exists === false) {
+        showForm();
+      }
+    }, function() {
+      // Sem conexão ou script fora do ar: mantém o estado atual (falha segura)
+    });
   }
 
   // Bloqueio: se este dispositivo/navegador já confirmou, mostra aviso e nem exibe o formulário
@@ -471,7 +493,46 @@
   const form = document.getElementById('rsvpForm');
   const errorMsg = document.getElementById('errorMsg');
   const submitBtn = document.getElementById('submitBtn');
-  const successName = null;
+  const cpfInput = document.getElementById('cpf');
+
+  // Máscara do CPF enquanto a pessoa digita: 000.000.000-00
+  function maskCPF(value) {
+    value = value.replace(/\D/g, '').slice(0, 11);
+    if (value.length > 9) {
+      value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/, '$1.$2.$3-$4');
+    } else if (value.length > 6) {
+      value = value.replace(/(\d{3})(\d{3})(\d{1,3})/, '$1.$2.$3');
+    } else if (value.length > 3) {
+      value = value.replace(/(\d{3})(\d{1,3})/, '$1.$2');
+    }
+    return value;
+  }
+
+  cpfInput.addEventListener('input', () => {
+    cpfInput.value = maskCPF(cpfInput.value);
+  });
+
+  // Validação do CPF (dígitos verificadores), pra pegar erro de digitação
+  // antes mesmo de mandar pro servidor.
+  function isValidCPF(cpfRaw) {
+    const cpf = String(cpfRaw).replace(/\D/g, '');
+    if (cpf.length !== 11) return false;
+    if (/^(\d)\1{10}$/.test(cpf)) return false;
+
+    let soma = 0;
+    for (let i = 0; i < 9; i++) soma += parseInt(cpf[i], 10) * (10 - i);
+    let resto = 11 - (soma % 11);
+    if (resto >= 10) resto = 0;
+    if (resto !== parseInt(cpf[9], 10)) return false;
+
+    soma = 0;
+    for (let i = 0; i < 10; i++) soma += parseInt(cpf[i], 10) * (11 - i);
+    resto = 11 - (soma % 11);
+    if (resto >= 10) resto = 0;
+    if (resto !== parseInt(cpf[10], 10)) return false;
+
+    return true;
+  }
 
   function calcularIdade(dataNascimentoStr) {
     const hoje = new Date();
@@ -489,16 +550,32 @@
     return dia + '/' + mes + '/' + ano;
   }
 
+  function resetSubmitBtn() {
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Confirmar presença';
+  }
+
+  function mostrarErro(msg) {
+    resetSubmitBtn();
+    errorMsg.textContent = msg;
+    errorMsg.style.display = 'block';
+  }
+
   form.addEventListener('submit', function(e){
     e.preventDefault();
 
     const nome = document.getElementById('nome').value.trim();
+    const cpf = cpfInput.value.trim();
     const nascimentoRaw = document.getElementById('nascimento').value;
     const presenca = presencaInput.value;
 
-    if (!nome || !nascimentoRaw || !presenca) {
-      errorMsg.textContent = 'Por favor, preencha todos os campos corretamente.';
-      errorMsg.style.display = 'block';
+    if (!nome || !cpf || !nascimentoRaw || !presenca) {
+      mostrarErro('Por favor, preencha todos os campos corretamente.');
+      return;
+    }
+
+    if (!isValidCPF(cpf)) {
+      mostrarErro('CPF inválido. Confira os números digitados.');
       return;
     }
 
@@ -509,29 +586,33 @@
     submitBtn.disabled = true;
     submitBtn.textContent = 'Enviando...';
 
-    const payload = new FormData();
-    payload.append('nome', nome);
-    payload.append('presenca', presenca);
-    payload.append('nascimento', formatarData(nascimentoRaw));
-    payload.append('situacao', situacao);
-    payload.append('data', new Date().toLocaleString('pt-BR'));
-    payload.append('deviceId', getDeviceId());
+    const params = {
+      action: 'submit',
+      nome: nome,
+      cpf: cpf,
+      presenca: presenca,
+      nascimento: formatarData(nascimentoRaw),
+      situacao: situacao,
+      data: new Date().toLocaleString('pt-BR'),
+      deviceId: getDeviceId()
+    };
 
-    fetch(SCRIPT_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      body: payload
-    })
-    .then(() => {
-      localStorage.setItem(STORAGE_KEY, '1');
-      card.classList.add('is-success');
-      successView.classList.add('show');
-    })
-    .catch(() => {
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Confirmar presença';
-      errorMsg.textContent = 'Não foi possível enviar. Verifique sua conexão e tente novamente.';
-      errorMsg.style.display = 'block';
+    const query = Object.keys(params)
+      .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
+      .join('&');
+
+    jsonp(SCRIPT_URL + '?' + query, function(response) {
+      if (response && response.status === 'ok') {
+        localStorage.setItem(STORAGE_KEY, '1');
+        card.classList.add('is-success');
+        successView.classList.add('show');
+      } else if (response && response.status === 'duplicate') {
+        mostrarErro('Esse CPF já confirmou presença anteriormente. Se você acha que isso é um engano, fale com a nossa equipe.');
+      } else {
+        mostrarErro('Não foi possível enviar. Tente novamente em instantes.');
+      }
+    }, function() {
+      mostrarErro('Não foi possível enviar. Verifique sua conexão e tente novamente.');
     });
   });
 </script>
