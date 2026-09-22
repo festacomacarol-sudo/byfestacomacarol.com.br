@@ -189,57 +189,6 @@
     font-weight: 600;
   }
 
-  .guest-row{
-    display:flex;
-    align-items:center;
-    gap: 10px;
-    margin-bottom: 12px;
-  }
-
-  .guest-name{
-    flex: 3;
-  }
-
-  .guest-age{
-    flex: 1;
-    min-width: 0;
-  }
-
-  .guest-age::placeholder,
-  .guest-name::placeholder{
-    color: rgba(28,43,74,0.45);
-  }
-
-  .remove-guest{
-    flex: 0 0 auto;
-    background: transparent;
-    border: none;
-    color: rgba(28,43,74,0.5);
-    font-size: 1.3rem;
-    line-height: 1;
-    cursor: pointer;
-    padding: 0 2px;
-    margin: 0;
-  }
-  .remove-guest:hover{ color: #a4372c; background: transparent; }
-
-  .add-guest-btn{
-    margin-top: 2px;
-    background: transparent;
-    color: var(--gold-deep);
-    border: 1px dashed var(--gold);
-    font-family:'Cinzel', serif;
-    font-size: 0.78rem;
-    letter-spacing: 0.05em;
-    padding: 9px 14px;
-    border-radius: 3px;
-    cursor: pointer;
-    width: 100%;
-  }
-  .add-guest-btn:hover{
-    background: rgba(184,135,60,0.12);
-  }
-
   button{
     margin-top: 8px;
     background: var(--navy);
@@ -271,6 +220,65 @@
     font-style: italic;
     display:none;
   }
+
+  .success{
+    color: #2e6b3e;
+    font-size: 0.9rem;
+    font-style: italic;
+    display:none;
+    text-align:center;
+  }
+
+  input[type="text"].cpf-input{
+    width:100%;
+    background: rgba(255,255,255,0.5);
+    border: none;
+    border-bottom: 1.5px solid var(--blue-line);
+    color: var(--navy);
+    font-family:'Cormorant Garamond', serif;
+    font-size: 1.15rem;
+    padding: 8px 6px;
+  }
+  input[type="text"].cpf-input:focus{
+    outline:none;
+    border-bottom-color: var(--gold);
+  }
+
+  .child-box{
+    border: 1px dashed var(--blue-line);
+    border-radius: 3px;
+    padding: 12px 14px;
+    background: rgba(255,255,255,0.25);
+  }
+
+  .child-toggle{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    cursor:pointer;
+  }
+  .child-toggle input{
+    margin-top: 4px;
+    cursor:pointer;
+  }
+  .child-toggle span{
+    font-family:'Cormorant Garamond', serif;
+    font-size: 1rem;
+    color: var(--navy);
+  }
+
+  .child-age-row{
+    display:none;
+    margin-top: 12px;
+  }
+  .child-age-row.visible{
+    display:block;
+  }
+
+  button:disabled{
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
 </style>
 </head>
 <body>
@@ -286,15 +294,37 @@
 
   <form id="rsvpForm">
     <div class="field">
-      <label>Convidados incluídos neste convite</label>
-      <div id="guestsContainer">
-        <div class="guest-row">
-          <input type="text" class="guest-name" placeholder="Nome completo" required>
-          <input type="number" class="guest-age" placeholder="Idade" min="0" max="120" required>
+      <label>Seu CPF (para confirmar a presença)</label>
+      <input type="text" id="cpfInput" class="cpf-input" placeholder="000.000.000-00" inputmode="numeric" maxlength="14" required>
+      <span class="hint">Usado apenas para validar sua confirmação. Cada CPF confirma apenas uma vez.</span>
+      <span class="error" id="cpfError">Informe um CPF válido.</span>
+      <span class="error" id="cpfDuplicateError">Este CPF já confirmou presença anteriormente.</span>
+    </div>
+
+    <div class="field">
+      <label>Nome completo</label>
+      <input type="text" id="guestNameInput" class="cpf-input" placeholder="Nome completo" required>
+    </div>
+
+    <div class="field">
+      <label>Sua idade</label>
+      <input type="number" id="guestAgeInput" placeholder="Idade" min="0" max="120" required>
+    </div>
+
+    <div class="field">
+      <div class="child-box">
+        <label class="child-toggle">
+          <input type="checkbox" id="hasChildCheckbox">
+          <span>Confirmar presença de uma criança incluída neste convite</span>
+        </label>
+        <span class="hint">Válido apenas para a criança já incluída neste convite individual — não é possível adicionar outras crianças.</span>
+        <div class="child-age-row" id="childAgeRow">
+          <label>Nome da criança</label>
+          <input type="text" id="childNameInput" class="cpf-input" placeholder="Nome completo da criança">
+          <label style="margin-top:10px;">Idade da criança</label>
+          <input type="number" id="childAgeInput" placeholder="Idade" min="0" max="17">
         </div>
       </div>
-      <button type="button" id="addGuestBtn" class="add-guest-btn">+ Adicionar outro convidado</button>
-      <span class="hint">Informe o nome completo e a idade de cada convidado.</span>
     </div>
 
     <div class="field">
@@ -311,102 +341,243 @@
       </div>
     </div>
 
-    <button type="submit">Enviar confirmação</button>
-    <div class="error" id="formError">Por favor, preencha o nome e a idade de cada convidado, e informe se irá à festa.</div>
+    <button type="submit" id="submitBtn">Enviar confirmação</button>
+    <div class="error" id="formError">Por favor, preencha o CPF, o nome, a idade e informe se irá à festa.</div>
+    <div class="error" id="submitError">Não foi possível enviar sua confirmação agora. Tente novamente em instantes.</div>
+    <div class="success" id="submitSuccess">Confirmação recebida com sucesso. Obrigado!</div>
   </form>
 
-  <div class="footer-note">Sua resposta será enviada por WhatsApp.</div>
+  <div class="footer-note">Sua resposta será registrada em nossa planilha de confirmações.</div>
 </div>
 
 <script>
-  // Número de WhatsApp que receberá as confirmações (formato internacional, sem espaços/símbolos).
-  // Ex.: 55 11 90000-0000 -> "5511900000000"
-  const WHATSAPP_NUMBER = "5511995614312";
+  // URL do Google Apps Script (Web App) que recebe o POST e grava na planilha (Google Sheets,
+  // que pode ser aberta/exportada como Excel a qualquer momento). Veja instruções de configuração
+  // no final deste arquivo (comentário ao fim do script).
+  const SHEET_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbw6QlX14ktTOjCto5hMlOwrt_1F6f0mat0x44vfkC9_hbOkfs_bKHBqaEf0wE6Yx-ws/exec";
 
   const form = document.getElementById('rsvpForm');
   const vaiFestaRadios = document.querySelectorAll('input[name="vaiFesta"]');
   const formError = document.getElementById('formError');
-  const guestsContainer = document.getElementById('guestsContainer');
-  const addGuestBtn = document.getElementById('addGuestBtn');
-  const MAX_GUESTS = 8;
+  const submitError = document.getElementById('submitError');
+  const submitSuccess = document.getElementById('submitSuccess');
+  const guestNameInput = document.getElementById('guestNameInput');
+  const guestAgeInput = document.getElementById('guestAgeInput');
+  const submitBtn = document.getElementById('submitBtn');
+  const cpfInput = document.getElementById('cpfInput');
+  const cpfError = document.getElementById('cpfError');
+  const cpfDuplicateError = document.getElementById('cpfDuplicateError');
+  const hasChildCheckbox = document.getElementById('hasChildCheckbox');
+  const childAgeRow = document.getElementById('childAgeRow');
+  const childNameInput = document.getElementById('childNameInput');
+  const childAgeInput = document.getElementById('childAgeInput');
 
-  function updateRemoveButtons(){
-    const rows = guestsContainer.querySelectorAll('.guest-row');
-    rows.forEach((row, index) => {
-      let removeBtn = row.querySelector('.remove-guest');
-      if (rows.length > 1) {
-        if (!removeBtn) {
-          removeBtn = document.createElement('button');
-          removeBtn.type = 'button';
-          removeBtn.className = 'remove-guest';
-          removeBtn.innerHTML = '&times;';
-          removeBtn.addEventListener('click', function(){
-            row.remove();
-            updateRemoveButtons();
-          });
-          row.appendChild(removeBtn);
-        }
-      } else if (removeBtn) {
-        removeBtn.remove();
-      }
-    });
-    addGuestBtn.style.display = rows.length >= MAX_GUESTS ? 'none' : 'block';
+  // ---------- CPF: máscara, validação e checagem local de duplicidade ----------
+
+  function maskCPF(value){
+    value = value.replace(/\D/g, '').slice(0, 11);
+    if (value.length > 9) {
+      value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/, '$1.$2.$3-$4');
+    } else if (value.length > 6) {
+      value = value.replace(/(\d{3})(\d{3})(\d{1,3})/, '$1.$2.$3');
+    } else if (value.length > 3) {
+      value = value.replace(/(\d{3})(\d{1,3})/, '$1.$2');
+    }
+    return value;
   }
 
-  addGuestBtn.addEventListener('click', function(){
-    const rows = guestsContainer.querySelectorAll('.guest-row');
-    if (rows.length >= MAX_GUESTS) return;
-
-    const row = document.createElement('div');
-    row.className = 'guest-row';
-    row.innerHTML = `
-      <input type="text" class="guest-name" placeholder="Nome completo" required>
-      <input type="number" class="guest-age" placeholder="Idade" min="0" max="120" required>
-    `;
-    guestsContainer.appendChild(row);
-    updateRemoveButtons();
+  cpfInput.addEventListener('input', function(){
+    cpfInput.value = maskCPF(cpfInput.value);
+    cpfError.style.display = 'none';
+    cpfDuplicateError.style.display = 'none';
   });
 
-  form.addEventListener('submit', function(e){
+  function isValidCPF(cpf){
+    cpf = cpf.replace(/\D/g, '');
+    if (cpf.length !== 11) return false;
+    if (/^(\d)\1{10}$/.test(cpf)) return false; // todos os dígitos iguais
+
+    let sum = 0;
+    for (let i = 0; i < 9; i++) sum += parseInt(cpf.charAt(i), 10) * (10 - i);
+    let check1 = (sum * 10) % 11;
+    if (check1 === 10) check1 = 0;
+    if (check1 !== parseInt(cpf.charAt(9), 10)) return false;
+
+    sum = 0;
+    for (let i = 0; i < 10; i++) sum += parseInt(cpf.charAt(i), 10) * (11 - i);
+    let check2 = (sum * 10) % 11;
+    if (check2 === 10) check2 = 0;
+    if (check2 !== parseInt(cpf.charAt(10), 10)) return false;
+
+    return true;
+  }
+
+  function getConfirmedCPFsLocal(){
+    try {
+      return JSON.parse(localStorage.getItem('rsvp_confirmed_cpfs') || '[]');
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function markCPFConfirmedLocal(cpfDigits){
+    const list = getConfirmedCPFsLocal();
+    if (!list.includes(cpfDigits)) {
+      list.push(cpfDigits);
+      localStorage.setItem('rsvp_confirmed_cpfs', JSON.stringify(list));
+    }
+  }
+
+  // ---------- Confirmação de criança ----------
+
+  hasChildCheckbox.addEventListener('change', function(){
+    if (hasChildCheckbox.checked) {
+      childAgeRow.classList.add('visible');
+      childAgeInput.setAttribute('required', 'required');
+      childNameInput.setAttribute('required', 'required');
+    } else {
+      childAgeRow.classList.remove('visible');
+      childAgeInput.removeAttribute('required');
+      childNameInput.removeAttribute('required');
+      childAgeInput.value = '';
+      childNameInput.value = '';
+    }
+  });
+
+  form.addEventListener('submit', async function(e){
     e.preventDefault();
 
-    const rows = guestsContainer.querySelectorAll('.guest-row');
-    const guests = [];
-    let allValid = true;
+    formError.style.display = 'none';
+    submitError.style.display = 'none';
+    submitSuccess.style.display = 'none';
+    cpfError.style.display = 'none';
+    cpfDuplicateError.style.display = 'none';
 
-    rows.forEach(row => {
-      const nome = row.querySelector('.guest-name').value.trim();
-      const idade = row.querySelector('.guest-age').value.trim();
-      if (!nome || idade === '') {
-        allValid = false;
-      } else {
-        guests.push({ nome, idade });
-      }
-    });
-
+    const cpfDigits = cpfInput.value.replace(/\D/g, '');
+    const nomeCompleto = guestNameInput.value.trim();
+    const idadeCompleto = guestAgeInput.value.trim();
     const vaiFestaEl = document.querySelector('input[name="vaiFesta"]:checked');
 
-    if (!allValid || guests.length === 0 || !vaiFestaEl) {
+    if (!nomeCompleto || idadeCompleto === '' || !vaiFestaEl) {
       formError.style.display = 'block';
       return;
     }
-    formError.style.display = 'none';
+
+    if (!isValidCPF(cpfDigits)) {
+      cpfError.style.display = 'block';
+      return;
+    }
+
+    const nomeCrianca = childNameInput.value.trim();
+    const idadeCrianca = childAgeInput.value.trim();
+
+    if (hasChildCheckbox.checked && (nomeCrianca === '' || idadeCrianca === '')) {
+      formError.style.display = 'block';
+      return;
+    }
+
+    // Checagem rápida local (evita reenvio óbvio no mesmo navegador).
+    // A checagem definitiva contra reenvio de outros dispositivos é feita no servidor (planilha).
+    if (getConfirmedCPFsLocal().includes(cpfDigits)) {
+      cpfDuplicateError.style.display = 'block';
+      return;
+    }
 
     const vaiFesta = vaiFestaEl.value;
+    const payload = {
+      cpf: cpfDigits,
+      nome: nomeCompleto,
+      idade: idadeCompleto,
+      vaiFesta: vaiFesta,
+      crianca: hasChildCheckbox.checked ? { nome: nomeCrianca, idade: idadeCrianca } : null,
+      enviadoEm: new Date().toISOString()
+    };
 
-    let mensagem = `Confirmação de presença - Bruna Cristina XV Anos%0A%0A`;
-    mensagem += `Vai à festa: ${encodeURIComponent(vaiFesta)}%0A%0A`;
-    mensagem += `Convidados:%0A`;
-    guests.forEach(g => {
-      mensagem += `- ${encodeURIComponent(g.nome)} (${encodeURIComponent(g.idade)} anos)%0A`;
-    });
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Enviando...';
 
-    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${mensagem}`;
-    window.open(url, '_blank');
+    try {
+      if (!SHEET_WEBAPP_URL || SHEET_WEBAPP_URL.indexOf('COLOQUE_AQUI') === 0) {
+        throw new Error('SHEET_WEBAPP_URL não configurada.');
+      }
+
+      const response = await fetch(SHEET_WEBAPP_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json();
+
+      if (data && data.status === 'duplicate') {
+        cpfDuplicateError.style.display = 'block';
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Enviar confirmação';
+        return;
+      }
+
+      if (!data || data.status !== 'ok') {
+        throw new Error('Resposta inesperada do servidor.');
+      }
+
+      markCPFConfirmedLocal(cpfDigits);
+      submitSuccess.style.display = 'block';
+      submitBtn.textContent = 'Confirmação enviada';
+    } catch (err) {
+      console.error(err);
+      submitError.style.display = 'block';
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Enviar confirmação';
+    }
   });
-
-  updateRemoveButtons();
 </script>
+
+<!--
+  ================================================================
+  COMO LIGAR ESTE FORMULÁRIO A UMA PLANILHA (GOOGLE SHEETS / EXCEL)
+
+  ================================================================
+  1. Crie uma planilha no Google Sheets com as colunas (nessa ordem):
+     CPF | NOME | ESTARÁ PRESENTE | IDADE | CRIANÇA | NOME DA CRIANÇA | IDADE DA CRIANÇA | ENVIADO EM
+  2. Nessa planilha, vá em Extensões > Apps Script e cole o código abaixo:
+
+     function doPost(e) {
+       var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+       var data = JSON.parse(e.postData.contents);
+       var cpf = data.cpf;
+
+       var cpfColumn = sheet.getRange("A:A").getValues().flat();
+       if (cpfColumn.indexOf(cpf) !== -1) {
+         return ContentService.createTextOutput(JSON.stringify({status: "duplicate"}))
+           .setMimeType(ContentService.MimeType.JSON);
+       }
+
+       var temCrianca = data.crianca ? "Sim" : "Não";
+       var nomeCrianca = data.crianca ? data.crianca.nome : "";
+       var idadeCrianca = data.crianca ? data.crianca.idade : "";
+
+       sheet.appendRow([
+         cpf,
+         data.nome,
+         data.vaiFesta,
+         data.idade,
+         temCrianca,
+         nomeCrianca,
+         idadeCrianca,
+         data.enviadoEm
+       ]);
+
+       return ContentService.createTextOutput(JSON.stringify({status: "ok"}))
+         .setMimeType(ContentService.MimeType.JSON);
+     }
+
+  3. Publique como "Implantação > Nova implantação > Aplicativo da Web",
+     com acesso "Qualquer pessoa", e copie a URL gerada.
+  4. Cole essa URL na constante SHEET_WEBAPP_URL no topo do <script> deste arquivo.
+  5. A planilha do Google Sheets pode ser baixada a qualquer momento como .xlsx
+     em Arquivo > Fazer download > Microsoft Excel (.xlsx).
+-->
+
 
 </body>
 </html>
