@@ -182,13 +182,15 @@
   }
 
   .store-grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
     gap:10px;
     margin-top:26px;
   }
 
   .store{
+    flex:0 0 calc(50% - 5px);
     display:flex;
     align-items:center;
     justify-content:center;
@@ -214,13 +216,12 @@
     .top-logo{ width:340px; }
     .measures{ padding:48px 64px 42px; }
     .stores{ padding:48px 64px 54px; }
-    .store-grid{ grid-template-columns:1fr 1fr 1fr; gap:12px; }
+    .store-grid{ gap:12px; }
+    .store{ flex:0 0 calc(33.333% - 8px); }
     .store{ font-size:18px; padding:18px 10px; }
   }
 
-  @media (max-width:360px){
-    .store-grid{ grid-template-columns:1fr 1fr; }
-  }
+
 </style>
 </head>
 <body>
@@ -279,14 +280,12 @@
         <a class="store" href="https://www.garagerio.com.br" target="_blank" rel="noopener">Garage</a>
         <a class="store" href="https://www.granado.com.br" target="_blank" rel="noopener">Granado</a>
         <a class="store" href="https://www.hm.com.br/" target="_blank" rel="noopener">H&amp;M</a>
-        <a class="store" href="https://www.hering.com.br" target="_blank" rel="noopener">Hering</a>
         <a class="store" href="https://br.loccitane.com/" target="_blank" rel="noopener">L'Occitane</a>
         <a class="store" href="https://www.morana.com.br" target="_blank" rel="noopener">Morana</a>
         <a class="store" href="https://www.natura.com.br" target="_blank" rel="noopener">Natura</a>
         <a class="store" href="https://www.bynv.com.br" target="_blank" rel="noopener">NV</a>
         <a class="store" href="https://www.oceane.com.br" target="_blank" rel="noopener">Océane</a>
         <a class="store" href="https://plakaacessorios.com/" target="_blank" rel="noopener">Plaka Acessórios</a>
-        <a class="store" href="https://www.riachuelo.com.br" target="_blank" rel="noopener">Riachuelo</a>
         <a class="store" href="https://www.santalolla.com.br" target="_blank" rel="noopener">Santa Lolla</a>
         <a class="store" href="https://www.sephora.com.br" target="_blank" rel="noopener">Sephora</a>
         <a class="store" href="https://www.schutz.com.br" target="_blank" rel="noopener">Schutz</a>
