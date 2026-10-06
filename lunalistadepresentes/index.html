@@ -193,6 +193,8 @@
   .modal h3{font-family:var(--font-script);font-weight:400;font-size:3.4rem;line-height:1;}
   .modal p{color:var(--ink-soft);font-size:1.12rem;margin-top:8px;}
   .modal .x{position:absolute;top:12px;right:14px;font-size:1.3rem;padding:10px;color:var(--ink-soft);z-index:2;}
+  .storelink{display:inline-block;margin-top:12px;font-size:.8rem;letter-spacing:.18em;text-transform:uppercase;font-weight:700;color:var(--ink);border-bottom:1px solid var(--ink);padding-bottom:2px;}
+  .storelink[hidden]{display:none;}
   .timer{display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:12px 0;margin:20px 0 14px;}
   .timer b{font-size:2rem;font-weight:600;font-variant-numeric:tabular-nums;}
   .timer span{font-size:.78rem;letter-spacing:.22em;text-transform:uppercase;font-weight:700;color:var(--ink-soft);}
@@ -238,8 +240,9 @@
 <div class="overlay" id="giftModal" role="dialog" aria-modal="true" aria-labelledby="giftTitle">
   <div class="modal">
     <button class="x" id="giftModalClose" aria-label="Fechar">✕</button>
-    <h3 id="giftTitle" >Você concluiu a compra?</h3>
-    <p>Confirme somente depois de finalizar o pedido. Se não confirmar, o presente volta para a lista quando o tempo acabar.</p>
+    <h3 id="giftTitle">Finalize sua compra</h3>
+    <p>A loja abriu em outra aba. Você tem 10 minutos para finalizar a compra e voltar aqui para confirmar. Se o tempo acabar, o presente volta para a lista.</p>
+    <a class="storelink" id="giftStoreLink" href="#" target="_blank" rel="noopener" hidden>Abrir a página da loja</a>
     <div class="timer"><span>Tempo para confirmar</span><b id="giftTimer">10:00</b></div>
     <input class="field" id="giftName" placeholder="Seu nome" maxlength="60" autocomplete="name">
     <input class="field" id="giftEmail" type="email" placeholder="E-mail para contato (opcional)" autocomplete="email">
@@ -421,13 +424,17 @@ function listenGifts(){
   });
 }
 
-async function openGiftModal(id){
+function openGiftModal(id){
   activeGiftId = id;
-  try{
-    await updateDoc(eventDoc('gifts', String(id)), { status:'reserved', reservedAt: serverTimestamp(), reservedBy:null });
-  }catch(err){ console.warn(err); showToast(FAIL_MSG); activeGiftId = null; return; }
+  const gift = GIFTS.find(g=>g.id === id);
+  const link = $('giftStoreLink');
+  // link de reserva: se o navegador bloquear a nova aba, a pessoa ainda chega na loja
+  if(gift && gift.url){ link.href = gift.url; link.hidden = false; } else { link.hidden = true; }
   $('giftModal').classList.add('open');
   startGiftTimer(RESERVE_SECONDS);
+  // reserva em segundo plano: o aviso não espera o servidor responder
+  updateDoc(eventDoc('gifts', String(id)), { status:'reserved', reservedAt: serverTimestamp(), reservedBy:null })
+    .catch(err=>{ console.warn(err); showToast('Não foi possível reservar agora, mas você pode continuar a compra.'); });
 }
 
 function releaseActiveGift(){
