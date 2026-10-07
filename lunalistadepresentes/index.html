@@ -214,7 +214,7 @@
 <body>
 
 <main class="page">
-  <nav class="topbar"><a class="back" href="/lunasite">‹ Voltar ao convite</a></nav>
+  <nav class="topbar"><a class="back" href="https://festacomcarol.com.br/lunasite">‹ Voltar ao convite</a></nav>
 
     <div class="plaque-img rise" style="--d:.15s">
       <h1 class="sr-only">Lista de presentes</h1>
@@ -268,12 +268,12 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "COLE_AQUI",
-  authDomain: "COLE_AQUI.firebaseapp.com",
-  projectId: "COLE_AQUI",
-  storageBucket: "COLE_AQUI.appspot.com",
-  messagingSenderId: "COLE_AQUI",
-  appId: "COLE_AQUI"
+  apiKey: "AIzaSyBq7h2Ad3Z7TzZ666yNO8DyzDdemmi1dsk",
+  authDomain: "convites-festacomcarol.firebaseapp.com",
+  projectId: "convites-festacomcarol",
+  storageBucket: "convites-festacomcarol.firebasestorage.app",
+  messagingSenderId: "268847347614",
+  appId: "1:268847347614:web:e865b9b38927bee051888f"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -305,6 +305,13 @@ service cloud.firestore {
     match /events/{eventId}/messages/{msgId} {
       allow read: if true;
       allow create: if true;
+    }
+    match /events/{eventId}/notices/{noticeId} {
+      allow read: if true;
+      // só os assessores (contas criadas por você em Authentication) publicam e apagam.
+      // E-mails dos assessores já preenchidos:
+      allow write: if request.auth != null
+        && request.auth.token.email in ['mariana@curionefestas.com.br', 'carlos@curionefestas.com.br', 'juliana@curionefestas.com.br'];
     }
     match /events/{eventId}/purchases/{purchaseId} {
       allow read: if false;   // só você, pelo console do Firebase
