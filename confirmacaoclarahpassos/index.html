@@ -168,7 +168,7 @@
     font-weight:500;
   }
 
-  input[type="text"], input[type="date"], textarea{
+  input[type="text"], input[type="tel"], input[type="date"], textarea{
     width:100%;
     background: rgba(255,255,255,0.03);
     border: 1px solid rgba(205,164,94,0.4);
@@ -185,7 +185,7 @@
     color-scheme: dark;
   }
 
-  input[type="text"]:focus, input[type="date"]:focus, textarea:focus{
+  input[type="text"]:focus, input[type="tel"]:focus, input[type="date"]:focus, textarea:focus{
     border-color: var(--gold-1);
     background: rgba(255,255,255,0.06);
   }
@@ -364,6 +364,11 @@
       </div>
 
       <div class="field">
+        <label for="telefone">Telefone</label>
+        <input type="tel" id="telefone" name="telefone" placeholder="(DDD) 9 9999-9999" inputmode="numeric" maxlength="16" required>
+      </div>
+
+      <div class="field">
         <label for="nascimento">Data de nascimento</label>
         <input type="date" id="nascimento" name="nascimento" required>
       </div>
@@ -512,6 +517,24 @@
     cpfInput.value = maskCPF(cpfInput.value);
   });
 
+  // Máscara de telefone brasileiro: (DD) DDDDD-DDDD / (DD) DDDD-DDDD
+  const telefoneInput = document.getElementById('telefone');
+  function maskTelefone(value) {
+    let digitos = value.replace(/\D/g, '').slice(0, 11);
+    let formatado = digitos;
+    if (digitos.length > 2) {
+      formatado = '(' + digitos.slice(0, 2) + ') ' + digitos.slice(2);
+    }
+    if (digitos.length > 7) {
+      const inicio = digitos.length > 10 ? 7 : 6;
+      formatado = '(' + digitos.slice(0, 2) + ') ' + digitos.slice(2, inicio) + '-' + digitos.slice(inicio);
+    }
+    return formatado;
+  }
+  telefoneInput.addEventListener('input', () => {
+    telefoneInput.value = maskTelefone(telefoneInput.value);
+  });
+
   // Validação do CPF (dígitos verificadores), pra pegar erro de digitação
   // antes mesmo de mandar pro servidor.
   function isValidCPF(cpfRaw) {
@@ -566,11 +589,17 @@
 
     const nome = document.getElementById('nome').value.trim();
     const cpf = cpfInput.value.trim();
+    const telefone = telefoneInput.value.trim();
     const nascimentoRaw = document.getElementById('nascimento').value;
     const presenca = presencaInput.value;
 
-    if (!nome || !cpf || !nascimentoRaw || !presenca) {
+    if (!nome || !cpf || !telefone || !nascimentoRaw || !presenca) {
       mostrarErro('Por favor, preencha todos os campos corretamente.');
+      return;
+    }
+
+    if (telefone.replace(/\D/g, '').length < 10) {
+      mostrarErro('Telefone inválido. Confira o número digitado.');
       return;
     }
 
@@ -590,6 +619,7 @@
       action: 'submit',
       nome: nome,
       cpf: cpf,
+      telefone: telefone,
       presenca: presenca,
       nascimento: formatarData(nascimentoRaw),
       situacao: situacao,
