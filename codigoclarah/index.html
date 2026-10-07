@@ -284,10 +284,15 @@
     <p class="eyebrow">Validação de Convite</p>
     <div class="rule"></div>
 
-    <p class="invite-text">Confirme seu CPF e informe seu WhatsApp para gerar o seu código pessoal de entrada.</p>
+    <p class="invite-text">Confirme seu nome, CPF e informe seu WhatsApp para gerar o seu código pessoal de entrada.</p>
     <p class="invite-deadline">Guarde esse código — ele será solicitado na portaria no dia da festa.</p>
 
     <form id="codigoForm">
+
+      <div class="field">
+        <label for="nome">Nome completo</label>
+        <input type="text" id="nome" name="nome" placeholder="Como você confirmou presença" required>
+      </div>
 
       <div class="field">
         <label for="cpf">CPF</label>
@@ -319,7 +324,7 @@
 <script>
   // 1) URL da implantação do Google Apps Script (mesma planilha/projeto das
   //    confirmações de presença — a ação "codigo" foi adicionada lá).
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwYHIG06ShXlzZ1sStKvCkeli5UfzApTdu3S4dYgEt1zQlS9Kk7du9pw5hDtj_PFWg-yQ/exec";
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwBsilBNK0lbEfkebTbAr7Z8ffyZPOvL5lO6M-1tkmcnXsWCUGSicRhi4DU5sBOmLFh9Q/exec";
 
   // Chamada via JSONP (tag <script>), igual ao formulário de confirmação.
   function jsonp(url, onSuccess, onError) {
@@ -433,10 +438,11 @@
   form.addEventListener('submit', function(e){
     e.preventDefault();
 
+    const nome = document.getElementById('nome').value.trim();
     const cpf = cpfInput.value.trim();
     const telefone = telefoneInput.value.trim();
 
-    if (!cpf || !telefone) {
+    if (!nome || !cpf || !telefone) {
       mostrarErro('Por favor, preencha todos os campos corretamente.');
       return;
     }
@@ -457,6 +463,7 @@
 
     const params = {
       action: 'codigo',
+      nome: nome,
       cpf: cpf,
       telefone: telefone
     };
