@@ -40,7 +40,9 @@
   fieldset:nth-of-type(4){--c:#FFB8D3}
   fieldset:nth-of-type(5){--c:var(--mint)}
   fieldset:nth-of-type(6){--c:var(--sky)}
-  fieldset:nth-of-type(7){--c:var(--lilac)}
+  fieldset:nth-of-type(7){--c:var(--peach)}
+  fieldset:nth-of-type(8){--c:var(--lilac)}
+  #pixDados[hidden]{display:none}
   fieldset:last-of-type{border-bottom:0}
   legend{
     font-family:"Fredoka","Nunito",sans-serif;font-weight:500;font-size:22px;color:var(--ink);
@@ -184,6 +186,23 @@
     </fieldset>
 
     <fieldset>
+      <legend>Pix</legend>
+      <p class="hint">Assim seus convidados sabem se podem presentear com um Pix</p>
+      <label class="field">Aceita presente em Pix?</label>
+      <div class="chips">
+        <label class="chip"><input type="radio" name="pix" value="Sim, prefiro Pix"><span>Sim, prefiro Pix</span></label>
+        <label class="chip"><input type="radio" name="pix" value="Sim, mas também gosto de presentes"><span>Sim, mas também gosto de presentes</span></label>
+        <label class="chip"><input type="radio" name="pix" value="Não, prefiro presentes"><span>Não, prefiro presentes</span></label>
+      </div>
+      <div id="pixDados" hidden>
+        <label class="field" for="pixChave">Chave Pix</label>
+        <input type="text" id="pixChave" autocomplete="off" placeholder="CPF, celular, e-mail ou chave aleatória">
+        <label class="field" for="pixTitular">Nome do titular da conta</label>
+        <input type="text" id="pixTitular" placeholder="Para o convidado conferir antes de transferir">
+      </div>
+    </fieldset>
+
+    <fieldset>
       <legend>Recado para os convidados</legend>
       <p class="hint">Opcional</p>
       <textarea id="recado" placeholder="Ex.: Sua presença já é o maior presente!"></textarea>
@@ -217,6 +236,10 @@
   });
 
   const $ = id => document.getElementById(id);
+  document.querySelectorAll('input[name="pix"]').forEach(r => r.addEventListener("change", () => {
+    $("pixDados").hidden = !r.value.startsWith("Sim");
+    if (!$("pixDados").hidden) $("pixChave").focus();
+  }));
   const radio = n => (document.querySelector(`input[name="${n}"]:checked`) || {}).value || "";
   const msg = $("msg");
   let pdfFile = null;
@@ -236,6 +259,9 @@
       perfumesFav: $("perfumesFav").value.trim(),
       make: radio("make"),
       lojas,
+      pix: radio("pix"),
+      pixChave: radio("pix").startsWith("Sim") ? $("pixChave").value.trim() : "",
+      pixTitular: radio("pix").startsWith("Sim") ? $("pixTitular").value.trim() : "",
       recado: $("recado").value.trim()
     };
   }
@@ -316,10 +342,20 @@
     const linhas = doc.splitTextToSize(txtLojas, W - 2*M);
     doc.text(linhas, M, y); y += linhas.length * 5.5 + 5;
 
+    if (d.pix){
+      secao("Pix");
+      item("Aceita Pix", d.pix);
+      bloco("Chave Pix", d.pixChave);
+      bloco("Titular da conta", d.pixTitular);
+      y += 3;
+    }
+
     if (d.recado){
+      doc.setFont("helvetica","italic"); doc.setFontSize(12.5);
+      const r = doc.splitTextToSize("“" + d.recado + "”", W - 2*M);
+      if (y + 10.5 + r.length * 6 > 280){ doc.addPage(); fundo(); y = 24; }
       secao("Recado para os convidados");
       doc.setFont("helvetica","italic"); doc.setFontSize(12.5); doc.setTextColor(...ink);
-      const r = doc.splitTextToSize("“" + d.recado + "”", W - 2*M);
       doc.text(r, M, y); y += r.length * 6 + 4;
     }
 
@@ -342,9 +378,9 @@
       $("nome").focus();
       return;
     }
-    if (!d.roupa && !d.calcado && !d.aro && !d.lojas.length){
+    if (!d.roupa && !d.calcado && !d.aro && !d.lojas.length && !d.pix){
       msg.className = "msg error";
-      msg.textContent = "Preencha pelo menos um tamanho ou uma loja antes de gerar o PDF.";
+      msg.textContent = "Preencha pelo menos um tamanho, uma loja ou o Pix antes de gerar o PDF.";
       return;
     }
     const doc = gerarPDF(d);
