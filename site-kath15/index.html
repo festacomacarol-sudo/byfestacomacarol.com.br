@@ -670,7 +670,7 @@ footer.rodape .rod-marca .rod-mono{width:clamp(80px,9vw,120px);height:auto}
         <p id="rsvp-passo"></p>
         <div id="rsvp-envio" class="rsvp-bloco" style="width:100%;align-items:center"><div class="msg-pronta" id="rsvp-msg"></div>
         <div class="convite-acoes" style="margin-top:4px">
-          <a class="btn" id="rsvp-whats" href="#">Enviar pelo WhatsApp</a>
+          <a class="btn" id="rsvp-whats" href="#" target="_top" rel="noopener">Enviar pelo WhatsApp</a>
           <button class="btn vazado" type="button" id="rsvp-copiar">Copiar mensagem</button>
         </div></div>
         <p class="ajuda">Em caso de problemas, entre em contato pelo WhatsApp <a href="https://wa.me/5511972537977" target="_blank" rel="noopener">(11) 97253-7977</a>.</p>
@@ -973,6 +973,12 @@ const links=[...document.querySelectorAll(".nav a")];
 const io=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ links.forEach(a=>a.classList.toggle("on",a.getAttribute("href")==="#"+e.target.id)); const on=links.find(a=>a.classList.contains("on")); on&&innerWidth>760&&on.scrollIntoView({block:"nearest",inline:"nearest"}); } }),{rootMargin:"-45% 0px -50% 0px"});
 document.querySelectorAll("main section[id]").forEach(s=>io.observe(s));
 
+/* Abre o WhatsApp: tenta a janela principal (funciona mesmo se o site estiver dentro de outro site), senão nova aba, senão a própria página */
+function abrirWhats(url){
+  try{ if(window.top!==window.self){ window.top.location.href=url; return; } }catch(e){}
+  try{ location.assign(url); return; }catch(e){}
+  if(!window.open(url,"_blank")) location.href=url;
+}
 /* Confirmação de presença */
 const fR=$("#form-rsvp");
 const esc2=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -1006,9 +1012,9 @@ fR.addEventListener("submit",e=>{
   } else msg=`Olá! Infelizmente não poderei ir aos 15 anos da Katherine.\nNome: ${nome}\nTelefone: ${tel}`;
   erro(""); $("#rsvp-msg").textContent=msg;
   const w=$("#rsvp-whats");
-  const url="https://wa.me/"+CONFIG.whatsapp+"?text="+encodeURIComponent(msg);
+  const url="https://api.whatsapp.com/send?phone="+CONFIG.whatsapp+"&text="+encodeURIComponent(msg);
   w.href=url; w.hidden=false;
-  setTimeout(()=>{ location.href=url; },150);
+  abrirWhats(url);
   $("#rsvp-passo").textContent = "Abrindo o WhatsApp com sua confirmação… É só tocar em enviar! Se não abrir, use o botão abaixo.";
   $("#rsvp-envio").hidden = false;
   $("#rsvp-ok .ouro-txt").textContent = vem ? "Obrigada!" : "Sentiremos sua falta";
