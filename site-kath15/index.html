@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="Katherine XV anos · 13 de fevereiro de 2027 · Buffet Allegro Espaço Maranello">
 <meta property="og:title" content="Katherine · XV anos">
-<meta property="og:image" content="img/capa.webp">
 <title>Kath XV Anos</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -52,6 +51,20 @@ a{color:var(--rosa-tinta)}
 .nav a{display:block;white-space:nowrap;padding:8px 11px;border-radius:99px;font-family:var(--f-label);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--rosa);text-decoration:none;transition:color .2s,background .2s}
 .nav a:hover,.nav a.on{color:var(--rosa);background:var(--blush)}
 
+.menu-btn{display:none}
+@media (max-width:760px){
+  .nav .wrap{justify-content:space-between;position:relative}
+  .menu-btn{display:flex;flex-direction:column;justify-content:center;gap:5px;width:44px;height:44px;border:0;background:none;cursor:pointer;padding:10px;margin-right:-10px}
+  .menu-btn span{display:block;height:2px;width:24px;border-radius:2px;background:var(--rosa);transition:transform .3s,opacity .2s}
+  .menu-btn[aria-expanded="true"] span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+  .menu-btn[aria-expanded="true"] span:nth-child(2){opacity:0}
+  .menu-btn[aria-expanded="true"] span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+  .nav ul{position:absolute;top:100%;left:0;right:0;flex-direction:column;gap:0;overflow:hidden;max-height:0;background:var(--papel);border-bottom:1px solid transparent;box-shadow:0 18px 30px rgba(140,70,85,.12);transition:max-height .35s ease,border-color .35s;flex:none}
+  .nav ul.aberto{max-height:420px;border-bottom-color:var(--linha)}
+  .nav ul li+li{border-top:1px solid #F6E3E7}
+  .nav ul a{padding:16px 20px;border-radius:0;font-size:12px;text-align:center}
+  .nav a.on{background:var(--blush)}
+}
 /* ---------- HERO ---------- */
 .hero{position:relative;overflow:hidden;background:
   linear-gradient(180deg,transparent 78%,var(--papel) 100%),
@@ -94,6 +107,7 @@ a{color:var(--rosa-tinta)}
 .faltam .label{color:var(--rosa)}
 
 /* ---------- SEÇÕES ---------- */
+section[id]{scroll-margin-top:64px}
 section.sec{padding-block:clamp(72px,10vw,120px);position:relative}
 .sec-head{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;margin-bottom:clamp(36px,5vw,56px)}
 .sec-head h2{font-family:var(--f-script);font-weight:400;font-size:clamp(46px,6.4vw,74px);line-height:1.15;margin:0;padding-inline:.15em;text-wrap:balance}
@@ -522,7 +536,8 @@ footer.rodape .rod-marca .rod-mono{width:clamp(80px,9vw,120px);height:auto}
 <nav class="nav" aria-label="Seções">
   <div class="wrap">
     <img class="nav-mono" src="img/mono.webp" alt="KM">
-    <ul>
+    <button type="button" class="menu-btn" id="menu-btn" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu-lista"><span></span><span></span><span></span></button>
+    <ul id="menu-lista">
       <li><a href="#festa">A festa</a></li>
       <li><a href="#presenca">Confirme sua presença</a></li>
       <li><a href="#presentes">Sugestões de presentes</a></li>
@@ -934,6 +949,13 @@ document.querySelectorAll(".seletor button").forEach(b=>b.addEventListener("clic
   $("#tab-elas").setAttribute("aria-selected",!eles); $("#tab-eles").setAttribute("aria-selected",eles);
   $("#traje-elas").hidden=eles; $("#traje-eles").hidden=!eles; }));
 
+/* Menu mobile */
+const mb=$("#menu-btn"), ml=$("#menu-lista");
+function menu(abrir){ ml.classList.toggle("aberto",abrir); mb.setAttribute("aria-expanded",abrir); mb.setAttribute("aria-label",abrir?"Fechar menu":"Abrir menu"); }
+mb.addEventListener("click",()=>menu(!ml.classList.contains("aberto")));
+ml.addEventListener("click",e=>{ if(e.target.closest("a")) menu(false); });
+addEventListener("click",e=>{ if(!e.target.closest(".nav")) menu(false); });
+
 /* Contagem regressiva */
 const alvo = new Date(CONFIG.festa).getTime();
 function tick(){
@@ -946,7 +968,7 @@ tick(); setInterval(tick,1000);
 
 /* Navegação ativa */
 const links=[...document.querySelectorAll(".nav a")];
-const io=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ links.forEach(a=>a.classList.toggle("on",a.getAttribute("href")==="#"+e.target.id)); const on=links.find(a=>a.classList.contains("on")); on&&on.scrollIntoView({block:"nearest",inline:"nearest"}); } }),{rootMargin:"-45% 0px -50% 0px"});
+const io=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ links.forEach(a=>a.classList.toggle("on",a.getAttribute("href")==="#"+e.target.id)); const on=links.find(a=>a.classList.contains("on")); on&&innerWidth>760&&on.scrollIntoView({block:"nearest",inline:"nearest"}); } }),{rootMargin:"-45% 0px -50% 0px"});
 document.querySelectorAll("main section[id]").forEach(s=>io.observe(s));
 
 /* Confirmação de presença */
