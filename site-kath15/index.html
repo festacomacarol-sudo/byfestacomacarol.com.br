@@ -982,7 +982,7 @@ function abrirWhats(url){
 /* Confirmação de presença */
 const fR=$("#form-rsvp");
 const esc2=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-$("#rsvp-tel").addEventListener("input",e=>{ let d=e.target.value.replace(/\D/g,"").slice(0,11); e.target.value = d.length>6 ? `(${d.slice(0,2)}) ${d.slice(2,d.length-4)}-${d.slice(-4)}` : d.length>2 ? `(${d.slice(0,2)}) ${d.slice(2)}` : d; });
+$("#rsvp-tel").addEventListener("input",e=>{ let d=e.target.value.replace(/\D/g,""); if(d.length>11&&d.startsWith("55")) d=d.slice(2); d=d.slice(0,11); e.target.value = d.length>6 ? `(${d.slice(0,2)}) ${d.slice(2,d.length-4)}-${d.slice(-4)}` : d.length>2 ? `(${d.slice(0,2)}) ${d.slice(2)}` : d; });
 function acomps(){ const n=+$("#rsvp-qtd").value-1, lista=$("#rsvp-acomp-lista"), atuais=[...lista.querySelectorAll("input")].map(i=>i.value);
   lista.innerHTML=""; for(let k=0;k<n;k++){ const d=document.createElement("div"); d.className="campo"; d.innerHTML=`<label for="rsvp-ac-${k}">Nome completo do acompanhante ${k+1}</label><input id="rsvp-ac-${k}" autocomplete="off">`; d.querySelector("input").value=atuais[k]||""; lista.appendChild(d); }
   $("#rsvp-acomps").hidden=n<1; }
@@ -1006,7 +1006,7 @@ fR.addEventListener("submit",e=>{
     const qtd=+$("#rsvp-qtd").value, ac=[...document.querySelectorAll("#rsvp-acomp-lista input")].map(i=>i.value.trim());
     const vazio=ac.findIndex(v=>!v); if(vazio>=0){ erro(`Escreva o nome do acompanhante ${vazio+1}.`); $("#rsvp-ac-"+vazio).focus(); return; }
     let cri=[]; if(fR.criancas.value==="sim"){ for(const l of document.querySelectorAll("#rsvp-cri-lista .cri-linha")){ const n=l.querySelector(".cri-nome").value.trim(), i=l.querySelector(".cri-idade").value; if(!n||i===""){ erro("Preencha o nome e a idade de cada criança."); (n?l.querySelector(".cri-idade"):l.querySelector(".cri-nome")).focus(); return; } cri.push(`${n} (${i==="0"?"menos de 1 ano":i+(i==="1"?" ano":" anos")})`); } }
-    msg=`Olá! Confirmo presença nos 15 anos da Katherine 🌸\nNome: ${nome}\nTelefone: ${tel}\nPessoas: ${qtd}`;
+    msg=`Olá! Confirmo presença nos 15 anos da Katherine!\nNome: ${nome}\nTelefone: ${tel}\nPessoas: ${qtd}`;
     if(ac.length) msg+=`\nAcompanhantes: ${ac.join(", ")}`;
     msg+= cri.length ? `\nCrianças: ${cri.join(", ")}` : `\nCrianças: não`;
   } else msg=`Olá! Infelizmente não poderei ir aos 15 anos da Katherine.\nNome: ${nome}\nTelefone: ${tel}`;
