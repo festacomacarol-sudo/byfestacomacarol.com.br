@@ -318,6 +318,8 @@ fieldset.campo{border:0;margin:0;padding:0}
 #form-rsvp .campo input,#form-rsvp .campo select{height:52px}
 .cri-linha .remover{border:0;background:none;color:var(--rosa);font-size:24px;line-height:1;cursor:pointer;padding:10px 6px}
 .btn.mini{align-self:flex-start;padding:10px 18px;font-size:11px}
+.ajuda{font-size:16px;font-style:italic;color:var(--rosa);text-align:center}
+.ajuda a{color:var(--rosa);font-weight:600;font-style:normal;white-space:nowrap}
 /* Presentes */
 .cotas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
 .cota{background:var(--branco);border:1px solid var(--linha);border-radius:20px;padding:26px 22px 22px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;position:relative;overflow:hidden}
@@ -661,16 +663,17 @@ footer.rodape .rod-marca .rod-mono{width:clamp(80px,9vw,120px);height:auto}
         </div>
         <p class="erro" id="rsvp-erro" role="alert"></p>
         <button class="btn" type="submit">Confirmar presença</button>
+        <p class="ajuda">Em caso de problemas para confirmar, entre em contato pelo WhatsApp <a href="https://wa.me/5511972537977" target="_blank" rel="noopener">(11) 97253-7977</a>.</p>
       </form>
       <div class="ok" id="rsvp-ok" hidden>
         <h3 class="ouro-txt">Obrigada!</h3>
         <p id="rsvp-passo"></p>
         <div id="rsvp-envio" class="rsvp-bloco" style="width:100%;align-items:center"><div class="msg-pronta" id="rsvp-msg"></div>
         <div class="convite-acoes" style="margin-top:4px">
-          <a class="btn" id="rsvp-whats" href="#" target="_blank" rel="noopener">Enviar pelo WhatsApp</a>
+          <a class="btn" id="rsvp-whats" href="#">Enviar pelo WhatsApp</a>
           <button class="btn vazado" type="button" id="rsvp-copiar">Copiar mensagem</button>
         </div></div>
-        <p style="font-size:16px" id="rsvp-num"></p>
+        <p class="ajuda">Em caso de problemas, entre em contato pelo WhatsApp <a href="https://wa.me/5511972537977" target="_blank" rel="noopener">(11) 97253-7977</a>.</p>
         <button class="btn vazado" type="button" id="rsvp-voltar" style="border:0">Editar resposta</button>
       </div>
     </div>
@@ -897,8 +900,7 @@ footer.rodape .rod-marca .rod-mono{width:clamp(80px,9vw,120px);height:auto}
 /* ====== CONFIGURAÇÃO DO SITE (edite aqui) ====== */
 const CONFIG = {
   festa: "2027-02-13T20:30:00-03:00",
-  planilha: "https://script.google.com/macros/s/AKfycby_rLLfdFAyo7Q5XzSUxjV5c60hUVJP4LsRSF9safhIHj3JIzR355p1JmjkBS2C3gq5_Q/exec",               // URL do App da Web do Google Apps Script (termina em /exec)
-  whatsapp: "",               // ex.: "5511999999999" (número da família para receber confirmações)
+  whatsapp: "5511972537977",  // recebe as confirmações e atende em caso de problemas               // ex.: "5511999999999" (número da família para receber confirmações)
   musica: "audio/perfect.mp3",  // já começa em 0:20 — arquivo da música (Perfect, Ed Sheeran)
   video: "",                  // ex.: "video/kath.mp4" — quando houver, substitui a prévia
 };
@@ -988,7 +990,7 @@ $("#rsvp-qtd").addEventListener("change",acomps);
 fR.addEventListener("change",e=>{ if(e.target.name==="vem"||e.target.name==="criancas") vis(); });
 $("#rsvp-cri-add").addEventListener("click",addCrianca);
 acomps(); vis();
-fR.addEventListener("submit",async e=>{
+fR.addEventListener("submit",e=>{
   e.preventDefault(); const erro=m=>{ $("#rsvp-erro").textContent=m; };
   const nome=$("#rsvp-nome").value.trim(), tel=$("#rsvp-tel").value.trim();
   if(nome.split(/\s+/).length<2){ erro("Escreva seu nome completo."); $("#rsvp-nome").focus(); return; }
@@ -1003,19 +1005,12 @@ fR.addEventListener("submit",async e=>{
     msg+= cri.length ? `\nCrianças: ${cri.join(", ")}` : `\nCrianças: não`;
   } else msg=`Olá! Infelizmente não poderei ir aos 15 anos da Katherine.\nNome: ${nome}\nTelefone: ${tel}`;
   erro(""); $("#rsvp-msg").textContent=msg;
-  const dados={ data:new Date().toLocaleString("pt-BR",{timeZone:"America/Sao_Paulo"}), nome, telefone:tel, presenca: vem?"Sim":"Não",
-    pessoas: vem?+$("#rsvp-qtd").value:0,
-    acompanhantes: vem?[...document.querySelectorAll("#rsvp-acomp-lista input")].map(i=>i.value.trim()).join(", "):"",
-    criancas: vem && fR.criancas.value==="sim" ? [...document.querySelectorAll("#rsvp-cri-lista .cri-linha")].map(l=>{const i=l.querySelector(".cri-idade").value; return `${l.querySelector(".cri-nome").value.trim()} (${i==="0"?"menos de 1 ano":i+(i==="1"?" ano":" anos")})`;}).join(", ") : "" };
-  const btn=fR.querySelector('button[type="submit"]'); btn.disabled=true; btn.textContent="Enviando…";
-  let salvo=false;
-  if(CONFIG.planilha){ try{ await fetch(CONFIG.planilha,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(dados)}); salvo=true; }catch(err){} }
-  btn.disabled=false; btn.textContent="Confirmar presença";
   const w=$("#rsvp-whats");
-  if(CONFIG.whatsapp){ w.href="https://wa.me/"+CONFIG.whatsapp+"?text="+encodeURIComponent(msg); w.hidden=false; } else w.hidden=true;
-  $("#rsvp-passo").textContent = salvo ? (vem ? "Sua presença foi confirmada. Até lá!" : "Recebemos sua resposta. Obrigada por avisar!") : "Não conseguimos registrar agora. Copie a mensagem abaixo e envie para a família.";
-  $("#rsvp-envio").hidden = salvo && !CONFIG.whatsapp;
-  $("#rsvp-num").textContent="";
+  const url="https://wa.me/"+CONFIG.whatsapp+"?text="+encodeURIComponent(msg);
+  w.href=url; w.hidden=false;
+  setTimeout(()=>{ location.href=url; },150);
+  $("#rsvp-passo").textContent = "Abrindo o WhatsApp com sua confirmação… É só tocar em enviar! Se não abrir, use o botão abaixo.";
+  $("#rsvp-envio").hidden = false;
   $("#rsvp-ok .ouro-txt").textContent = vem ? "Obrigada!" : "Sentiremos sua falta";
   fR.hidden=true; $("#rsvp-ok").hidden=false;
 });
