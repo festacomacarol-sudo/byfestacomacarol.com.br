@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Teremos um encontro especial antes do grande dia. 28/10 às 16h00 · Buffet Allegro – Espaço Maranello.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://byfestacomacarol.com.br/convitebrunchkath/">
+<meta property="og:title" content="Brunch pré-festa da Kath · XV anos">
+<meta property="og:description" content="Teremos um encontro especial antes do grande dia. 28/10 às 16h00 · Buffet Allegro – Espaço Maranello.">
+<meta property="og:image" content="https://byfestacomacarol.com.br/convitebrunchkath/img/preview-brunch-kath.jpg">
+<meta property="og:image:secure_url" content="https://byfestacomacarol.com.br/convitebrunchkath/img/preview-brunch-kath.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="pt_BR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://byfestacomacarol.com.br/convitebrunchkath/img/preview-brunch-kath.jpg">
+<title>Brunch pré-festa da Kath · XV anos</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gilda+Display&family=Pinyon+Script&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* Layout: a arte original do convite intacta no topo; contagem e dress code logo abaixo, no mesmo estilo */
+:root{
+  --paper:#ffffff;
+  --paper-2:#ffffff;
+  --rose:#e07a93;
+  --rose-deep:#c95b77;
+  --rose-soft:#f6dfe5;
+  --gold:#b98a2f;
+  --ink:#6e4a55;
+  --display:"Gilda Display","Didot","Bodoni 72",Georgia,serif;
+  --script:"Pinyon Script","Snell Roundhand","Apple Chancery",cursive;
+  --body:"Cormorant Garamond","Garamond",Georgia,serif;
+  --gold-grad:linear-gradient(100deg,#a87920 0%,#d9b85a 40%,#f1df98 60%,#b98a2f 100%);
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{
+  background:var(--paper-2);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.45;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:24px 40px;
+}
+.wrap{max-width:480px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+.invite{position:relative;margin:0;box-shadow:0 18px 50px -24px rgba(201,91,119,.45);background:var(--paper);container-type:inline-size;line-height:0}
+.invite img{display:block;width:100%;height:auto}
+.part{position:relative}
+/* textos reescritos sobre a arte (posições medidas na arte original, em cqw) */
+.tx{position:absolute;left:0;right:0;margin:0;text-align:center;white-space:nowrap;font-family:var(--display);font-weight:400;color:var(--rose);line-height:1}
+.t-lead{top:77.03cqw;font-size:4.3cqw;line-height:7.15cqw}
+.t-date{top:118.8cqw;display:flex;align-items:center;justify-content:center;gap:1.3cqw;font-size:5.6cqw;font-variant-numeric:lining-nums}
+.t-date .bar{display:block;width:.25cqw;height:8cqw;background:var(--rose)}
+.t-venue{top:2.62cqw;font-size:2.96cqw}
+.t-addr{top:7.72cqw;font-size:3.07cqw}
+/* faixa encaixada entre a data e o endereço, com as linhas da moldura */
+.band{position:relative;aspect-ratio:1000/260;padding-top:3.6cqw;max-width:100%;background:url("img/moldura-faixa.png") 0 0/100% 100% no-repeat;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:1.2cqw;line-height:1}
+.count-label{font-family:var(--script);font-size:5.6cqw;line-height:1;padding:0 .2em .08em;margin-top:-1cqw;
+  background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.units{display:flex;align-items:stretch;justify-content:center}
+.unit{display:flex;flex-direction:column;align-items:center;gap:.7cqw;width:13.4cqw}
+.unit+.unit{border-left:.25cqw solid var(--rose)}
+.unit b{font-family:var(--display);font-weight:400;color:var(--rose);font-size:6cqw;line-height:1;font-variant-numeric:tabular-nums lining-nums}
+.unit span{font-family:var(--display);color:var(--rose);font-size:2.2cqw;letter-spacing:.06em}
+.done{font-family:var(--script);font-size:8cqw;padding:0 .2em .1em;background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+/* botões no lugar do botão original da arte: confirmação e dress code, mesmo desenho */
+.pill{position:absolute;left:32%;width:36%;height:14%;padding:0;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;text-decoration:none;
+  border-radius:999px;border:.22cqw solid transparent;
+  background:linear-gradient(#fff,#fff) padding-box,var(--gold-grad) border-box;
+  font-family:var(--display);color:var(--rose);font-size:3.2cqw;line-height:1;transition:box-shadow .2s,transform .2s}
+.pill:hover{box-shadow:0 1cqw 2.6cqw -1.4cqw rgba(185,138,47,.8);transform:translateY(-1px)}
+.pill:focus-visible,.close:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.dress{top:53%}
+
+dialog{border:none;padding:0;background:transparent;max-width:min(440px,calc(100vw - 32px));width:100%}
+dialog::backdrop{background:rgba(110,74,85,.45);backdrop-filter:blur(3px)}
+.sheet{position:relative;border:4px solid var(--rose);padding:6px;background:var(--paper)}
+.sheet-in{border:1.5px solid transparent;background:linear-gradient(var(--paper),var(--paper)) padding-box,var(--gold-grad) border-box;
+  padding:48px 24px 26px;text-align:center;display:flex;flex-direction:column;gap:14px;align-items:center}
+.sheet h2{font-family:var(--script);font-weight:400;font-size:52px;line-height:1;margin:0;padding:0 .2em .1em;
+  background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.style{font-family:var(--display);color:var(--rose);font-size:26px;margin:0;letter-spacing:.03em}
+.sheet p{margin:0;max-width:30ch;text-wrap:pretty}
+.swatches{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.sw{width:34px;height:34px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--rose-soft)}
+.avoid{font-size:16px;font-style:italic;color:var(--rose-deep)}
+.close{position:absolute;top:12px;right:12px;width:36px;height:36px;border-radius:50%;
+  border:1px solid var(--rose-soft);background:#fff;color:var(--rose);font-size:22px;line-height:1;cursor:pointer}
+.tabs{display:flex;gap:4px;padding:4px;border-radius:999px;border:1px solid var(--rose-soft);background:#fff}
+.tab{appearance:none;border:none;cursor:pointer;border-radius:999px;padding:8px 20px;background:transparent;
+  font-family:var(--display);font-size:17px;color:var(--rose);transition:background-color .2s,color .2s}
+.tab[aria-selected="true"]{background:var(--rose);color:#fff}
+.tab:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.track{display:flex;width:100%;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.track::-webkit-scrollbar{display:none}
+.look{flex:0 0 100%;scroll-snap-align:center;margin:0;display:flex;flex-direction:column;align-items:center;gap:10px}
+.look img{height:min(52vh,380px);width:auto;max-width:100%;object-fit:contain}
+.look figcaption{font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);font-weight:600}
+.note{max-width:34ch;text-wrap:pretty}
+.dots{display:flex;gap:6px}
+.dots span{width:7px;height:7px;border-radius:50%;background:var(--rose-soft)}
+.dots span.on{background:var(--rose)}
+.sheet-in{padding-top:44px!important;gap:12px!important}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media (max-width:420px){body{padding-block:12px 28px}}
+</style>
+</head>
+<body>
+
+<main class="wrap">
+  <figure class="invite">
+    <div class="part">
+      <img src="img/convite-topo.jpg" width="1000" height="1310" alt="Brunch pré-festa · Katherine Monegatto · XV anos">
+      <p class="tx t-lead">Teremos um encontro especial<br>antes do grande dia</p>
+      <p class="tx t-date"><span>28/10</span><span class="bar" aria-hidden="true"></span><span>Às 16h00</span></p>
+    </div>
+    <div class="band" aria-live="polite">
+      <div class="count-label">faltam apenas</div>
+      <div class="units" id="units">
+        <div class="unit"><b id="d">00</b><span>dias</span></div>
+        <div class="unit"><b id="h">00</b><span>horas</span></div>
+        <div class="unit"><b id="m">00</b><span>min</span></div>
+        <div class="unit"><b id="s">00</b><span>seg</span></div>
+      </div>
+      <div class="done" id="done" hidden>Chegou o grande dia!</div>
+    </div>
+    <div class="part">
+      <img src="img/convite-base.jpg" width="1000" height="410"
+        alt="">
+      <p class="tx t-venue">BUFFET ALLEGRO – ESPAÇO MARANELLO</p>
+      <p class="tx t-addr">Rua Alegre, 1127 – São Caetano do Sul</p>
+      <button class="pill dress" id="openDress" type="button">Dress code</button>
+    </div>
+  </figure>
+</main>
+
+<dialog id="dress" aria-labelledby="dressTitle">
+  <div class="sheet">
+    <div class="sheet-in">
+      <button class="close" id="closeDress" type="button" aria-label="Fechar">×</button>
+      <h2 id="dressTitle">Dress code</h2>
+      <p class="style">Casual</p>
+      <p class="note">Para harmonizar com a proposta desse dia tão especial, sugerimos looks em tons claros e pedimos, gentilmente, que deem preferência a comprimentos mais alongados. Agradecemos o carinho e a compreensão! 🤍</p>
+      <div class="tabs" role="tablist">
+        <button class="tab" role="tab" id="tabElas" aria-selected="true" data-i="0" type="button">Para elas</button>
+        <button class="tab" role="tab" id="tabEles" aria-selected="false" data-i="1" type="button">Para eles</button>
+      </div>
+      <div class="track" id="track">
+        <figure class="look" role="tabpanel" aria-labelledby="tabElas">
+          <img src="img/look-elas.jpg" width="456" height="808" alt="Inspiração de look feminino">
+          <figcaption>Inspiração</figcaption>
+        </figure>
+        <figure class="look" role="tabpanel" aria-labelledby="tabEles">
+          <img src="img/look-eles.jpg" width="352" height="808" alt="Inspiração de look masculino">
+          <figcaption>Inspiração</figcaption>
+        </figure>
+      </div>
+      <div class="dots" aria-hidden="true"><span class="on"></span><span></span></div>
+    </div>
+  </div>
+</dialog>
+
+<script>
+(function(){
+
+  const target=new Date('2026-10-28T16:00:00-03:00').getTime();
+  const el={d:document.getElementById('d'),h:document.getElementById('h'),m:document.getElementById('m'),s:document.getElementById('s')};
+  const pad=n=>String(n).padStart(2,'0');
+  let timer;
+  function tick(){
+    const diff=Math.max(0,target-Date.now());
+    if(diff===0){
+      document.getElementById('units').hidden=true;
+      document.querySelector('.count-label').hidden=true;
+      document.getElementById('done').hidden=false;
+      clearInterval(timer);return;
+    }
+    const s=Math.floor(diff/1000);
+    el.d.textContent=pad(Math.floor(s/86400));
+    el.h.textContent=pad(Math.floor(s%86400/3600));
+    el.m.textContent=pad(Math.floor(s%3600/60));
+    el.s.textContent=pad(s%60);
+  }
+  tick();timer=setInterval(tick,1000);
+
+  const dlg=document.getElementById('dress');
+  document.getElementById('openDress').addEventListener('click',()=>{
+    if(typeof dlg.showModal==='function')dlg.showModal();else dlg.setAttribute('open','');
+  });
+  document.getElementById('closeDress').addEventListener('click',()=>dlg.close?dlg.close():dlg.removeAttribute('open'));
+  dlg.addEventListener('click',e=>{if(e.target===dlg)dlg.close();});
+  const track=document.getElementById('track'),tabs=[...document.querySelectorAll('.tab')],dots=[...document.querySelectorAll('.dots span')];
+  function setActive(i){tabs.forEach((t,n)=>t.setAttribute('aria-selected',n===i));dots.forEach((d,n)=>d.classList.toggle('on',n===i));}
+  tabs.forEach(t=>t.addEventListener('click',()=>{const i=+t.dataset.i;track.scrollTo({left:i*track.clientWidth});setActive(i);}));
+  track.addEventListener('scroll',()=>{setActive(Math.round(track.scrollLeft/Math.max(1,track.clientWidth)));},{passive:true});
+})();
+</script>
+
+</body>
+</html>
