@@ -1,0 +1,27 @@
+SITE DE CASAMENTO · GABRIELLE & TALES · 09/01/2027
+===================================================
+
+ARQUIVOS (suba TODOS, mantendo esta mesma estrutura de pastas)
+- index.html ............ o site (leve, para abrir rápido e gerar a prévia do WhatsApp)
+- fotos/ ................ as fotos do site (não renomeie a pasta nem os arquivos)
+- musica.mp3 ............ a música de fundo
+  (a pasta fotos/ também contém preview-whatsapp.jpg, a imagem da prévia do WhatsApp)
+- favicon-512.png ....... ícone do monograma (opcional)
+
+PRÉVIA DO WHATSAPP
+Já configurada para: https://www.mamadesign.com.br/gabrielle-e-tales/
+1. Confira se a imagem abre em:
+   https://www.mamadesign.com.br/gabrielle-e-tales/fotos/preview-whatsapp.jpg
+2. Atualize em https://developers.facebook.com/tools/debug ("Coletar novamente").
+3. No WhatsApp, envie o link com ?v=3 no final.
+Ao mudar para outro domínio, troque esse endereço nas tags og:url, og:image,
+og:image:secure_url e canonical do index.html.
+
+O QUE JÁ ESTÁ CONFIGURADO
+- Confirmação de presença: Google Forms
+- Lista de presentes: Pix estático para gabi1999campos@gmail.com
+  (os QR Codes não expiram e aceitam quantos pagamentos vierem)
+- Mapas: Igreja Matriz Nossa Senhora de Fátima e CTG Tropeiro Velho
+- Música: começa ao tocar em "Abrir convite"
+
+Antes de divulgar, faça um Pix de teste de R$ 1 pelo "Presente livre".
