@@ -172,6 +172,9 @@
   .fine{font-size:1.05rem;color:var(--ink-soft);margin-top:22px;font-style:italic;}
 
   /* tamanhos da Luna */
+  .store{max-width:420px;margin:0 auto;text-align:center;}
+  .store .storename{font-size:2.2rem;font-weight:600;letter-spacing:.06em;line-height:1.1;}
+  .store .storetxt{font-size:1.15rem;margin-top:10px;}
   .sizes{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:34px;}
   .sizes[hidden]{display:none;}
   .size{min-width:112px;padding:14px 20px;border:1px solid rgba(168,115,30,.45);border-radius:14px;background:rgba(245,241,232,.7);text-align:center;}
@@ -222,14 +225,25 @@
     </div>
   <section class="sec rise" style="--d:.3s">
     <!-- EDITAR: mensagem de apresentação -->
-    <p class="lead">Sua presença já é o meu maior presente. Mas, se quiser me presentear, preparei uma lista com muito carinho.</p>
+    <p class="lead">Sua presença já é o meu maior presente. Mas, se quiser me presentear, separei minhas medidas e minha loja favorita.</p>
     <!-- Os tamanhos aparecem aqui. Preencha SIZES no <script> (campos vazios não aparecem). -->
-    <div class="sizes" id="sizes" aria-label="Tamanhos da Luna" hidden></div>
+    <!-- EDITAR: tamanhos da Luna (escritos direto no HTML, aparecem mesmo se o Firebase falhar) -->
+    <div class="sizes" id="sizes" aria-label="Tamanhos da Luna">
+      <div class="size"><span class="k">Roupa</span><span class="v">P ou PP</span></div>
+      <div class="size"><span class="k">Sapato</span><span class="v">35</span></div>
+    </div>
   </section>
 
   <section class="sec rise" style="--d:.4s">
-    <div class="gifts" id="giftsGrid" aria-live="polite"></div>
-    <p class="fine">Ao iniciar a compra, o presente fica reservado por 10 minutos para você confirmar.</p>
+    <!-- EDITAR: loja sugerida pela Luna -->
+    <div class="card store">
+      <p class="label">Minha loja favorita</p>
+      <div class="orn"><i></i></div>
+      <h3 class="storename">Track&amp;Field</h3>
+      <p class="storetxt">Fique à vontade para escolher o presente. Basta se guiar pelos tamanhos acima.</p>
+      <div class="btns"><a class="btn" href="https://www.tf.com.br" target="_blank" rel="noopener">Abrir a loja</a></div>
+    </div>
+    <div class="gifts" id="giftsGrid" aria-live="polite" hidden></div>
   </section>
 
   <footer class="closing">
@@ -336,26 +350,13 @@ service cloud.firestore {
    id    = número único (não repita, não mude depois de publicar)
    url   = link da loja onde o convidado compra ('' = não abre nada)
    ========================================================= */
-const GIFTS = [
-  {id:1, name:'Pingente Life Disney Orelha Minnie', desc:'Prata 925 com pedras incolores, no formato das orelhas da Minnie.',
-   price:'R$ 196,00', url:'https://www.vivara.com.br/pingente-life-disney-orelha-minnie-em-prata-925-com-pedras-incolores-el00007070/p',
-   img:'https://lojavivarafsv3.vtexassets.com/arquivos/ids/2562289/Pingente-Life-Disney-Orelha-Minnie-em-Prata-925-com-Pedras-Incolores-1116691781103626698_3_set.jpg?v=639167004275430000'},
-  {id:2, name:'Anel Life Duplo Bolinhas', desc:'Prata 925, aro delicado de 3 mm com acabamento polido. Ótimo para combinar com outros anéis.',
-   price:'R$ 133,00', url:'https://www.vivara.com.br/anel-life-bolinhas-duplo-prata-al00055800/p',
-   img:'https://lojavivarafsv3.vtexassets.com/arquivos/ids/688231/Anel-Life-Bolinhas-Duplo-Prata-73555_2_set.jpg?v=638369467105830000'},
-  {id:3, name:'Pulseira Life Sua História', desc:'Pulseira em prata 925 da linha Life.',
-   price:'R$ 550,00', url:'https://www.vivara.com.br/pulseira-life-sua-historia-em-prata-925-pl00015208/p',
-   img:'https://lojavivarafsv3.vtexassets.com/arquivos/ids/2471331/PL00015208-hover.jpg.jpg?v=638804193927200000'},
-  {id:4, name:'Pingente Life Amor Místico Estrela', desc:'Prata 925 com pedras azuis e rosa, em formato de estrela.',
-   price:'R$ 168,00', url:'https://www.vivara.com.br/pingente-life-amor-mistico-estrela-prata-cravejado-el00006343/p',
-   img:'https://lojavivarafsv3.vtexassets.com/arquivos/ids/867925/Pingente-Life-Amor-Mistico-Estrela-em-Prata-925-com-Pedras-Azuis-e-Rosa-73682-mon.png?v=638519860904730000'},
-];
+const GIFTS = []; // sem itens específicos: a Luna prefere indicar só os tamanhos e uma loja
 
 /* =========================================================
    TAMANHOS DA LUNA — EDITAR
    Preencha só o que quiser mostrar; o que ficar vazio não aparece.
    ========================================================= */
-const SIZES = { roupa:'', sapato:'', anel:'' };
+/* (tamanhos: edite no HTML, no bloco "EDITAR: tamanhos da Luna") */
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -488,13 +489,7 @@ $('giftConfirm').addEventListener('click', async ()=>{
   showToast('Presente confirmado! Muito obrigada pelo carinho.');
 });
 
-(function renderSizes(){
-  const items = [['Roupa',SIZES.roupa],['Sapato',SIZES.sapato],['Anel',SIZES.anel]].filter(x=>String(x[1]).trim());
-  const box = $('sizes');
-  if(!items.length) return;
-  box.innerHTML = items.map(([k,v])=>`<div class="size"><span class="k">${k}</span><span class="v">${esc(v)}</span></div>`).join('');
-  box.hidden = false;
-})();
+/* tamanhos agora ficam escritos direto no HTML (veja a seção EDITAR acima) */
 
 renderGifts(); // mostra a lista mesmo antes do Firebase responder
 ensureGiftDocs().then(listenGifts).catch(err=>console.warn('Firebase não configurado ou indisponível:', err));
