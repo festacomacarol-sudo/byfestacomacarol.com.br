@@ -397,7 +397,7 @@ footer img{width:120px;height:auto;opacity:.9}
     </div>
 
     <div class="items">
-      <h3><span>O que está incluído</span><small id="count"></small></h3>
+      <h3><span>O que está incluso</span><small id="count"></small></h3>
       <ul id="itemlist"></ul>
       <button type="button" class="more-items" id="more-items"></button>
     </div>
@@ -522,7 +522,7 @@ footer img{width:120px;height:auto;opacity:.9}
   <h2 class="h2">Ficou alguma <em>dúvida</em>?</h2>
   <div class="faq">
     <details><summary>Qual a diferença entre Glamour e Royal?</summary><div class="a">O Royal tem tudo do Glamour e mais: 6 estampas (em vez de 4), 6 artes adicionais (em vez de 3), Manual das 15 Damas, arte para o Convite do Príncipe e um website. No Royal, o website substitui o convite interativo, porque cumpre a mesma função. Veja a tabela em <a href="#comparar">Comparar</a>.</div></details>
-    <details><summary>A impressão está incluída?</summary><div class="a">Não. Eu entrego o design (os arquivos digitais em alta resolução), prontos para você levar à gráfica de sua preferência ou usar no digital.</div></details>
+    <details><summary>A impressão está inclusa?</summary><div class="a">Não. Eu entrego o design (os arquivos digitais em alta resolução), prontos para você levar à gráfica de sua preferência ou usar no digital.</div></details>
     <details><summary>Como recebo os arquivos?</summary><div class="a">Numa pasta no Google Drive, com todos os arquivos em alta resolução, organizados e prontos para impressão ou uso digital.</div></details>
     <details><summary>O prazo começa a contar quando?</summary><div class="a">A partir do dia em que você me envia o formulário de branding preenchido. Antes disso o prazo não corre. O total é de cerca de 12 dias úteis (segunda a sexta).</div></details>
     <details><summary>Pedir ajustes atrasa a entrega?</summary><div class="a">Pode atrasar. Os ajustes fazem parte do processo, mas cada rodada de alteração adiciona tempo ao prazo final.</div></details>
@@ -583,7 +583,7 @@ const ITEMS = [
   {t:"Guia de Identidade Visual completo",g:1,r:1,a:"Um documento que reúne cores, fontes, monograma e estampas, para qualquer fornecedor seguir o mesmo padrão."},
   {t:"Mockups premium de apresentação",g:1,r:1,a:"Simulações realistas mostrando como as artes ficam aplicadas (canecas, caixas, sacolas), para você visualizar antes de produzir."},
   {grp:"Peças da festa"},
-  {t:"Convite físico (design)",g:1,r:1,a:"A arte do convite pronta para impressão. A impressão não está incluída."},
+  {t:"Convite físico (design)",g:1,r:1,a:"A arte do convite pronta para impressão. A impressão não está inclusa."},
   {t:"Convite interativo",g:1,r:"site",a:"Versão digital do convite para enviar no celular aos convidados.",diff:1},
   {t:"Save the date",g:1,r:1,a:"O aviso de “reserve a data”, enviado antes do convite."},
   {t:"Tag personalizada",g:1,r:1,a:"Etiqueta com a identidade da festa, para lembrancinhas e embalagens."},
@@ -645,7 +645,7 @@ document.querySelectorAll("[data-pay]").forEach(b=>b.addEventListener("click",()
 // comparação
 (function(){
   const tb=document.getElementById("cmp");
-  const cell=v=> v==="site"? '<td class="via">pelo website</td>' : v===0? '<td class="no" aria-label="Não incluído">—</td>' : v===1? '<td class="yes" aria-label="Incluído">✓</td>' : '<td class="num">'+v+'</td>';
+  const cell=v=> v==="site"? '<td class="via">pelo website</td>' : v===0? '<td class="no" aria-label="Não incluso">—</td>' : v===1? '<td class="yes" aria-label="Incluso">✓</td>' : '<td class="num">'+v+'</td>';
   tb.innerHTML = ITEMS.map(it=> it.grp ? '<tr class="group"><td colspan="3">'+it.grp+'</td></tr>'
     : '<tr'+(it.diff?' class="diff"':'')+'><td>'+it.t+'</td>'+cell(it.g)+cell(it.r)+'</tr>').join("");
 })();
