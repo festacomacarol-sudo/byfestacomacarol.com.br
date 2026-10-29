@@ -49,7 +49,7 @@
         #sessaoFeed { background-color: #fffbfa; box-shadow: 0 0 30px rgba(191,120,140,0.15); min-height: 100dvh; }
         .header-perfil { background-color: #fffbfa; background-image: linear-gradient(rgba(255,251,250,0.9), rgba(255,251,250,0.9)), var(--textura-floral); background-repeat: no-repeat, repeat; background-size: cover, 190px auto; padding-bottom: 22px; border-bottom: 1px solid #f0dfe2; position: relative; }
         .banner { width: 100%; aspect-ratio: 1600 / 734; background-color: #fdf0f3; background-image: var(--banner-padrao); background-repeat: no-repeat; background-size: cover; background-position: center; display: block; position: relative; }
-        .info-perfil { display: flex; flex-direction: column; align-items: center; margin-top: -54px; text-align: center; padding: 0 20px; position: relative; z-index: 1; }
+        .info-perfil { display: flex; flex-direction: column; align-items: center; margin-top: 18px; text-align: center; padding: 0 20px; position: relative; z-index: 1; }
         .avatar { width: 112px; height: 112px; border-radius: 50%; background-color: #fff; object-fit: contain; padding: 18px; margin-bottom: 12px; box-shadow: 0 0 0 5px #fffbfa, 0 0 0 7px var(--cor-dourada), 0 10px 20px rgba(0,0,0,0.12); }
         .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
         .wordmark-evento { display: block; max-width: 230px; width: 70%; height: auto; margin: 2px auto 6px; }
@@ -244,17 +244,16 @@
                 document.getElementById('nomeEvento').textContent = data.nome || "";
                 document.getElementById('dataEvento').textContent = data.data || "";
                 document.getElementById('descricaoEvento').textContent = data.texto || "";
-                if (data.url_avatar) document.getElementById('avatarEvento').src = data.url_avatar;
-                if (data.url_banner) {
-                    // Quando existe uma foto real de capa configurada, ela cobre o
-                    // banner inteiro sem repetir (diferente do padrão decorativo,
-                    // que é um textura pequena repetida) — senão a foto dela
-                    // apareceria "quadriculada" em miniatura.
-                    const bannerEl = document.querySelector('.banner');
-                    bannerEl.style.backgroundImage = "url('" + data.url_banner + "')";
-                    bannerEl.style.backgroundSize = 'cover';
-                    bannerEl.style.backgroundRepeat = 'no-repeat';
-                }
+                // Avatar e banner ficam FIXOS na arte nova embutida no HTML
+                // (identidade visual definitiva da Kath). Propositalmente NÃO lemos
+                // mais data.url_avatar / data.url_banner aqui: esses campos ainda
+                // existem no documento configurações/katherine_monegatto com os
+                // valores antigos (de antes do redesign) e, se fossem aplicados,
+                // sobrescreveriam a arte nova assim que o Firestore respondesse —
+                // era exatamente isso que causava "carrega a versão nova e depois
+                // vira a antiga". Se um dia quiser trocar o avatar/banner de novo,
+                // troque a arte embutida no HTML (variáveis --banner-padrao e o
+                // <img id="avatarEvento">), não esses campos do Firestore.
 
                 // =========================================================
                 // CORREÇÃO CIRÚRGICA: DESTRAVAR CORS DO GITHUB
