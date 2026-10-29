@@ -668,33 +668,62 @@ function switchCamera() { usingFrontCamera = !usingFrontCamera; initCamera(); }
         console.error("Erro ao conectar com a galeria do Instamomentos:", e);
     }
 
-    window.enviarFotoParaGaleriaInstamomentos = async function (blob) {
-        if (!dbGaleria) return { ok: false };
+    async function tentarEnviarUmaVez(blob) {
+        const base64 = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(String(reader.result).split(',')[1]);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+        });
+
+        const form = new FormData();
+        form.append('image', base64);
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 15000);
+        let res;
         try {
-            const base64 = await new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(String(reader.result).split(',')[1]);
-                reader.onerror = reject;
-                reader.readAsDataURL(blob);
+            res = await fetch("https://api.imgbb.com/1/upload?key=" + IMGBB_API_KEY, {
+                method: 'POST',
+                body: form,
+                signal: controller.signal
             });
+        } finally {
+            clearTimeout(timeoutId);
+        }
 
-            const form = new FormData();
-            form.append('image', base64);
-            const res = await fetch("https://api.imgbb.com/1/upload?key=" + IMGBB_API_KEY, { method: 'POST', body: form });
-            const imgData = await res.json();
-            if (!imgData.success) throw new Error('Falha no upload da imagem para o imgbb');
+        if (!res.ok) throw new Error('imgbb respondeu HTTP ' + res.status);
+        const imgData = await res.json();
+        if (!imgData || !imgData.success) throw new Error('Falha no upload da imagem para o imgbb: ' + JSON.stringify(imgData));
 
-            await addDoc(collection(dbGaleria, "eventos/" + EVENTO_ID + "/postagens"), {
-                url_imagem: imgData.data.url,
-                curtidas: 0,
-                data_envio: serverTimestamp()
-            });
+        await addDoc(collection(dbGaleria, "eventos/" + EVENTO_ID + "/postagens"), {
+            url_imagem: imgData.data.url,
+            curtidas: 0,
+            data_envio: serverTimestamp()
+        });
+    }
 
-            return { ok: true };
-        } catch (e) {
-            console.error("Erro ao enviar foto para a galeria do Instamomentos:", e);
+    window.enviarFotoParaGaleriaInstamomentos = async function (blob) {
+        if (!dbGaleria) {
+            console.error("Erro ao enviar foto para a galeria do Instamomentos: conexão com o Firebase não foi inicializada.");
             return { ok: false };
         }
+        const tentativas = 3;
+        let ultimoErro = null;
+        for (let i = 1; i <= tentativas; i++) {
+            try {
+                await tentarEnviarUmaVez(blob);
+                return { ok: true };
+            } catch (e) {
+                ultimoErro = e;
+                console.error("Erro ao enviar foto para a galeria do Instamomentos (tentativa " + i + "/" + tentativas + "):", e);
+                if (i < tentativas) {
+                    await new Promise(r => setTimeout(r, 1200 * i));
+                }
+            }
+        }
+        console.error("Envio para a galeria falhou após " + tentativas + " tentativas:", ultimoErro);
+        return { ok: false };
     };
 </script>
 </body>
