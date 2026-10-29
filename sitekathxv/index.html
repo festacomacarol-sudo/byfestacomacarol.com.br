@@ -10,8 +10,8 @@
 <meta property="og:url" content="https://byfestacomacarol.com.br/sitekathxv/">
 <meta property="og:title" content="Katherine · XV anos">
 <meta property="og:description" content="Sábado, 13 de fevereiro de 2027 · 20h30 · Buffet Allegro - Espaço Maranello. Confirme sua presença!">
-<meta property="og:image" content="https://byfestacomacarol.com.br/sitekathxv/previa.jpg">
-<meta property="og:image:secure_url" content="https://byfestacomacarol.com.br/sitekathxv/previa.jpg">
+<meta property="og:image" content="https://byfestacomacarol.com.br/sitekathxv/img/previa.jpg?v=7">
+<meta property="og:image:secure_url" content="https://byfestacomacarol.com.br/sitekathxv/img/previa.jpg?v=7">
 <meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -913,7 +913,7 @@ const CONFIG = {
   festa: "2027-02-13T20:30:00-03:00",
   whatsapp: "5511972537977",  // recebe as confirmações e atende em caso de problemas               // ex.: "5511999999999" (número da família para receber confirmações)
   musica: "audio/perfect.mp3",  // já começa em 0:20 — arquivo da música (Perfect, Ed Sheeran)
-  video: "",                  // ex.: "video/kath.mp4" — quando houver, substitui a prévia
+  video: "video/kath.mp4",    // vídeo da Kath (sem som: a música do site continua tocando)
 };
 /* =============================================== */
 
@@ -926,7 +926,7 @@ async function copiar(texto, origem){
 }
 
 /* Vídeo */
-if(CONFIG.video){ const tela=$("#video-tela"); const p=tela.querySelector("img").getAttribute("src"); tela.innerHTML=`<video controls playsinline preload="metadata" poster="${p}"><source src="${CONFIG.video}"></video>`; }
+if(CONFIG.video){ const tela=$("#video-tela"); const p=tela.querySelector("img").getAttribute("src"); tela.innerHTML=`<video controls playsinline muted preload="metadata" poster="img/video-capa.webp"><source src="${CONFIG.video}" type="video/mp4"></video>`; }
 
 /* Ver detalhes */
 const pd=$("#pagina-det");
@@ -954,6 +954,7 @@ $("#play").addEventListener("click",()=>{ audio.paused?tocar():(audio.pause(),es
 audio.addEventListener("timeupdate",()=>{ if(audio.duration) $("#prog").style.width=(audio.currentTime/audio.duration*100)+"%"; });
 audio.addEventListener("pause",estado); audio.addEventListener("play",estado);
 document.documentElement.style.overflow="hidden";
+const vid=document.querySelector("#video-tela video"); if(vid) vid.addEventListener("play",()=>{ if(audio.paused) tocar(); });
 $("#abrir-convite").addEventListener("click",()=>{ $("#abertura").classList.add("sai"); document.documentElement.style.overflow=""; if(CONFIG.musica) tocar(); setTimeout(()=>{$("#abertura").hidden=true},900); });
 
 /* Dress code: seletor */
