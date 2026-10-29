@@ -617,7 +617,8 @@ function enviarFotoParaGaleriaComFeedback(btn) {
         } else {
             btn.disabled = false;
             btn.innerHTML = textoOriginal;
-            alert('Não foi possível enviar para a galeria. Tente novamente.');
+            const detalhe = (res && res.erro) ? ('\n\nDetalhe técnico: ' + res.erro) : '';
+            alert('Não foi possível enviar para a galeria. Tente novamente.' + detalhe);
         }
     });
 }
@@ -705,8 +706,9 @@ function switchCamera() { usingFrontCamera = !usingFrontCamera; initCamera(); }
 
     window.enviarFotoParaGaleriaInstamomentos = async function (blob) {
         if (!dbGaleria) {
-            console.error("Erro ao enviar foto para a galeria do Instamomentos: conexão com o Firebase não foi inicializada.");
-            return { ok: false };
+            const msg = "conexão com o Firebase não foi inicializada";
+            console.error("Erro ao enviar foto para a galeria do Instamomentos: " + msg);
+            return { ok: false, erro: msg };
         }
         const tentativas = 3;
         let ultimoErro = null;
@@ -723,7 +725,10 @@ function switchCamera() { usingFrontCamera = !usingFrontCamera; initCamera(); }
             }
         }
         console.error("Envio para a galeria falhou após " + tentativas + " tentativas:", ultimoErro);
-        return { ok: false };
+        const msgErro = (ultimoErro && (ultimoErro.name === 'AbortError'))
+            ? "tempo esgotado ao conectar (conexão lenta ou instável)"
+            : (ultimoErro && ultimoErro.message) ? ultimoErro.message : "erro desconhecido";
+        return { ok: false, erro: msgErro };
     };
 </script>
 </body>
