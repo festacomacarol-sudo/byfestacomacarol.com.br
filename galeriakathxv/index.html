@@ -244,17 +244,16 @@
                 document.getElementById('nomeEvento').textContent = data.nome || "";
                 document.getElementById('dataEvento').textContent = data.data || "";
                 document.getElementById('descricaoEvento').textContent = data.texto || "";
-                if (data.url_avatar) document.getElementById('avatarEvento').src = data.url_avatar;
-                if (data.url_banner) {
-                    // Quando existe uma foto real de capa configurada, ela cobre o
-                    // banner inteiro sem repetir (diferente do padrão decorativo,
-                    // que é um textura pequena repetida) — senão a foto dela
-                    // apareceria "quadriculada" em miniatura.
-                    const bannerEl = document.querySelector('.banner');
-                    bannerEl.style.backgroundImage = "url('" + data.url_banner + "')";
-                    bannerEl.style.backgroundSize = 'cover';
-                    bannerEl.style.backgroundRepeat = 'no-repeat';
-                }
+                // Avatar e banner ficam FIXOS na arte nova embutida no HTML
+                // (identidade visual definitiva da Kath). Propositalmente NÃO lemos
+                // mais data.url_avatar / data.url_banner aqui: esses campos ainda
+                // existem no documento configurações/katherine_monegatto com os
+                // valores antigos (de antes do redesign) e, se fossem aplicados,
+                // sobrescreveriam a arte nova assim que o Firestore respondesse —
+                // era exatamente isso que causava "carrega a versão nova e depois
+                // vira a antiga". Se um dia quiser trocar o avatar/banner de novo,
+                // troque a arte embutida no HTML (variáveis --banner-padrao e o
+                // <img id="avatarEvento">), não esses campos do Firestore.
 
                 // =========================================================
                 // CORREÇÃO CIRÚRGICA: DESTRAVAR CORS DO GITHUB
