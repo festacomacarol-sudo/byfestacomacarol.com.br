@@ -255,33 +255,13 @@
                 // troque a arte embutida no HTML (variáveis --banner-padrao e o
                 // <img id="avatarEvento">), não esses campos do Firestore.
 
-                // =========================================================
-                // CORREÇÃO CIRÚRGICA: DESTRAVAR CORS DO GITHUB
-                // =========================================================
-                if (data.url_moldura) {
-                    let urlSegura = data.url_moldura;
-                    if (urlSegura.includes("github.com") && urlSegura.includes("/blob/")) {
-                        urlSegura = urlSegura.replace("github.com", "raw.githubusercontent.com").replace("/blob/", "/").split("?")[0];
-                    }
-                    const molduraEstudio = document.getElementById('molduraEstudio');
-                    // Se a moldura externa falhar (CORS, link quebrado, etc.), volta
-                    // sozinho pra moldura padrão embutida em vez de deixar a foto
-                    // sair sem moldura silenciosamente.
-                    const voltarParaMolduraPadrao = (origem) => {
-                        console.error("[Moldura] Falha ao carregar moldura externa (" + origem + "), usando a moldura embutida:", urlSegura);
-                        molduraOverlay.src = MOLDURA_PADRAO_B64;
-                        if (molduraEstudio) molduraEstudio.src = MOLDURA_PADRAO_B64;
-                    };
-                    molduraOverlay.crossOrigin = "anonymous";
-                    molduraOverlay.onerror = () => voltarParaMolduraPadrao('molduraOverlay');
-                    molduraOverlay.src = urlSegura;
-
-                    if (molduraEstudio) {
-                        molduraEstudio.crossOrigin = "anonymous";
-                        molduraEstudio.onerror = () => voltarParaMolduraPadrao('molduraEstudio');
-                        molduraEstudio.src = urlSegura;
-                    }
-                }
+                // Moldura também FIXA na arte embutida (MOLDURA_PADRAO_B64).
+                // Propositalmente NÃO lemos mais data.url_moldura do Firestore:
+                // era uma foto externa que podia vir com tamanho/corte diferente
+                // do que a moldura embutida foi desenhada pra encaixar, causando
+                // sobreposição em cima dos botões/ícones do editor. Se um dia
+                // quiser trocar a moldura, troque a constante MOLDURA_PADRAO_B64
+                // no código, não um campo do Firestore.
             } else {
                 alert("Alerta: o sistema não encontrou a pasta '" + EVENTO_ID + "' em 'configuracoes'. Verifique o Firebase.");
                 console.error("Documento configuracoes/" + EVENTO_ID + " não existe!");
@@ -603,11 +583,11 @@
                 const base64 = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
                 const form = new FormData(); form.append('image', base64);
                 const res = await fetch("https://api.imgbb.com/1/upload?key=" + IMGBB_API_KEY, { method: 'POST', body: form });
+                if (!res.ok) throw new Error('imgbb respondeu HTTP ' + res.status);
                 const imgData = await res.json();
-                if (imgData.success) {
-                   await addDoc(collection(db, "eventos/" + EVENTO_ID + "/postagens"), { url_imagem: imgData.data.url, curtidas: 0, data_envio: serverTimestamp() });
-                    document.getElementById('modalEstudio').style.display = 'none';
-                }
+                if (!imgData || !imgData.success) throw new Error('Falha no upload da imagem para o imgbb: ' + JSON.stringify(imgData));
+                await addDoc(collection(db, "eventos/" + EVENTO_ID + "/postagens"), { url_imagem: imgData.data.url, curtidas: 0, data_envio: serverTimestamp() });
+                document.getElementById('modalEstudio').style.display = 'none';
             } catch(e) {
                 alert("Aviso do Sistema: Erro ao enviar foto da galeria. " + e.message);
             } finally {
