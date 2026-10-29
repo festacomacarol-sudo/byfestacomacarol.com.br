@@ -209,7 +209,7 @@
         appId: "1:305461265991:web:fd0e2755224057cf535362"
     };
 
-    const IMGBB_API_KEY = "b72af0187ed2187cf43d6bdf9bc8c779";
+    const IMGBB_API_KEY = "186df34ff9c705a946cc418dbdad1aff";
     const EVENTO_ID = "katherine_monegatto";
 
     const LINK_FILTRO_CAMERA = "https://byfestacomacarol.com.br/katherinemonegattoxv/";
@@ -583,9 +583,15 @@
                 const base64 = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
                 const form = new FormData(); form.append('image', base64);
                 const res = await fetch("https://api.imgbb.com/1/upload?key=" + IMGBB_API_KEY, { method: 'POST', body: form });
-                if (!res.ok) throw new Error('imgbb respondeu HTTP ' + res.status);
-                const imgData = await res.json();
-                if (!imgData || !imgData.success) throw new Error('Falha no upload da imagem para o imgbb: ' + JSON.stringify(imgData));
+                const resTexto = await res.text();
+                let imgData = null;
+                try { imgData = JSON.parse(resTexto); } catch (e) { /* resposta não era JSON */ }
+                if (!res.ok || !imgData || !imgData.success) {
+                    const motivo = (imgData && imgData.error && imgData.error.message)
+                        ? imgData.error.message
+                        : ('HTTP ' + res.status + (resTexto ? (' — ' + resTexto.slice(0, 200)) : ''));
+                    throw new Error('imgbb: ' + motivo);
+                }
                 await addDoc(collection(db, "eventos/" + EVENTO_ID + "/postagens"), { url_imagem: imgData.data.url, curtidas: 0, data_envio: serverTimestamp() });
                 document.getElementById('modalEstudio').style.display = 'none';
             } catch(e) {
