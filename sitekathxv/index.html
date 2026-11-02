@@ -542,11 +542,53 @@ footer.rodape .rod-marca .rod-mono{width:clamp(80px,9vw,120px);height:auto}
   .contagem-card{padding-inline:12px}
   .convite{outline-offset:-10px}
 }
+
+/* ---------- MOBILE: refinamento delicado ---------- */
+.nav-prog{position:absolute;left:0;bottom:-1px;height:2px;width:100%;transform-origin:0 50%;transform:scaleX(var(--prog,0));background:linear-gradient(90deg,var(--rosa),var(--ouro));opacity:.75;pointer-events:none}
+@media (prefers-reduced-motion:no-preference){
+  .js-revela .revela{opacity:0;transform:translateY(18px);transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform .9s cubic-bezier(.2,.7,.2,1)}
+  .js-revela .revela.visto{opacity:1;transform:none}
+}
+@media (max-width:760px){
+  section.sec{padding-block:clamp(52px,14vw,72px)}
+  .sec-head{margin-bottom:30px;gap:4px}
+  .sec-head h2{font-size:clamp(40px,11.5vw,50px);line-height:1.12}
+  #festa .sec-head h2{font-size:clamp(56px,16vw,72px)}
+  .sec-head p,.video-sub{font-size:16.5px;line-height:1.6}
+  .hero-logo{max-width:88%;margin-inline:auto}
+  .hero-frase{font-size:15px;letter-spacing:.01em;opacity:.95}
+  .contagem-card{border-radius:22px}
+  .video-legenda{font-size:30px;text-wrap:balance;max-width:16ch;margin-inline:auto}
+  .video-moldura{border-radius:24px}
+  /* cartão da festa */
+  .convite{padding:34px 20px 30px}
+  .local-tit{gap:10px;margin-bottom:16px}
+  .local-tit::before,.local-tit::after{max-width:56px}
+  .info-tit h3,.local-tit h3{font-size:19px;letter-spacing:.22em;padding-left:.22em}
+  .info strong{font-size:25px!important}
+  .info small{font-size:15.5px}
+  .info-grid{gap:30px!important}
+  .local-nome h4{font-size:17px;letter-spacing:.08em;line-height:1.35;text-wrap:balance}
+  .local-nome p{font-size:17px}
+  .btn-mapa{font-family:var(--f-label);font-size:11.5px;letter-spacing:.18em;padding:15px 22px;gap:12px;white-space:nowrap;box-shadow:0 10px 26px rgba(220,120,137,.28)}
+  .btn-mapa svg{width:18px;height:18px}
+  .btn{font-size:11px;letter-spacing:.18em;padding:14px 22px}
+  /* formulários */
+  .campo input,.campo select,.campo textarea{font-size:16px}
+  #presenca .opcoes{grid-template-columns:1fr 1fr;gap:8px}
+  #presenca .opcoes:has(#rsvp-sim){grid-template-columns:minmax(0,1fr)}
+  .opcoes input[type=radio]{width:18px!important;height:18px!important;min-height:0!important;padding:0!important;margin:0!important;flex:none;box-shadow:none!important}
+  section.video-sec{padding-bottom:34px}
+  #presenca .opcoes label{font-size:16px;padding:12px 12px;min-height:0;height:auto;border-radius:14px;line-height:1.25}
+  .ajuda{font-size:14px}
+  .galeria-previa{gap:8px}
+  .galeria-previa img{border-radius:16px}
+}
 </style>
 
 </head>
 <body style="margin:0">
-<nav class="nav" aria-label="Seções">
+<nav class="nav" aria-label="Seções"><span class="nav-prog" aria-hidden="true"></span>
   <div class="wrap">
     <img class="nav-mono" src="img/mono.webp" alt="KM">
     <button type="button" class="menu-btn" id="menu-btn" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu-lista"><span></span><span></span><span></span></button>
@@ -1119,6 +1161,18 @@ carregarLocal(); render();
   db.collection("curtidas").onSnapshot(s=>{ FOTOS.forEach(f=>curt[f]=new Set()); s.docs.forEach(x=>{ const v=x.data(); if(v&&curt[v.foto]) curt[v.foto].add(v.por); }); render(); });
   db.collection("comentarios").orderBy("ts","asc").onSnapshot(s=>{ FOTOS.forEach(f=>coms[f]=[]); s.docs.forEach(x=>{ const v=x.data(); if(v&&coms[v.foto]) coms[v.foto].push({n:String(v.nome||"Convidado"),t:String(v.texto||""),ts:+v.ts||0}); }); render(); });
 }catch(e){} })();
+
+/* Revelar suavemente ao rolar + barra de progresso */
+(function(){
+  const nav=document.querySelector(".nav");
+  const prog=()=>{const h=document.documentElement.scrollHeight-innerHeight; nav&&nav.style.setProperty("--prog",h>0?Math.min(1,scrollY/h):0);};
+  addEventListener("scroll",prog,{passive:true}); prog();
+  if(!("IntersectionObserver" in window)) return;
+  const alvos=document.querySelectorAll("main .sec-head, main .convite, .contagem-card, .video-moldura, .galeria-previa, main form, .mural, .recados-grid, .lugares");
+  document.documentElement.classList.add("js-revela");
+  const ob=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add("visto"); ob.unobserve(e.target);} }),{rootMargin:"0px 0px -8% 0px"});
+  alvos.forEach(el=>{el.classList.add("revela"); ob.observe(el);});
+})();
 </script>
 
 </body>
