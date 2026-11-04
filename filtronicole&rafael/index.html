@@ -14,11 +14,14 @@ Lei 9.610/98 – Direitos Autorais.
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="format-detection" content="telephone=no" />
-    <title>Natalia & Rafael</title>
+    <title>Nicole & Rafael</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        :root { --accent: #25D366; --record: #ff0000; }
+        :root { --accent: #f38743; --record: #ff0000; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; background: #000; color: #fff; overflow: hidden; width: 100vw; height: 100vh; height: 100dvh; font-family: sans-serif; -webkit-text-size-adjust: 100%; overscroll-behavior: none; }
+        body { margin: 0; background: #000; color: #fff; overflow: hidden; width: 100vw; height: 100vh; height: 100dvh; font-family: 'Poppins', sans-serif; -webkit-text-size-adjust: 100%; overscroll-behavior: none; }
         
         .stage { position: relative; width: 100%; height: 100%; overflow: hidden; background: #000; touch-action: none; }
         
@@ -63,10 +66,10 @@ Lei 9.610/98 – Direitos Autorais.
         .btn-ui { padding: 10px 20px; background: rgba(0,0,0,0.6); border: 1px solid #fff; border-radius: 20px; color: #fff; cursor: pointer; backdrop-filter: blur(5px); }
         
         .capture-controls { display: flex; flex-direction: column; gap: 20px; align-items: center; }
-        /* Ordem explicita: galeria, depois video, depois foto */
+        /* Ordem explicita: galeria, depois foto, depois video */
         #galleryBtn { order: 0; }
-        #captureVideoBtn { order: 1; }
-        #capturePhotoBtn { order: 2; }
+        #capturePhotoBtn { order: 1; }
+        #captureVideoBtn { order: 2; }
         
         .btn-photo { width: 55px; height: 55px; border-radius: 50%; border: 2px solid #fff; background: rgba(255,255,255,0.2); font-size: 24px; cursor: pointer; color: #fff; display: flex; align-items: center; justify-content: center; }
         .btn-gallery { width: 50px; height: 50px; border-radius: 10px; border: 1px solid #fff; background: rgba(0,0,0,0.5); font-size: 20px; cursor: pointer; color: #fff; display: flex; align-items: center; justify-content: center; }
@@ -125,14 +128,14 @@ Lei 9.610/98 – Direitos Autorais.
     <div id="resultUI">
         <div id="previewLabel" style="background:rgba(0,0,0,0.55); padding:6px 16px; border-radius:20px; margin-bottom:16px; font-size:13px; text-align:center;">Confira seu registro antes de salvar</div>
         <div class="actions-box">
-            <button id="salvarGaleriaBtn" class="btn-res" style="background:#fff; color:#333;"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;"><path d="M20 6 9 17l-5-5"/></svg>SALVAR NA GALERIA DOS NOIVOS</button>
+            <button id="salvarGaleriaBtn" class="btn-res" style="background:#fff; color:#333; border:1.5px solid #e0c8a8;"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;"><path d="M20 6 9 17l-5-5"/></svg>SALVAR NA GALERIA DOS NOIVOS</button>
             <button id="shareBtn" class="btn-res" style="background:#fff; color:#333;"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v14"/></svg>COMPARTILHAR / SALVAR</button>
             <button id="downloadBtn" class="btn-res" style="background:var(--accent); display:none;"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>BAIXAR NO CELULAR</button>
             <button id="newBtn" class="btn-res" style="background:#444;"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>VOLTAR</button>
         </div>
     </div>
 
-    <div id="startScreen"><button id="startBtn">Clique aqui para iniciar</button></div>
+    <div id="startScreen"><button id="startBtn">INICIAR</button></div>
 </div>
 
 <script>
@@ -633,7 +636,8 @@ function enviarFotoParaGaleriaComFeedback(btn) {
         } else {
             btn.disabled = false;
             btn.innerHTML = textoOriginal;
-            alert('Não foi possível enviar para a galeria. Tente novamente.');
+            const detalhe = (res && res.erro) ? ('\n\nDetalhe técnico: ' + res.erro) : '';
+            alert('Não foi possível enviar para a galeria. Tente novamente.' + detalhe);
         }
     });
 }
@@ -673,7 +677,7 @@ function switchCamera() { usingFrontCamera = !usingFrontCamera; initCamera(); }
         messagingSenderId: "305461265991",
         appId: "1:305461265991:web:fd0e2755224057cf535362"
     };
-    const IMGBB_API_KEY = "b72af0187ed2187cf43d6bdf9bc8c779";
+    const IMGBB_API_KEY = "186df34ff9c705a946cc418dbdad1aff";
     const EVENTO_ID = "casamentonicoleerafael";
 
     let dbGaleria = null;
@@ -684,33 +688,72 @@ function switchCamera() { usingFrontCamera = !usingFrontCamera; initCamera(); }
         console.error("Erro ao conectar com a galeria do Instamomentos:", e);
     }
 
-    window.enviarFotoParaGaleriaInstamomentos = async function (blob) {
-        if (!dbGaleria) return { ok: false };
+    async function tentarEnviarUmaVez(blob) {
+        const base64 = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(String(reader.result).split(',')[1]);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+        });
+
+        const form = new FormData();
+        form.append('image', base64);
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 15000);
+        let res;
         try {
-            const base64 = await new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(String(reader.result).split(',')[1]);
-                reader.onerror = reject;
-                reader.readAsDataURL(blob);
+            res = await fetch("https://api.imgbb.com/1/upload?key=" + IMGBB_API_KEY, {
+                method: 'POST',
+                body: form,
+                signal: controller.signal
             });
-
-            const form = new FormData();
-            form.append('image', base64);
-            const res = await fetch("https://api.imgbb.com/1/upload?key=" + IMGBB_API_KEY, { method: 'POST', body: form });
-            const imgData = await res.json();
-            if (!imgData.success) throw new Error('Falha no upload da imagem para o imgbb');
-
-            await addDoc(collection(dbGaleria, "eventos/" + EVENTO_ID + "/postagens"), {
-                url_imagem: imgData.data.url,
-                curtidas: 0,
-                data_envio: serverTimestamp()
-            });
-
-            return { ok: true };
-        } catch (e) {
-            console.error("Erro ao enviar foto para a galeria do Instamomentos:", e);
-            return { ok: false };
+        } finally {
+            clearTimeout(timeoutId);
         }
+
+        const resTexto = await res.text();
+        let imgData = null;
+        try { imgData = JSON.parse(resTexto); } catch (e) { /* resposta não era JSON */ }
+        if (!res.ok || !imgData || !imgData.success) {
+            const motivo = (imgData && imgData.error && imgData.error.message)
+                ? imgData.error.message
+                : ('HTTP ' + res.status + (resTexto ? (' — ' + resTexto.slice(0, 200)) : ''));
+            throw new Error('imgbb: ' + motivo);
+        }
+
+        await addDoc(collection(dbGaleria, "eventos/" + EVENTO_ID + "/postagens"), {
+            url_imagem: imgData.data.url,
+            curtidas: 0,
+            data_envio: serverTimestamp()
+        });
+    }
+
+    window.enviarFotoParaGaleriaInstamomentos = async function (blob) {
+        if (!dbGaleria) {
+            const msg = "conexão com o Firebase não foi inicializada";
+            console.error("Erro ao enviar foto para a galeria do Instamomentos: " + msg);
+            return { ok: false, erro: msg };
+        }
+        const tentativas = 3;
+        let ultimoErro = null;
+        for (let i = 1; i <= tentativas; i++) {
+            try {
+                await tentarEnviarUmaVez(blob);
+                return { ok: true };
+            } catch (e) {
+                ultimoErro = e;
+                console.error("Erro ao enviar foto para a galeria do Instamomentos (tentativa " + i + "/" + tentativas + "):", e);
+                if (i < tentativas) {
+                    await new Promise(r => setTimeout(r, 1200 * i));
+                }
+            }
+        }
+        console.error("Envio para a galeria falhou após " + tentativas + " tentativas:", ultimoErro);
+        const msgErro = (ultimoErro && (ultimoErro.name === 'AbortError'))
+            ? "tempo esgotado ao conectar (conexão lenta ou instável)"
+            : (ultimoErro && ultimoErro.message) ? ultimoErro.message : "erro desconhecido";
+        return { ok: false, erro: msgErro };
     };
 </script>
 </body>
