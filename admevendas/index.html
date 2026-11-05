@@ -483,6 +483,10 @@ textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(
 .dchart text{font:10.5px var(--f-body);fill:var(--muted)}
 .dleg{display:flex;gap:10px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin-top:4px}
 .dleg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+.dinp{font:600 17px var(--f-display)!important;padding:4px 8px!important;margin-top:2px;width:100%}
+.rsec{border-top:2px dashed var(--line);padding-top:12px;margin-top:4px;display:flex;flex-direction:column;gap:2px}
+.rsec b{font-family:var(--f-display);font-weight:600;font-size:16px}
+.rsec span,.rhelp{font-size:12.5px;color:var(--muted);font-weight:500;letter-spacing:0}
 .dstats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .dstats div{background:var(--raise);border:1.5px solid var(--line);border-radius:12px;padding:8px 10px;min-width:0}
 .dstats small{display:block;font-size:11px;color:var(--muted);font-weight:700}
@@ -1115,10 +1119,17 @@ function abrirProduto(p){
 }
 function abrirRegras(){
   const t=state.cfg.taxas||{};
-  openModal(`<h2>Regras de preço</h2><p class="note" style="margin:0 0 16px">O preço mínimo de cada produto já desconta a maior taxa, então fica seguro em qualquer pagamento. O lucro mínimo nunca fica abaixo de 10%.</p>
-    <div class="form"><label class="f">Lucro mínimo (%)<input id="r-min" class="mono" type="number" min="10" step="0.5" value="${minPct()}"></label><label class="f">Taxa crédito (%)<input id="r-cre" class="mono" type="number" min="0" step="0.01" value="${t.credito||0}"></label><label class="f">Taxa débito (%)<input id="r-deb" class="mono" type="number" min="0" step="0.01" value="${t.debito||0}"></label><label class="f">Taxa Pix (%)<input id="r-pix" class="mono" type="number" min="0" step="0.01" value="${t.pix||0}"></label>
-      <div class="full"><div class="lbl note" style="font-weight:700;margin:6px 0">Desconto por quantidade</div><div class="grid" style="gap:6px">${[0,1,2,3].map(i=>{ const f=faixas()[i]||{}; return `<div class="ex" style="grid-template-columns:1fr 1fr"><label class="f">A partir de (un.)<input id="r-fm${i}" type="number" min="2" value="${f.min||''}" placeholder="—"></label><label class="f">Desconto (%)<input id="r-fp${i}" type="number" min="0" step="0.5" value="${f.pct||''}" placeholder="—"></label></div>`; }).join('')}</div></div>
-      <label class="f">Lucro mínimo com desconto (%)<input id="r-ls" class="mono" type="number" min="11" step="0.5" value="${pisoDesc()}"></label><label class="f">Desconto máximo sobre o preço de tabela (%)<input id="r-dm" class="mono" type="number" min="0" max="90" step="0.5" value="${descMax()}"></label>
+  openModal(`<h2>Regras de preço</h2><p class="note" style="margin:0 0 14px">Estas regras valem para todos os produtos e orçamentos. Só as administradoras mudam.</p>
+    <div class="form">
+      <div class="rsec full"><b>1. Lucro mínimo</b><span>Nenhum preço pode dar menos lucro que isso. Se alguém tentar vender abaixo, o app bloqueia. Nunca fica abaixo de 10%.</span></div>
+      <label class="f full">Lucro mínimo (%)<input id="r-min" class="mono" type="number" min="10" step="0.5" value="${minPct()}"></label>
+      <div class="rsec full"><b>2. Taxas da maquininha</b><span>Quanto a maquininha cobra em cada forma de pagamento. Se não usa maquininha, deixe 0.</span></div>
+      <label class="f">Crédito (%)<input id="r-cre" class="mono" type="number" min="0" step="0.01" value="${t.credito||0}"></label><label class="f">Débito (%)<input id="r-deb" class="mono" type="number" min="0" step="0.01" value="${t.debito||0}"></label><label class="f">Pix (%)<input id="r-pix" class="mono" type="number" min="0" step="0.01" value="${t.pix||0}"></label>
+      <div class="rsec full"><b>3. Desconto automático por quantidade</b><span>Quando o orçamento estiver “Com desconto”, o app aplica sozinho conforme a quantidade de peças. Ex.: a partir de 50 peças, 5% de desconto. Produtos que têm a própria tabela de “Preço por quantidade” usam a tabela deles.</span></div>
+      <div class="full"><div class="grid" style="gap:6px">${[0,1,2,3].map(i=>{ const f=faixas()[i]||{}; return `<div class="ex" style="grid-template-columns:1fr 1fr"><label class="f">A partir de (un.)<input id="r-fm${i}" type="number" min="2" value="${f.min||''}" placeholder="—"></label><label class="f">Desconto (%)<input id="r-fp${i}" type="number" min="0" step="0.5" value="${f.pct||''}" placeholder="—"></label></div>`; }).join('')}</div></div>
+      <div class="rsec full"><b>4. Limites do desconto</b><span>Proteções para nenhum desconto passar do ponto, nem o automático nem o manual.</span></div>
+      <label class="f">Lucro que precisa sobrar com desconto (%)<input id="r-ls" class="mono" type="number" min="11" step="0.5" value="${pisoDesc()}"><small class="rhelp">Ex.: 20 = mesmo com desconto, cada peça ainda dá pelo menos 20% de lucro.</small></label><label class="f">Maior desconto permitido (%)<input id="r-dm" class="mono" type="number" min="0" max="90" step="0.5" value="${descMax()}"><small class="rhelp">Ex.: 15 = nunca mais que 15% abaixo do preço do produto.</small></label>
+      <div class="rsec full"><b>5. Na proposta</b><span>Aparece no rodapé da proposta e do catálogo.</span></div>
       <label class="f full">Contato na proposta<input id="r-cont" value="${esc(state.cfg.contato||'')}" placeholder="Ex.: @byfestacomacarol · (11) 99999-9999"></label>
       <label class="f full">Condições padrão da proposta<textarea id="r-cond" rows="3" placeholder="Ex.: 50% na aprovação e 50% na entrega. Prazo de produção de 10 dias úteis.">${esc(state.cfg.condicoes||'')}</textarea></label></div>
     <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px"><button class="btn" id="r-x">Cancelar</button><button class="btn primary" id="r-ok">Salvar</button></div>`);
@@ -1211,7 +1222,9 @@ const descMax=()=> Math.min(90,Math.max(0, state.cfg.descMax==null? 15 : Number(
 const pisoDesc=()=> Math.max(minPct()+0.5, Number(state.cfg.lucroSaudavel)||20);
 const faixaPara=q=>{ let r=null; faixas().forEach(f=>{ if(q>=f.min) r=f; }); return r; };
 const faixasTxt=()=> faixas().map(f=>`${f.min}+ un. −${pct(f.pct)}`).join(' · ');
-function linhaOrc(l,desc){
+let EMB_CTX=0, EMB_EX=0, EMB_Q=0;
+function embOf(o){ if(o.embutir===false) return 0; const ex=(o.extras||[]).reduce((a,e)=>a+(Number(e.valor)||0),0); if(!(ex>0)) return 0; const q=(o.itens||[]).reduce((a,l)=>a+(linhaOrc(l,o.desconto,0)?Math.max(1,parseInt(l.qtd)||1):0),0); EMB_EX=ex; EMB_Q=q; return q? Math.ceil(ex/q*100-1e-6)/100 : 0; }
+function linhaOrc(l,desc,emb=EMB_CTX){
   const p=state.produtos.find(x=>x.id===l.pid); if(!p) return null;
   const custo=custoVar(p,l.sel,l.excl); const qtd=Math.max(1,parseInt(l.qtd)||1);
   const cheio = l.margem==='atual'? precoVar(p,l.sel) : precoSugerido(custo, Math.max(minPct()+0.5, Number(l.margem)||30));
@@ -1237,7 +1250,9 @@ function linhaOrc(l,desc){
   const ref = tabela>0? Math.max(tabela, dpct>0?cheio:0) : cheio;
   const off = ref>unit+0.004? (1-unit/ref)*100 : 0;
   const a=analisa(unit,custo,taxaMax());
-  return {manual,p,custo,cheio,tabela,minU,capped,ref,off,unit,dpct,limitado,fx,prox,proxUnit,qtd,sub:unit*qtd,lucro:a.lucro*qtd,margem:a.margem,ok:okMargem(a.margem)};
+  const R={manual,p,custo,cheio,tabela,minU,capped,ref,off,unit,dpct,limitado,fx,prox,proxUnit,qtd,sub:unit*qtd,lucro:a.lucro*qtd,margem:a.margem,ok:okMargem(a.margem)};  if(emb>0){ R.emb=emb; R.unit=Math.round((R.unit+emb)*100)/100; R.cheio+=emb; R.ref+=emb; if(R.tabela) R.tabela+=emb; if(R.proxUnit!=null&&R.prox){ const qq=Math.max(1,EMB_Q-R.qtd+R.prox.min); R.proxUnit=Math.round((R.proxUnit+Math.ceil(EMB_EX/qq*100-1e-6)/100)*100)/100; } R.off=R.ref>R.unit+0.004?(1-R.unit/R.ref)*100:0; R.sub=R.unit*R.qtd; }
+  return R;
+
 }
 function altPrecos(l,desc,g){
   const base=linhaOrc(l,desc); if(!base) return [];
@@ -1255,24 +1270,24 @@ function combos(l,desc,p){
     return {nome:c.map(([g,it])=>it.nome).join(' + '),unit:x?x.unit:0,ref:x?x.ref:0,sub:x?x.sub:0,on}; });
 }
 const mostraOpc=(l,p)=> l.mostrarOpc!==false && opcoes(p).length>0;
-function totOrc(o){ let sub=0,custo=0,lucro=0,bad=0,econ=0; (o.itens||[]).forEach(l=>{ const x=linhaOrc(l,o.desconto); if(!x) return; econ+=((o.mostrarTabela!==false? x.ref : x.cheio)-x.unit)*x.qtd; sub+=x.sub; custo+=x.custo*x.qtd; lucro+=x.lucro; if(!x.ok) bad++; }); const ex=(o.extras||[]).reduce((a,e)=>a+(Number(e.valor)||0),0); const exC=(o.extras||[]).reduce((a,e)=>a+(e.gastoId? custoItem({gastoId:e.gastoId,valor:0})*(Number(e.qtd)||1):0),0); custo+=exC; lucro+=ex-exC; return {sub,ex,total:sub+ex,custo,lucro,bad,econ}; }
-function propHTML(o){
+function totOrc(o){ EMB_CTX=embOf(o); let sub=0,custo=0,lucro=0,bad=0,econ=0,q=0; (o.itens||[]).forEach(l=>{ const x=linhaOrc(l,o.desconto); if(!x) return; q+=x.qtd; econ+=((o.mostrarTabela!==false? x.ref : x.cheio)-x.unit)*x.qtd; sub+=x.sub; custo+=x.custo*x.qtd; lucro+=x.lucro; if(!x.ok) bad++; }); const exV=(o.extras||[]).reduce((a,e)=>a+(Number(e.valor)||0),0); const exC=(o.extras||[]).reduce((a,e)=>a+(e.gastoId? custoItem({gastoId:e.gastoId,valor:0})*(Number(e.qtd)||1):0),0); custo+=exC; const emb=EMB_CTX; const ex= emb? 0 : exV; lucro+=(emb? emb*q : exV)-exC; return {sub,ex,exV,emb,q,total:sub+ex,custo,lucro,bad,econ}; }
+function propHTML(o){ EMB_CTX=embOf(o);
   const L=(o.itens||[]).map(l=>({l,x:linhaOrc(l,o.desconto)})).filter(r=>r.x); const ex=(o.extras||[]).filter(e=>(e.nome||'').trim()||Number(e.valor)); const T=totOrc(o);
   const dataDoc=o.criadoEm? new Date(o.criadoEm) : new Date();
   return `<div class="pp"><header class="pp-h"><img src="${logoSrc()}" alt="By Festa com a Carol"><div class="pp-meta"><div class="pp-k">Proposta</div>${o.numero?`<div>Nº ${esc(o.numero)}</div>`:''}<div>${dataDoc.toLocaleDateString('pt-BR',{day:'numeric',month:'long',year:'numeric'})}</div></div></header>
     <div class="pp-to"><span class="pp-script">para</span><b>${esc(o.cliente||'Nome do cliente')}</b>${o.evento?` · ${esc(o.evento)}`:''}${o.dataEvento?` · ${fmtDate(o.dataEvento)}`:''}</div>
     ${L.length? L.map(({l,x})=>{ const tags=mostraOpc(l,x.p)? '' : itensSel(x.p,l.sel).map(s=>`<span>${esc(s.it.nome)}</span>`).join(''); const grpHTML=g=>`<div class="pp-alt"><div class="pp-alt-h">${esc(g.nome)}${g.tipo==='varias'?' <span>(pode escolher mais de um)</span>':''}</div>${altPrecos(l,o.desconto,g).map(a=>`<div class="pp-alt-r ${a.on?'on':''}"><span>${a.on?'● ':'○ '}${esc(a.it.nome)}${a.on?' <em>no total</em>':''}</span><b>${a.add?'+ ':''}${brl(a.unit)}${a.add?' por un.':' cada'}</b></div>`).join('')}</div>`; const cb=mostraOpc(l,x.p)? combos(l,o.desconto,x.p) : null; const alts=!mostraOpc(l,x.p)? '' : cb? `<div class="pp-alt"><div class="pp-alt-h">Escolha a sua opção <span>· total para ${x.qtd} un.</span></div>${cb.map(c=>`<div class="pp-alt-r ${c.on?'on':''}"><span>${c.on?'● ':'○ '}${esc(c.nome)}${c.on?' <em>no total</em>':''}<small> · ${o.mostrarTabela!==false&&c.ref>c.unit+0.004?`<s>${brl(c.ref)}</s> `:''}${brl(c.unit)} cada</small></span><b>${brl(c.sub)}</b></div>`).join('')}</div>`+opcoes(x.p).filter(g=>g.tipo==='varias').map(grpHTML).join('') : opcoes(x.p).map(grpHTML).join(''); const inc=incluiNomes(x.p,l.excl);
       return `<div class="pp-it"><div class="pp-it-h"><b>${esc(x.p.nome)}</b>${(()=>{ const tb=o.mostrarTabela!==false; const de=tb? x.ref : x.cheio; const pc=tb? x.off : x.dpct; return `<span>${x.qtd} un. × ${pc>0?`<s>${brl(de)}</s> `:''}${brl(x.unit)}</span>${pc>0?`<span class="pp-off">${pct(pc)} OFF ${x.manual?'especial':x.dpct>0?'por quantidade':'para esta quantidade'}</span>`:''}`; })()}</div><div class="pp-sub">${brl(x.sub)}</div>${tags?`<div class="pp-tags">${tags}</div>`:''}${alts}${inc.length?`<div class="pp-inc">Inclui: ${inc.map(esc).join(', ')}</div>`:''}${x.prox?`<div class="pp-up">Pedindo ${x.prox.min} unidades, cada uma sai por <b>${brl(x.proxUnit)}</b>.</div>`:''}</div>`; }).join('') : '<div class="pp-empty">Adicione produtos ao orçamento e eles aparecem aqui.</div>'}
-    ${ex.map(e=>`<div class="pp-ex"><span>${esc(e.nome||'Extra')}</span><b>${brl(Number(e.valor)||0)}</b></div>`).join('')}
+    ${T.emb? '' : ex.map(e=>`<div class="pp-ex"><span>${esc(e.nome||'Extra')}</span><b>${brl(Number(e.valor)||0)}</b></div>`).join('')}
     ${T.econ>0.004?`<div class="pp-save">Com o desconto em cada produto, você economiza <b>${brl(T.econ)}</b></div>`:''}<div class="pp-total"><span>Total</span><b>${brl(T.total)}</b></div>
     ${o.obs?`<div class="pp-obs">${nl(o.obs)}</div>`:''}
     <div class="pp-foot">Proposta válida por ${Number(o.validade)||15} dias${state.cfg.contato?' · '+esc(state.cfg.contato):''}</div></div>`;
 }
-function textoWhats(o){
+function textoWhats(o){ EMB_CTX=embOf(o);
   const L=(o.itens||[]).map(l=>({l,x:linhaOrc(l,o.desconto)})).filter(r=>r.x); const T=totOrc(o);
   return [`*Proposta By Festa com a Carol*`,`Para: ${o.cliente||''}${o.evento?' — '+o.evento:''}${o.dataEvento?' ('+fmtDate(o.dataEvento)+')':''}`,'',
     ...L.map(({l,x})=>{ const op=selLabel(x.p,l.sel); return `• ${x.qtd}× ${x.p.nome}${op?' ('+op+')':''} — ${o.mostrarTabela!==false&&x.off>0?`de ${brl(x.ref)} por `:''}${brl(x.unit)} cada${(o.mostrarTabela!==false?x.off:x.dpct)>0?' ('+pct(o.mostrarTabela!==false?x.off:x.dpct)+' OFF)':''} = ${brl(x.sub)}`+(mostraOpc(l,x.p)? ((cbw=>cbw? cbw.map(c=>`\n   ${c.on?'✓':'•'} ${c.nome}: ${brl(c.unit)} cada = ${brl(c.sub)}`).join('') : opcoes(x.p).map(g=>`\n   ${g.nome}: `+altPrecos(l,o.desconto,g).map(a=>`${a.it.nome} ${a.add?'+':''}${brl(a.unit)}${a.on?' ✓':''}`).join(' | ')).join(''))(combos(l,o.desconto,x.p))) : '')+(x.prox?`\n   _Pedindo ${x.prox.min} un., sai por ${brl(x.proxUnit)} cada_`:''); }),
-    ...(o.extras||[]).filter(e=>e.nome||e.valor).map(e=>`• ${e.nome||'Extra'} — ${brl(Number(e.valor)||0)}`),
+    ...(embOf(o)? [] : (o.extras||[]).filter(e=>e.nome||e.valor).map(e=>`• ${e.nome||'Extra'} — ${brl(Number(e.valor)||0)}`)),
     '',...(T.econ>0.004?[`Você economiza: ${brl(T.econ)}`]:[]),`*Total: ${brl(T.total)}*`,`Válida por ${Number(o.validade)||15} dias.`,...(o.obs?['',o.obs]:[]),...(state.cfg.contato?['',state.cfg.contato]:[])].join('\n');
 }
 function textoCatalogo(){
@@ -1327,7 +1342,7 @@ function vCatalogo(v){
   $('#cat-pdf')?.addEventListener('click',e=>baixarPDF(`catalogo-by-festa-${today()}.pdf`,catHTML(ui.catSel),e.currentTarget));
   $('#cat-dl')?.addEventListener('click',()=>baixarHTML(`catalogo-by-festa-${today()}.html`,'Catálogo By Festa com a Carol',catHTML(ui.catSel)));
 }
-function vOrcEdit(v){
+function vOrcEdit(v){ EMB_CTX=embOf(ui.orc);
   const o=ui.orc; const T=totOrc(o); const ro=!canWrite;
   const prodsAtivos=state.produtos.filter(p=>p.ativo!==false); const cats=[...new Set(prodsAtivos.map(catOf))].sort();
   const linhas=o.itens.map((l,li)=>{ const x=linhaOrc(l,o.desconto); if(!x) return `<div class="ol"><div class="ol-h"><b>Produto removido</b><button class="btn sm ghost danger" data-olx="${li}">${icon('x')}</button></div></div>`; const p=x.p;
@@ -1362,7 +1377,8 @@ function vOrcEdit(v){
       <div class="card"><div class="card-head"><h3>Produtos</h3><span class="note">${o.itens.length} no orçamento</span></div>
         <div class="grid" style="gap:12px">${linhas||'<p class="note" style="margin:0">Escolha um produto abaixo para começar.</p>'}</div>
         ${ro?'':`<label class="f" style="margin-top:14px">Adicionar produto<select id="o-add"><option value="">Escolha um produto…</option>${cats.map(c=>`<optgroup label="${esc(c)}">${prodsAtivos.filter(p=>catOf(p)===c).map(p=>`<option value="${p.id}">${esc(p.nome)}</option>`).join('')}</optgroup>`).join('')}</select></label>`}</div>
-      <div class="card"><div class="card-head"><h3>Envio e extras</h3><span class="note">cobrado uma vez no pedido</span></div>
+      <div class="card"><div class="card-head"><h3>Envio e extras</h3><span class="note">${o.embutir!==false?'diluído no preço das peças · a cliente não vê':'aparece separado na proposta'}</span></div>
+        <label class="pv" style="margin-bottom:10px;white-space:normal;font-size:13.5px"><input type="checkbox" data-oemb="1" ${o.embutir!==false?'checked':''} ${ro?'disabled':''}> Embutir no preço de cada peça${o.embutir!==false&&embOf(o)?` (<b>+ ${brl(embOf(o))}</b> por peça)`:''}</label>
         <div class="grid" style="gap:10px">${(o.extras||[]).map((e,ei)=>{ const custo=e.gastoId? custoItem({gastoId:e.gastoId,valor:0})*(Number(e.qtd)||1) : 0; return `<div class="ex"><input id="oe-n${ei}" data-oen="${ei}" value="${esc(e.nome)}" placeholder="Ex.: Embalagem de envio" ${ro?'disabled':''}><input id="oe-v${ei}" class="mono" inputmode="decimal" data-oev="${ei}" value="${toInput(e.valor)}" placeholder="0,00" aria-label="Valor cobrado" ${ro?'disabled':''}><button type="button" class="btn sm ghost danger" data-oex="${ei}" aria-label="Remover" ${ro?'disabled':''}>${icon('x')}</button>
           <div class="sub"><select data-oeg="${ei}" aria-label="Custo a partir de um gasto" ${ro?'disabled':''}><option value="">Sem custo ligado</option>${gastosOpts(e.gastoId)}</select><label class="pv">Qtd <input id="oe-q${ei}" type="number" min="1" data-oeq="${ei}" value="${Number(e.qtd)||1}" style="width:64px;padding:5px 8px" ${ro?'disabled':''}></label></div>
           ${e.gastoId?`<div class="note" style="grid-column:1/-1">Custo ${brl(custo)} · ${Number(e.valor)>=custo?`lucro ${brl((Number(e.valor)||0)-custo)}`:`<b style="color:var(--bad)">cobrando menos que o custo</b>`}</div>`:''}</div>`; }).join('')}</div>
@@ -1390,7 +1406,7 @@ const olFoot=x=>`<span>${x.qtd} × ${brl(x.unit)} · lucro ${brl(x.lucro)} (${pc
 // ---------- controle de desconto com gráfico ----------
 function baseDesc(l,x){ return Number(x.p.preco)>0? precoVar(x.p,l.sel) : x.cheio; }
 function curDesc(l,x){ if(l.semDesc) return 0; if(l.descManual!=null) return Number(l.descManual); const b=baseDesc(l,x); return b>0&&x.unit<b? Math.round((1-x.unit/b)*1000)/10 : 0; }
-function descStats(l,x,d){ const b=baseDesc(l,x); const hard=precoSugerido(x.custo,minPct()+0.5); let u=Math.round(b*(1-d/100)*100)/100; if(u<hard) u=hard; const a=analisa(u,x.custo,taxaMax()); return {u,luc:a.lucro,mg:a.margem,tot:u*x.qtd}; }
+function descStats(l,x,d){ const b=baseDesc(l,x); const hard=precoSugerido(x.custo,minPct()+0.5); let u=Math.round(b*(1-d/100)*100)/100; if(u<hard) u=hard; const a=analisa(u,x.custo,taxaMax()); const em=x.emb||0; return {u:Math.round((u+em)*100)/100,luc:a.lucro,mg:a.margem,tot:(u+em)*x.qtd}; }
 function descChart(l,x,d){
   const W=320,H=130,L=44,R=10,T=12,B=22; const D=Math.max(1,descMax()); const pts=[];
   for(let i=0;i<=40;i++){ const dd=D*i/40; const s=descStats(l,x,dd); pts.push([dd,s.luc,s.mg]); }
@@ -1416,16 +1432,17 @@ function dctlHTML(l,li,x,ro){
   const col=s.mg<=minPct()+0.5?'var(--bad)':s.mg<pisoDesc()?'var(--warn)':'var(--ok)';
   return `<div class="dctl" id="dctl-${li}"><div class="lbl">Desconto neste produto <span style="font-weight:500">· arraste e veja o lucro por unidade</span></div>
     <div class="dgrid"><div>${descChart(l,x,d)}<div class="dleg"><span><i style="background:var(--brand)"></i>lucro por unidade</span><span><i style="background:var(--warn-soft)"></i>abaixo de ${pct(pisoDesc())}</span><span><i style="background:var(--bad-soft)"></i>proibido</span></div></div>
-      <div class="dstats" id="dst-${li}">${dstatsHTML(s,d,b,col,x.qtd)}</div></div>
+      <div class="dstats" id="dst-${li}">${dstatsHTML(s,d,b,col,x.qtd,li)}</div></div>
     <input type="range" min="0" max="${descMax()}" step="0.5" value="${d}" data-oldr="${li}" aria-label="Desconto em %" ${ro||l.semDesc?'disabled':''}>
     <div class="chips">${[0,5,10,15,20].filter(v=>v<=descMax()).map(v=>`<button type="button" class="chip" data-ol="${li}" data-oldq="${v}" aria-pressed="${l.descManual!=null&&Number(l.descManual)===v}" ${ro?'disabled':''}>${v?v+'%':'Sem desconto'}</button>`).join('')}<button type="button" class="chip" data-ol="${li}" data-oldauto="1" aria-pressed="${l.descManual==null&&!l.semDesc}" ${ro?'disabled':''}>Automático pela quantidade</button></div></div>`;
 }
-function dstatsHTML(s,d,b,col,q){ return `<div><small>Desconto</small><b>${pct(d)}</b></div><div><small>Preço por un.</small><b>${brl(s.u)}</b>${d>0?`<small>de ${brl(b)}</small>`:''}</div><div><small>Lucro por un.</small><b style="color:${col}">${brl(s.luc)}</b><small style="color:${col}">${pct(s.mg)} de lucro</small></div><div><small>Total (${q} un.)</small><b>${brl(s.tot)}</b></div>`; }
+function dstatsHTML(s,d,b,col,q,li){ return `<div><small>Desconto (%)</small>${li!=null&&canWrite?`<input class="dinp" id="dpi-${li}" type="number" min="0" max="${descMax()}" step="0.1" value="${Math.round(d*10)/10}" data-oldi="${li}" aria-label="Digitar desconto">`:`<b>${pct(d)}</b>`}</div><div><small>Preço por un. (R$)</small>${li!=null&&canWrite?`<input class="dinp" id="dpp-${li}" inputmode="decimal" value="${toInput(s.u)}" data-oldp="${li}" aria-label="Digitar preço por unidade">`:`<b>${brl(s.u)}</b>`}${d>0?`<small>de ${brl(b)}</small>`:''}</div><div><small>Lucro por un.</small><b style="color:${col}">${brl(s.luc)}</b><small style="color:${col}">${pct(s.mg)} de lucro</small></div><div><small>Total (${q} un.)</small><b>${brl(s.tot)}</b></div>`; }
 
-function orcLive(){
+document.addEventListener('keydown',e=>{ if(e.key==='Enter'&&e.target.matches?.('.dinp')){ e.preventDefault(); e.target.blur(); } });
+function orcLive(){ if(ui.orc) EMB_CTX=embOf(ui.orc);
   const o=ui.orc; if(!o) return; const T=totOrc(o);
   const paper=$('#o-paper'); if(paper) paper.innerHTML=propHTML(o);
-  const t=$('#o-tot'); if(t) t.innerHTML=`<span>Produtos</span><span>${brl(T.sub)}</span>${T.ex?`<span>Extras</span><span>${brl(T.ex)}</span>`:''}<span>Custo total</span><span>${brl(T.custo)}</span><span>Lucro estimado</span><span style="color:${T.bad?'var(--bad)':'var(--ok)'}">${brl(T.lucro)}${T.sub?' ('+pct(T.lucro/T.sub*100)+')':''}</span>${T.econ>0.004?`<span>Desconto que a cliente vê</span><span style="color:var(--ok)">− ${brl(T.econ)}</span>`:''}<span class="big">Total</span><span>${brl(T.total)}</span>`;
+  const t=$('#o-tot'); if(t) t.innerHTML=`<span>Produtos</span><span>${brl(T.sub)}</span>${T.emb?`<span>Envio e extras (dentro do preço)</span><span>${brl(T.exV)} · +${brl(T.emb)}/un.</span>`:T.ex?`<span>Extras</span><span>${brl(T.ex)}</span>`:''}<span>Custo total</span><span>${brl(T.custo)}</span><span>Lucro estimado</span><span style="color:${T.bad?'var(--bad)':'var(--ok)'}">${brl(T.lucro)}${T.sub?' ('+pct(T.lucro/T.sub*100)+')':''}</span>${T.econ>0.004?`<span>Desconto que a cliente vê</span><span style="color:var(--ok)">− ${brl(T.econ)}</span>`:''}<span class="big">Total</span><span>${brl(T.total)}</span>`;
   const sv=$('#o-salvar'); if(sv) sv.disabled = !!T.bad && !isOwner;
 }
 function refreshOrc(){ const id=document.activeElement?.id; if(ui.view!=='orcamentos') return; vOrc($('#view')); if(id&&$('#'+id)) $('#'+id).focus(); }
@@ -1433,7 +1450,7 @@ document.addEventListener('input',e=>{
   if(ui.view!=='orcamentos'||!ui.orc) return; const t=e.target, ds=t.dataset; let hit=true;
   if(ds.of) ui.orc[ds.of]= ds.of==='validade'? (parseInt(t.value)||15) : t.value;
   else if(ds.olqi!=null){ const q=parseInt(t.value); if(!(q>=1)) return; ui.orc.itens[ds.olqi].qtd=q; const x=linhaOrc(ui.orc.itens[ds.olqi],ui.orc.desconto); const f=$('#olf-'+ds.olqi); if(f&&x) f.innerHTML=olFoot(x); }
-  else if(ds.oldr!=null){ const li=Number(ds.oldr), l=ui.orc.itens[li]; l.descManual=Number(t.value); l.semDesc=false; const x=linhaOrc(l,ui.orc.desconto); if(x){ const d=Number(t.value), s2=descStats(l,x,d), col=s2.mg<=minPct()+0.5?'var(--bad)':s2.mg<pisoDesc()?'var(--warn)':'var(--ok)'; const st=$('#dst-'+li); if(st) st.innerHTML=dstatsHTML(s2,d,baseDesc(l,x),col,x.qtd); const ch=$('#dctl-'+li)?.querySelector('.dchart'); if(ch) ch.outerHTML=descChart(l,x,d); const f=$('#olf-'+li); if(f) f.innerHTML=olFoot(x); } }
+  else if(ds.oldr!=null){ const li=Number(ds.oldr), l=ui.orc.itens[li]; l.descManual=Number(t.value); l.semDesc=false; const x=linhaOrc(l,ui.orc.desconto); if(x){ const d=Number(t.value), s2=descStats(l,x,d), col=s2.mg<=minPct()+0.5?'var(--bad)':s2.mg<pisoDesc()?'var(--warn)':'var(--ok)'; const st=$('#dst-'+li); if(st) st.innerHTML=dstatsHTML(s2,d,baseDesc(l,x),col,x.qtd,li); const ch=$('#dctl-'+li)?.querySelector('.dchart'); if(ch) ch.outerHTML=descChart(l,x,d); const f=$('#olf-'+li); if(f) f.innerHTML=olFoot(x); } }
   else if(ds.oen!=null) ui.orc.extras[ds.oen].nome=t.value;
   else if(ds.oev!=null){ const x=num(t.value); ui.orc.extras[ds.oev].valor=Number.isFinite(x)?x:0; }
   else hit=false;
@@ -1442,6 +1459,13 @@ document.addEventListener('input',e=>{
 document.addEventListener('change',e=>{
   if(ui.view!=='orcamentos'||!ui.orc) return; const t=e.target, ds=t.dataset;
   if(ds.oldr!=null){ refreshOrc(); return; }
+  if(ds.oldi!=null||ds.oldp!=null){ const li=Number(ds.oldi??ds.oldp), l=ui.orc.itens[li]; const x=linhaOrc(l,ui.orc.desconto); if(!x) return; let d;
+    if(ds.oldi!=null) d=Number(String(t.value).replace(',','.'))||0;
+    else { const v=num(t.value); if(!Number.isFinite(v)||v<=0){ toast('Preço inválido'); return; } const b=baseDesc(l,x); d=b>0? (1-(v-(x.emb||0))/b)*100 : 0; }
+    if(d<0){ toast('Esse preço é maior que o preço de tabela: fica sem desconto.'); d=0; }
+    if(d>descMax()){ toast(`O desconto máximo é ${pct(descMax())}. Para liberar mais, mude em Regras de preço.`); d=descMax(); }
+    l.semDesc=false; l.descManual=Math.round(d*100)/100; ui.orcDirty=true; refreshOrc(); return; }
+  if(ds.oemb!=null){ ui.orc.embutir=t.checked; ui.orcDirty=true; refreshOrc(); return; }
   if(ds.otab2!=null){ ui.orc.mostrarTabela=t.checked; ui.orcDirty=true; refreshOrc(); return; }
   if(ds.olqi!=null){ const q=Math.max(1,parseInt(t.value)||1); ui.orc.itens[ds.olqi].qtd=q; t.value=q; ui.orcDirty=true; if(ui.orc.desconto){ setTimeout(refreshOrc,0); } else { const x=linhaOrc(ui.orc.itens[ds.olqi],ui.orc.desconto); const f=$('#olf-'+ds.olqi); if(f&&x) f.innerHTML=olFoot(x); orcLive(); } }
   if(ds.oeg!=null){ const e2=ui.orc.extras[ds.oeg]; if(t.value){ e2.gastoId=t.value; const c=custoItem({gastoId:t.value,valor:0})*(Number(e2.qtd)||1); if(!Number(e2.valor)) e2.valor=Math.ceil(c*2-1e-9)/2; } else { delete e2.gastoId; } ui.orcDirty=true; refreshOrc(); return; }
@@ -1474,10 +1498,10 @@ document.addEventListener('click',e=>{
   else return;
   ui.orcDirty=true; refreshOrc();
 });
-function orcBody(o){
+function orcBody(o){ EMB_CTX=embOf(o);
   const T=totOrc(o);
   const itens=o.itens.map(l=>{ const x=linhaOrc(l,o.desconto); return x? {pid:l.pid,nome:x.p.nome,categoria:catOf(x.p),sel:l.sel||{},excl:l.excl||[],opcoes:selLabel(x.p,l.sel),qtd:x.qtd,margem:l.margem,semDesc:!!l.semDesc,descManual:l.descManual==null?null:Number(l.descManual),mostrarOpc:l.mostrarOpc!==false,custoUnit:Math.round(x.custo*100)/100,precoCheio:x.cheio,precoTabela:x.tabela,descontoPct:Math.round(x.dpct*10)/10,precoUnit:x.unit} : null; }).filter(Boolean);
-  return {mostrarTabela:o.mostrarTabela!==false,desconto:!!o.desconto,cliente:(o.cliente||'').trim(),evento:(o.evento||'').trim(),dataEvento:o.dataEvento||'',validade:Number(o.validade)||15,status:o.status||'rascunho',obs:o.obs||'',itens,extras:(o.extras||[]).filter(e=>(e.nome||'').trim()||Number(e.valor)).map(e=>{ const r={nome:(e.nome||'').trim(),valor:Number(e.valor)||0}; if(e.gastoId){ r.gastoId=e.gastoId; r.qtd=Number(e.qtd)||1; } return r; }),total:Math.round(T.total*100)/100};
+  return {embutir:o.embutir!==false,mostrarTabela:o.mostrarTabela!==false,desconto:!!o.desconto,cliente:(o.cliente||'').trim(),evento:(o.evento||'').trim(),dataEvento:o.dataEvento||'',validade:Number(o.validade)||15,status:o.status||'rascunho',obs:o.obs||'',itens,extras:(o.extras||[]).filter(e=>(e.nome||'').trim()||Number(e.valor)).map(e=>{ const r={nome:(e.nome||'').trim(),valor:Number(e.valor)||0}; if(e.gastoId){ r.gastoId=e.gastoId; r.qtd=Number(e.qtd)||1; } return r; }),total:Math.round(T.total*100)/100};
 }
 async function salvarOrc(){
   const o=ui.orc; if(!o.cliente?.trim()){ toast('Preencha o nome do cliente.'); $('#o-cli')?.focus(); return; }
@@ -1491,14 +1515,15 @@ async function salvarOrc(){
     if(ref){ ui.orc={...o,...body,id:ref.id,por:myId,criadoEm:Date.now()}; ui.orcDirty=false; toast(`Orçamento ${body.numero} salvo`); } }
   render();
 }
-async function registrarVendaOrc(){
+async function registrarVendaOrc(){ EMB_CTX=embOf(ui.orc);
   const o=ui.orc; const b=$('#o-venda'); if(!b.dataset.armed){ b.dataset.armed=1; b.textContent='Confirmar: lançar como venda pendente'; return; } b.disabled=true;
   if(ui.orcDirty) await salvarOrc();
   const pedidoId='o'+Date.now().toString(36); let n=0;
   for(const l of o.itens){ const x=linhaOrc(l,o.desconto); if(!x) continue;
-    const doc={data:today(),pedidoId,orcamentoId:o.id,produtoId:x.p.id,produtoNome:x.p.nome,variacao:selLabel(x.p,l.sel),categoria:catOf(x.p),qtd:x.qtd,precoUnit:x.unit,custoUnit:x.custo,pagamento:'pix',status:'pendente',cliente:[o.cliente,o.evento].filter(Boolean).join(' · '),liberadaAbaixo:!x.ok};
+    const doc={data:today(),pedidoId,orcamentoId:o.id,produtoId:x.p.id,produtoNome:x.p.nome,variacao:selLabel(x.p,l.sel),categoria:catOf(x.p),qtd:x.qtd,precoUnit:x.unit,custoUnit:Math.round((x.custo+(embV&&qTot?exCusto/qTot:0))*100)/100,pagamento:'pix',status:'pendente',cliente:[o.cliente,o.evento].filter(Boolean).join(' · '),liberadaAbaixo:!x.ok};
     if(await criar('vendas',doc,`${x.qtd}× ${x.p.nome} · ${brl(x.sub)} · do ${o.numero||'orçamento'}`)) n++; }
-  for(const e of (o.extras||[]).filter(e=>Number(e.valor))){ if(await criar('vendas',{data:today(),pedidoId,orcamentoId:o.id,produtoId:'',produtoNome:e.nome||'Extra',variacao:'',categoria:'Extras',qtd:1,precoUnit:Number(e.valor)||0,custoUnit:e.gastoId? Math.round(custoItem({gastoId:e.gastoId,valor:0})*(Number(e.qtd)||1)*100)/100 : 0,pagamento:'pix',status:'pendente',cliente:[o.cliente,o.evento].filter(Boolean).join(' · ')},`Extra ${e.nome} · do ${o.numero||'orçamento'}`)) n++; }
+  const embV=embOf(o); const exCusto=(o.extras||[]).reduce((a,e)=>a+(e.gastoId? custoItem({gastoId:e.gastoId,valor:0})*(Number(e.qtd)||1):0),0); const qTot=o.itens.reduce((a,l)=>a+(linhaOrc(l,o.desconto)?Math.max(1,parseInt(l.qtd)||1):0),0);
+  for(const e of (embV?[]:(o.extras||[])).filter(e=>Number(e.valor))){ if(await criar('vendas',{data:today(),pedidoId,orcamentoId:o.id,produtoId:'',produtoNome:e.nome||'Extra',variacao:'',categoria:'Extras',qtd:1,precoUnit:Number(e.valor)||0,custoUnit:e.gastoId? Math.round(custoItem({gastoId:e.gastoId,valor:0})*(Number(e.qtd)||1)*100)/100 : 0,pagamento:'pix',status:'pendente',cliente:[o.cliente,o.evento].filter(Boolean).join(' · ')},`Extra ${e.nome} · do ${o.numero||'orçamento'}`)) n++; }
   if(n){ await editar('orcamentos',o.id,{vendaRegistrada:true},`Orçamento ${o.numero||''} virou venda`); ui.orc.vendaRegistrada=true; confetti(); toast(`${n} item(ns) lançados como venda pendente. Ajuste o pagamento na Planilha quando receber.`); }
   render();
 }
