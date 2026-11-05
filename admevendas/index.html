@@ -649,7 +649,7 @@ async function excluir(col,id,resumo){
   return ok;
 }
 async function restaurar(col,id,body,resumo){
-  const ok=await guard(()=>db.doc(col+'/'+id).set(body).then(()=>true));
+  const ok=await guard(()=>db.doc(col+'/'+id).set({...body,restauradoPor:myId}).then(()=>true));
   if(ok){ if(col==='produtos') setTimeout(()=>syncVitrine(id),400); await logar('restaurou',col,id,resumo,null,body); toast('Restaurado'); }
 }
 
@@ -1565,7 +1565,7 @@ document.addEventListener('click',async e=>{
   u.disabled=true; let ok=null;
   if(h.acao==='importou'){ const ids=h.depois?.ids||[]; for(let i=0;i<ids.length;i+=10){ await Promise.all(ids.slice(i,i+10).map(id=>db.doc(h.col+'/'+id).delete().catch(()=>null))); } ok=true; }
   else if(h.acao==='criou') ok=await guard(()=>db.doc(h.col+'/'+h.docId).delete().then(()=>true));
-  else if(h.acao==='excluiu') ok=await guard(()=>db.doc(h.col+'/'+h.docId).set(h.antes||{}).then(()=>true));
+  else if(h.acao==='excluiu') ok=await guard(()=>db.doc(h.col+'/'+h.docId).set({...(h.antes||{}),restauradoPor:myId}).then(()=>true));
   else if(h.acao==='editou') ok=await guard(()=>db.doc(h.col+'/'+h.docId).update({...(h.antes||{}),editadoPor:myId,editadoEm:Date.now()}).then(()=>true));
   if(ok){ await logar('desfez',h.col,h.docId,`${verbo(h).replace(':','')} ${h.resumo||''} (de ${nome(h.por)})`,h.depois,h.antes); try{ await db.doc(`equipe/${por}/historico/${hid}`).update({desfeito:true,desfeitoPor:myId}); }catch{} toast('Alteração desfeita'); }
 });
@@ -1643,7 +1643,7 @@ function loginForm(modo){
   const go2=async()=>{ const em=$('#lg-email').value.trim(), pw=$('#lg-senha')?.value||'', er=$('#lg-err'); er.textContent=''; const b=$('#lg-ok'); b.disabled=true;
     try{ const auth=firebase.auth();
       if(modo==='entrar') await auth.signInWithEmailAndPassword(em,pw);
-      else if(modo==='criar'){ if(pw!==$('#lg-senha2').value){ throw {code:'x',message:'As senhas não são iguais.'}; } await auth.createUserWithEmailAndPassword(em,pw); }
+      else if(modo==='criar'){ if(pw!==$('#lg-senha2').value){ throw {code:'x',message:'As senhas não são iguais.'}; } const cr=await auth.createUserWithEmailAndPassword(em,pw); try{ await cr.user.sendEmailVerification(); }catch{} }
       else { await auth.sendPasswordResetEmail(em); er.style.color='var(--ok)'; er.textContent='Pronto! Confira seu e-mail (e a caixa de spam).'; } }
     catch(e){ er.style.color=''; er.textContent=AUTH_ERR[e?.code]||e?.message||'Não deu certo. Tente de novo.'; }
     b.disabled=false; };
@@ -1677,6 +1677,13 @@ function startData(){
   firebase.auth().onAuthStateChanged(async u=>{
     if(!u){ if(started){ location.reload(); return; } showGate(); loginForm('entrar'); return; }
     myEmail=(u.email||'').toLowerCase(); myId=u.uid; isOwner=ADMIN_EMAILS.includes(myEmail); canWrite=true;
+    if(!u.emailVerified){
+      showGate(`Falta confirmar seu e-mail. Enviamos um link para ${myEmail}: abra, confirme e volte aqui. Confira também a caixa de spam.`);
+      $('#gate-form').innerHTML=`<button class="btn primary block" id="vf-ok">Já confirmei</button><div class="links"><button type="button" id="vf-re">Reenviar e-mail</button><button type="button" id="vf-out">Usar outro e-mail</button></div><div class="err" id="vf-err" role="alert"></div>`;
+      $('#vf-ok').onclick=async()=>{ await u.reload(); if(firebase.auth().currentUser.emailVerified){ await u.getIdToken(true); location.reload(); } else $('#vf-err').textContent='Ainda não apareceu como confirmado. Abra o link do e-mail e tente de novo.'; };
+      $('#vf-re').onclick=async()=>{ try{ await u.sendEmailVerification(); $('#vf-err').style.color='var(--ok)'; $('#vf-err').textContent='E-mail reenviado.'; }catch(e){ $('#vf-err').textContent=AUTH_ERR[e?.code]||'Espere um pouco e tente de novo.'; } };
+      $('#vf-out').onclick=()=>firebase.auth().signOut();
+      return; }
     if(!isOwner){ let ok=false; try{ ok=(await db.doc('acesso/'+myEmail).get()).exists; }catch{}
       if(!ok){ showGate(`O e-mail ${myEmail} ainda não foi liberado. Peça para a Carol liberar em Equipe > Quem pode entrar.`); loginForm('sair'); return; } }
     $('#gate').hidden=true; $('#app').hidden=false; render(); startData();
