@@ -1234,7 +1234,7 @@ function linhaOrc(l,desc,emb=EMB_CTX){
   const custo=custoVar(p,l.sel,l.excl); const qtd=Math.max(1,parseInt(l.qtd)||1);
   const cheio = l.margem==='atual'? precoVar(p,l.sel) : precoSugerido(custo, Math.max(minPct()+0.5, Number(l.margem)||30));
   let unit=cheio, dpct=0, limitado=false, fx=null, prox=null, proxUnit=null, manual=false;
-  if(l.descManual!=null && !l.semDesc){ const base=Number(p.preco)>0? precoVar(p,l.sel) : cheio; const hard=precoSugerido(custo,minPct()+0.5); let u=Math.round((base*(1-Number(l.descManual)/100)-(emb||0))*100)/100; if(u<hard){ u=hard; limitado=true; } unit=u; dpct= unit<cheio-0.004? (1-unit/cheio)*100 : 0; manual=true; }
+  if(l.descManual!=null && !l.semDesc){ const base=Number(p.preco)>0? precoVar(p,l.sel) : cheio; const hard=precoSugerido(custo,minPct()+0.5); let u=Math.round(base*(1-Number(l.descManual)/100)*100)/100; if(u<hard){ u=hard; limitado=true; } unit=u; dpct= unit<cheio-0.004? (1-unit/cheio)*100 : 0; manual=true; }
   else if(desc && !l.semDesc){
     const piso=precoSugerido(custo,pisoDesc());
     const comDesc=pc=>{ let u=Math.round(cheio*(1-pc/100)*100)/100; let lim=false; if(u<piso){ u=piso; lim=true; } return u<cheio-0.004? {u,lim} : null; };
@@ -1316,10 +1316,11 @@ function carregarPDF(){ if(window.html2pdf) return Promise.resolve(); if(h2pP) r
 async function baixarPDF(nomeArq,html,btn){
   if(!downloads){ toast('Download indisponível nesta visualização.'); return; }
   const txt=btn?.innerHTML; if(btn){ btn.disabled=true; btn.textContent='Gerando PDF…'; }
-  const box=document.createElement('div'); box.style.cssText='position:fixed;left:-12000px;top:0;width:760px;background:#fff;z-index:-1'; box.innerHTML=html; document.body.appendChild(box);
+  const box=document.createElement('div'); box.style.cssText='position:absolute;left:0;top:0;width:760px;background:#fff;z-index:-9999;pointer-events:none'; box.innerHTML=html; document.body.appendChild(box);
   try{
     await carregarPDF(); try{ await document.fonts?.ready; }catch{}
-    const blob=await window.html2pdf().set({margin:[6,6,8,6],image:{type:'jpeg',quality:0.95},html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff',logging:false},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:['css','legacy'],avoid:['.pp-it','.pp-total','.pp-save','.pp-alt']}}).from(box.firstElementChild).outputPdf('blob');
+    const alvo=box.firstElementChild; const altura=Math.ceil(alvo.scrollHeight)+40;
+    const blob=await window.html2pdf().set({margin:[6,6,8,6],image:{type:'jpeg',quality:0.95},html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff',logging:false,scrollY:0,windowHeight:altura},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:['css','legacy'],avoid:['.pp-it','.pp-total','.pp-save','.pp-sum','.pp-alt','.pp-obs']}}).from(alvo).outputPdf('blob');
     await downloads.save({filename:nomeArq,data:blob}); toast('PDF baixado');
   }catch(e){ if(e?.code!=='declined') toast(e?.message==='lib'?'Não consegui carregar o gerador de PDF. Confira a internet.':'Não consegui gerar o PDF. Tente de novo.'); }
   finally{ box.remove(); if(btn){ btn.disabled=false; btn.innerHTML=txt; } }
@@ -1411,8 +1412,8 @@ const olFoot=x=>`<span>${x.qtd} × ${brl(x.unit)} · lucro ${brl(x.lucro)} (${pc
 // ---------- controle de desconto com gráfico ----------
 function usaTabela(l){ const p=state.produtos.find(z=>z.id===l.pid); if(Number(p?.preco)>0) l.margem='atual'; }
 function baseDesc(l,x){ return Number(x.p.preco)>0? precoVar(x.p,l.sel) : x.cheio; }
-function curDesc(l,x){ const b=baseDesc(l,x); return b>0&&x.unit<b-0.004? (1-x.unit/b)*100 : 0; }
-function descStats(l,x,d){ const b=baseDesc(l,x); const hard=precoSugerido(x.custo,minPct()+0.5); const em=x.emb||0; let fin=Math.round(b*(1-d/100)*100)/100; let u=fin-em; if(u<hard){ u=hard; fin=u+em; } const a=analisa(u,x.custo,taxaMax()); return {u:Math.round(fin*100)/100,luc:a.lucro,mg:a.margem,tot:fin*x.qtd}; }
+function curDesc(l,x){ const b=baseDesc(l,x); const u=x.unit-(x.emb||0); return b>0&&u<b-0.004? (1-u/b)*100 : 0; }
+function descStats(l,x,d){ const b=baseDesc(l,x); const hard=precoSugerido(x.custo,minPct()+0.5); const em=x.emb||0; let u=Math.round(b*(1-d/100)*100)/100; if(u<hard) u=hard; const fin=Math.round((u+em)*100)/100; const a=analisa(u,x.custo,taxaMax()); return {u:fin,prod:u,em,luc:a.lucro,mg:a.margem,tot:fin*x.qtd}; }
 function descChart(l,x,d){
   const W=320,H=130,L=44,R=10,T=12,B=22; const D=Math.max(1,descMax()); const pts=[];
   for(let i=0;i<=40;i++){ const dd=D*i/40; const s=descStats(l,x,dd); pts.push([dd,s.luc,s.mg]); }
@@ -1442,7 +1443,7 @@ function dctlHTML(l,li,x,ro){
     <input type="range" min="0" max="${descMax()}" step="0.5" value="${d}" data-oldr="${li}" aria-label="Desconto em %" ${ro||l.semDesc?'disabled':''}>
     <div class="chips">${[0,5,10,15,20].filter(v=>v<=descMax()).map(v=>`<button type="button" class="chip" data-ol="${li}" data-oldq="${v}" aria-pressed="${l.descManual!=null&&Number(l.descManual)===v}" ${ro?'disabled':''}>${v?v+'%':'Sem desconto'}</button>`).join('')}<button type="button" class="chip" data-ol="${li}" data-oldauto="1" aria-pressed="${l.descManual==null&&!l.semDesc}" ${ro?'disabled':''}>Automático pela quantidade</button></div></div>`;
 }
-function dstatsHTML(s,d,b,col,q,li){ return `<div><small>Desconto (%)</small>${li!=null&&canWrite?`<input class="dinp" id="dpi-${li}" type="number" min="0" max="${descMax()}" step="0.1" value="${Math.round(d*10)/10}" data-oldi="${li}" aria-label="Digitar desconto">`:`<b>${pct(d)}</b>`}</div><div><small>Preço por un. (R$)</small>${li!=null&&canWrite?`<input class="dinp" id="dpp-${li}" inputmode="decimal" value="${toInput(s.u)}" data-oldp="${li}" aria-label="Digitar preço por unidade">`:`<b>${brl(s.u)}</b>`}${d>0?`<small>de ${brl(b)}</small>`:''}</div><div><small>Lucro por un.</small><b style="color:${col}">${brl(s.luc)}</b><small style="color:${col}">${pct(s.mg)} de lucro</small></div><div><small>Total (${q} un.)</small><b>${brl(s.tot)}</b></div>`; }
+function dstatsHTML(s,d,b,col,q,li){ const emTxt=s.em>0?`<small>peça ${brl(s.prod)} + envio/brinde ${brl(s.em)}</small>`:''; return `<div><small>Desconto (%)</small>${li!=null&&canWrite?`<input class="dinp" id="dpi-${li}" type="number" min="0" max="${descMax()}" step="0.1" value="${Math.round(d*10)/10}" data-oldi="${li}" aria-label="Digitar desconto">`:`<b>${pct(d)}</b>`}</div><div><small>Preço final por un. (R$)</small>${li!=null&&canWrite?`<input class="dinp" id="dpp-${li}" inputmode="decimal" value="${toInput(s.u)}" data-oldp="${li}" aria-label="Digitar preço por unidade">`:`<b>${brl(s.u)}</b>`}${d>0?`<small>de ${brl(b)}</small>`:''}${emTxt}</div><div><small>Lucro por un.</small><b style="color:${col}">${brl(s.luc)}</b><small style="color:${col}">${pct(s.mg)} de lucro</small></div><div><small>Total (${q} un.)</small><b>${brl(s.tot)}</b></div>`; }
 
 document.addEventListener('keydown',e=>{ if(e.key==='Enter'&&e.target.matches?.('.dinp')){ e.preventDefault(); e.target.blur(); } });
 function orcLive(){ if(ui.orc) EMB_CTX=embOf(ui.orc);
@@ -1467,7 +1468,7 @@ document.addEventListener('change',e=>{
   if(ds.oldr!=null){ refreshOrc(); return; }
   if(ds.oldi!=null||ds.oldp!=null){ const li=Number(ds.oldi??ds.oldp), l=ui.orc.itens[li]; const x=linhaOrc(l,ui.orc.desconto); if(!x) return; let d;
     if(ds.oldi!=null) d=Number(String(t.value).replace(',','.'))||0;
-    else { const v=num(t.value); if(!Number.isFinite(v)||v<=0){ toast('Preço inválido'); return; } const b=baseDesc(l,x); d=b>0? (1-v/b)*100 : 0; }
+    else { const v=num(t.value); if(!Number.isFinite(v)||v<=0){ toast('Preço inválido'); return; } const b=baseDesc(l,x); d=b>0? (1-(v-(x.emb||0))/b)*100 : 0; }
     if(d<0){ toast('Esse preço é maior que o preço de tabela: fica sem desconto.'); d=0; }
     if(d>descMax()){ toast(`O desconto máximo é ${pct(descMax())}. Para liberar mais, mude em Regras de preço.`); d=descMax(); }
     l.semDesc=false; l.descManual=Math.round(d*100)/100; usaTabela(l); ui.orcDirty=true; refreshOrc(); return; }
