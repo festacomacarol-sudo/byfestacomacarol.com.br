@@ -448,6 +448,7 @@ a.pv.buy:hover{text-decoration:underline}
 .oi{display:grid;grid-template-columns:46px minmax(0,1fr) 78px 78px 32px;gap:6px;align-items:center}
 .oi input[type=radio],.oi input[type=checkbox]{width:18px;height:18px;accent-color:var(--brand);justify-self:center}
 .oi input{padding:7px 9px;font-size:14px}
+.oi input[data-oiv]::placeholder{color:var(--accent);opacity:1;font-weight:700}
 .oi-h{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
 .presets{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:10px}
 .pp-mini{border:2px solid var(--line);border-radius:18px;overflow:hidden}
@@ -1015,9 +1016,10 @@ function abrirProduto(p){
   const tmpP=()=>({id:p?.id||'tmp',nome:$('#d-nome')?.value||'Nome do produto',categoria:$('#d-cat')?.value||'',componentes:d.comps,preco:d.preco,opcoes:d.opcoes});
   const drawPrev=()=>{ const b=$('#d-prev'); if(b) b.innerHTML=`<div class="pp">${catItemHTML(tmpP())}</div>`; };
   const opsBox=$('#d-ops');
+  const refreshSug=()=>{ const tp=tmpP(); d.opcoes.forEach((g,gi)=>g.itens.forEach((it,ii)=>{ const el=$(`#oi-p${gi}-${ii}`); if(el) el.placeholder=toInput(precoExtra({...it,preco:0},tp))||'0,00'; })); };
   const drawOps=()=>{ const tp=tmpP();
     opsBox.innerHTML = d.opcoes.length? d.opcoes.map((g,gi)=>`<div class="og"><div class="og-h"><input id="og-n${gi}" value="${esc(g.nome)}" placeholder="Nome do grupo (ex.: Fixação)" data-ogn="${gi}" ${ro?'disabled':''} aria-label="Nome do grupo"><select data-ogt="${gi}" ${ro?'disabled':''} aria-label="Tipo de escolha"><option value="uma" ${g.tipo!=='varias'?'selected':''}>Escolhe 1</option><option value="varias" ${g.tipo==='varias'?'selected':''}>Pode várias</option></select><button type="button" class="btn sm ghost danger" data-ogx="${gi}" ${ro?'disabled':''} aria-label="Remover grupo">${icon('x')}</button></div>
-      <div class="oi oi-h"><span>Padrão</span><span>Opção</span><span>Custo</span><span>+ no preço</span><span></span></div>
+      <div class="oi oi-h"><span>Padrão</span><span>Opção</span><span>Custo</span><span>+ no preço</span><span></span></div><p class="note" style="margin:-4px 0 2px;font-size:12px">Pode digitar a conta no custo (ex.: <span class="mono">100/20</span>). O valor em rosa é a sugestão automática de acréscimo; deixe em branco para usar ou digite outro.</p>
       ${g.itens.map((it,ii)=>`<div class="oi"><input type="${g.tipo==='varias'?'checkbox':'radio'}" name="pad-${gi}" data-oip="${gi}.${ii}" ${it.padrao?'checked':''} ${ro?'disabled':''} aria-label="Padrão"><input id="oi-n${gi}-${ii}" value="${esc(it.nome)}" placeholder="Ex.: Mosquetão" data-oin="${gi}.${ii}" ${ro?'disabled':''} aria-label="Opção"><input id="oi-c${gi}-${ii}" class="mono" inputmode="decimal" value="${toInput(custoItem(it))}" placeholder="0,00" data-oic="${gi}.${ii}" ${ro||it.gastoId?'disabled':''} aria-label="Custo"><input id="oi-p${gi}-${ii}" class="mono" inputmode="decimal" value="${toInput(it.preco)}" placeholder="${toInput(precoExtra({...it,preco:0},tp))||'0,00'}" data-oiv="${gi}.${ii}" ${ro?'disabled':''} aria-label="Acréscimo no preço"><button type="button" class="btn sm ghost danger" data-oix="${gi}.${ii}" ${ro?'disabled':''} aria-label="Remover opção">${icon('x')}</button>
         <div class="sub"><select data-oig="${gi}.${ii}" ${ro?'disabled':''} aria-label="Puxar custo de um gasto"><option value="">Custo digitado</option>${gastosOpts(it.gastoId)}</select>${linkDoGasto(it.gastoId)}</div></div>`).join('')}
       ${ro?'':`<button type="button" class="btn sm" data-oia="${gi}">${icon('plus')} Opção</button>`}</div>`).join('')
@@ -1027,10 +1029,13 @@ function abrirProduto(p){
   opsBox.addEventListener('input',e=>{ const t=e.target, ds=t.dataset;
     if(ds.ogn!=null) d.opcoes[ds.ogn].nome=t.value;
     if(ds.oin) oiAt(ds.oin)[1].nome=t.value;
-    if(ds.oic){ const x=num(t.value); oiAt(ds.oic)[1].custo=Number.isFinite(x)?x:0; }
+    if(ds.oic){ t.dataset.raw=t.value; const x=num(t.value); oiAt(ds.oic)[1].custo=Number.isFinite(x)?x:0; }
     if(ds.oiv){ const x=num(t.value); oiAt(ds.oiv)[1].preco=Number.isFinite(x)?x:0; }
+    if(ds.oic) refreshSug();
     drawPrev(); });
   opsBox.addEventListener('change',e=>{ const t=e.target, ds=t.dataset;
+    if(ds.oic){ const it=oiAt(ds.oic)[1]; t.value=toInput(it.custo); if(String(t.dataset.raw||'').includes('/')) toast(`Custo por unidade: ${brl(it.custo)}`); }
+    if(ds.oiv){ t.value=toInput(oiAt(ds.oiv)[1].preco); }
     if(ds.ogt!=null){ const g=d.opcoes[ds.ogt]; g.tipo=t.value; if(g.tipo==='uma'){ let f=false; g.itens.forEach(i=>{ if(i.padrao&&!f) f=true; else i.padrao=false; }); } drawOps(); drawPrev(); }
     if(ds.oip){ const [g,it]=oiAt(ds.oip); if(g.tipo==='varias') it.padrao=t.checked; else g.itens.forEach(i=>i.padrao=(i===it)); drawPrev(); }
     if(ds.oig){ const it=oiAt(ds.oig)[1]; if(t.value){ it.gastoId=t.value; it.custo=custoItem(it); } else delete it.gastoId; drawOps(); drawPrev(); } });
@@ -1053,10 +1058,11 @@ function abrirProduto(p){
     $('#d-info').innerHTML = d.preco>0? `Lucro de <b style="color:${col}">${brl(a.lucro)}</b> por unidade${taxaMax()?` (já tirando ${brl(a.taxa)} de taxa)`:''}.${ok?'':` <b style="color:var(--bad)">Abaixo do mínimo: use pelo menos ${brl(min)}.</b>`}` : `Preço mínimo: <b>${brl(min)}</b>`;
     $('#d-sug').innerHTML=[minPct(),Math.max(30,minPct()+10),Math.max(50,minPct()+20)].map(t=>{ const vv=precoSugerido(c,t); return `<button type="button" data-sv="${vv}" ${ro?'disabled':''}><b>${brl(vv)}</b>${t===minPct()?'mínimo':pct(t)+' lucro'}</button>`; }).join('');
     const s=$('#d-save'); if(s) s.disabled = !(d.preco>0 && ok) && d.preco>0;
+    refreshSug();
   };
   drawComps(); drawOps(); update(); drawPrev();
   compsBox.addEventListener('input',e=>{ const n=e.target.dataset.cn, v=e.target.dataset.cv; if(n!=null) d.comps[n].nome=e.target.value; if(v!=null){ const x=num(e.target.value); d.comps[v].valor=Number.isFinite(x)?x:0; update(); } drawPrev(); });
-  compsBox.addEventListener('change',e=>{ const t=e.target; if(t.dataset.cg!=null){ const c=d.comps[t.dataset.cg]; if(t.value){ c.gastoId=t.value; c.valor=custoItem(c); } else delete c.gastoId; drawComps(); update(); drawPrev(); } if(t.dataset.cpv!=null){ d.comps[t.dataset.cpv].prop=t.checked; drawPrev(); } });
+  compsBox.addEventListener('change',e=>{ const t=e.target; if(t.dataset.cv!=null){ t.value=toInput(d.comps[t.dataset.cv].valor); refreshSug(); } if(t.dataset.cg!=null){ const c=d.comps[t.dataset.cg]; if(t.value){ c.gastoId=t.value; c.valor=custoItem(c); } else delete c.gastoId; drawComps(); update(); drawPrev(); } if(t.dataset.cpv!=null){ d.comps[t.dataset.cpv].prop=t.checked; drawPrev(); } });
   ['#d-nome','#d-cat'].forEach(s=>$(s)?.addEventListener('input',drawPrev));
   compsBox.addEventListener('click',e=>{ const r=e.target.closest('[data-cr]'); if(r){ d.comps.splice(Number(r.dataset.cr),1); drawComps(); update(); drawPrev(); } });
   $('#d-addc')?.addEventListener('click',()=>{ d.comps.push({nome:'',valor:0}); drawComps(); $('#dc-n'+(d.comps.length-1)).focus(); });
