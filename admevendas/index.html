@@ -706,6 +706,8 @@ function vPainel(v){
 
   v.innerHTML = head(saudacao(), `Resumo dos últimos ${lbl[ui.periodo]}${ui.pCat?' · '+esc(ui.pCat):''}`,
     `<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><div class="seg" role="group" aria-label="Período">${Object.entries(lbl).map(([k,l])=>`<button type="button" data-per="${k}" aria-pressed="${ui.periodo==k}">${l}</button>`).join('')}</div><button class="btn primary" data-go="vender">${icon('plus')} Nova venda</button></div>`)
+  + (()=>{ if(!isOwner||!loaded) return ''; const ult=Math.max(0,...state.equipe.map(m=>Number(m.ultimoBackup)||0)); const dias=ult?Math.floor((Date.now()-ult)/864e5):null; if(dias!==null&&dias<7) return '';
+      return `<div class="banner warn" style="margin-bottom:16px;align-items:center;justify-content:space-between;flex-wrap:wrap"><span>${dias===null?'Vocês ainda não fizeram nenhum backup.':`Faz ${dias} dias desde o último backup.`} Baixe uma cópia de tudo e guarde no computador ou no Google Drive.</span><button class="btn sm primary" id="bk-now">${icon('down')} Baixar backup agora</button></div>`; })()
   + (cats.length>1? `<div class="chips" style="margin-bottom:16px"><button class="chip" data-pcat="" aria-pressed="${!ui.pCat}">Todas</button>${cats.map(c=>`<button class="chip" data-pcat="${esc(c)}" aria-pressed="${ui.pCat===c}" style="--cc:${corCat(c)}"><i></i>${esc(c)}</button>`).join('')}</div>`:'')
   + `<div class="grid g-kpi" style="margin-bottom:16px">
       <div class="card kpi hero"><div class="l">Faturamento</div><div class="v" id="k1" data-v="${lastKpi.k1||0}">${brl(lastKpi.k1||0)}</div><div class="s">${A.un} un. ${delta(A.rec,P.rec)}</div><svg class="spark" id="spark" viewBox="0 0 200 56" preserveAspectRatio="none"></svg></div>
@@ -755,6 +757,7 @@ function vPainel(v){
   $('#meta').innerHTML = meta? `<div class="ring-wrap"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="${R}" fill="none" stroke="var(--sunk)" stroke-width="11"/><circle cx="50" cy="50" r="${R}" fill="none" stroke="${fr>=1?'var(--c3)':'var(--brand)'}" stroke-width="11" stroke-linecap="round" stroke-dasharray="${C*fr} ${C}" transform="rotate(-90 50 50)"/><text x="50" y="55" text-anchor="middle" style="font:600 18px var(--f-display);fill:var(--ink)">${Math.round(fr*100)}%</text></svg><div><div style="font:600 22px var(--f-display)">${brl(recMes)}</div><div class="note">de ${brl(meta)} em ${MESES[new Date().getMonth()]}</div><div class="note" style="margin-top:6px">${fr>=1?'Meta batida! 🎉':'Faltam '+brl(meta-recMes)}</div></div></div>`
     : `<div class="empty" style="padding:20px"><b>Sem meta definida</b>${isOwner?'Defina uma meta de faturamento para acompanhar o mês.':'A Carol pode definir uma meta mensal.'}<div style="margin-top:8px;font:600 18px var(--f-mono);color:var(--ink)">${brl(recMes)} este mês</div></div>`;
   $('#meta-edit')?.addEventListener('click',abrirMeta);
+  $('#bk-now')?.addEventListener('click',exportXlsx);
 
   // feed
   const hs=histAll().slice(0,7);
@@ -1398,7 +1401,7 @@ function vPlanilha(v){
   const empty=`<tbody><tr><td colspan="${S.cols.length+2}" style="padding:26px;text-align:center;color:var(--muted)">${q?'Nenhuma linha com esse filtro.':'Planilha vazia. Use “+ Linha” ou registre pelas outras abas.'}</td></tr></tbody>`;
   v.innerHTML = head('Planilha','Edite direto nas células. Cada alteração fica no histórico com o seu nome.')
   + `<div class="toolbar"><div class="seg" role="group">${[['vendas','Vendas'],['produtos','Produtos'],['gastos','Gastos']].map(([k,l])=>`<button type="button" data-sheet="${k}" aria-pressed="${ui.sheet===k}">${l} <span class="num" style="opacity:.6">${state[k].length}</span></button>`).join('')}</div>
-     <div style="display:flex;gap:8px;flex-wrap:wrap"><div class="search">${icon('search')}<input id="s-busca" data-live="1" type="search" placeholder="Filtrar…" value="${esc(ui.sBusca)}" style="width:200px"></div>${canWrite?`<button class="btn" id="s-add">${icon('plus')} Linha</button>`:''}${canWrite&&window.XLSX?`<button class="btn primary" id="s-imp">${icon('planilha')} Importar do Excel</button>`:''}${downloads?`<button class="btn" id="s-csv">${icon('down')} Baixar Excel</button>`:''}</div></div>
+     <div style="display:flex;gap:8px;flex-wrap:wrap"><div class="search">${icon('search')}<input id="s-busca" data-live="1" type="search" placeholder="Filtrar…" value="${esc(ui.sBusca)}" style="width:200px"></div>${canWrite?`<button class="btn" id="s-add">${icon('plus')} Linha</button>`:''}${canWrite&&window.XLSX?`<button class="btn primary" id="s-imp">${icon('planilha')} Importar do Excel</button>`:''}${downloads?`<button class="btn" id="s-csv">${icon('down')} Baixar Excel (backup)</button>`:''}</div></div>
     <div class="sheet-wrap"><table class="sheet">${headR}${rows.length?`<tbody>${body}</tbody>`:empty}${foot}</table></div>
     <p class="note" style="margin-top:10px">Colunas cinza são calculadas. Clique no título para ordenar. Enter salva a célula. Já tem uma planilha no Excel? Use “Importar do Excel” e o app reconhece as colunas.</p>`;
   $('#s-busca').addEventListener('input',e=>{ ui.sBusca=e.target.value; const pos=e.target.selectionStart; vPlanilha(v); const i=$('#s-busca'); i.focus(); try{i.setSelectionRange(pos,pos)}catch{} });
@@ -1522,8 +1525,12 @@ async function exportXlsx(){
     const S=SHEETS[k]; const rows=[...state[k]].sort((a,b)=>(a.criadoEm||0)-(b.criadoEm||0));
     const aoa=[S.cols.map(c=>c.l),...rows.map(r=>S.cols.map(c=>{ const x=cellVal(r,c); if(c.o) return c.o[x]??x; if(c.t==='date') return fmtDate(x); if(c.k==='_mg') return Number.isFinite(x)?Math.round(x*10)/10:''; if(typeof x==='number') return Math.round(x*100)/100; return x??''; }))];
     const ws=XLSX.utils.aoa_to_sheet(aoa); ws['!cols']=S.cols.map(c=>({wch:Math.max(10,c.l.length+2)})); XLSX.utils.book_append_sheet(wb,ws,l); });
+  const oa=[['Número','Cliente','Evento','Data do evento','Situação','Produtos','Total','Criado por']].concat([...state.orcamentos].sort((a,b)=>(a.criadoEm||0)-(b.criadoEm||0)).map(o=>[o.numero||'',o.cliente||'',o.evento||'',fmtDate(o.dataEvento||''),(ORC_ST[o.status]||ORC_ST.rascunho)[0],(o.itens||[]).map(l=>`${l.qtd}× ${l.nome}${l.opcoes?' ('+l.opcoes+')':''}`).join('; '),Number(o.total)||0,nome(o.por)]));
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(oa),'Orçamentos');
+  const ha=[['Quando','Quem','O que fez','Detalhe']].concat(histAll().map(h=>[new Date(h.quando).toLocaleString('pt-BR'),nome(h.por),verbo(h).replace(':',''),h.resumo||'']));
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(ha),'Histórico');
   const data=XLSX.write(wb,{type:'array',bookType:'xlsx'});
-  try{ await downloads.save({filename:`by-festa-planilha-${today()}.xlsx`,data:new Blob([data],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'})}); toast('Planilha enviada'); }
+  try{ await downloads.save({filename:`backup-by-festa-${today()}.xlsx`,data:new Blob([data],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'})}); toast('Backup baixado. Guarde o arquivo numa pasta ou no Google Drive.'); try{ await db.doc('equipe/'+myId).set({ultimoBackup:Date.now()},{merge:true}); }catch{} }
   catch(e){ if(e?.code==='rejected_extension') return exportCsv(); if(e?.code!=='declined') toast('Não foi possível baixar o arquivo.'); }
 }
 async function exportCsv(){
