@@ -241,6 +241,21 @@
   .draft-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--mint-l);border:1.6px solid #CDEFD8;color:#2F8F55;border-radius:14px;padding:9px 14px;margin-bottom:14px;font-family:var(--f-brand);font-size:13px;font-weight:600}
   .draft-bar button{margin-left:auto}
   .draft-st{font-family:var(--f-brand);font-size:12px;color:var(--soft);align-self:center}
+  .parc-box{grid-column:1/-1;padding:14px;border:1.6px solid var(--line);border-radius:18px;background:#fff}
+  .parc-tg{display:flex;align-items:flex-start;gap:12px;cursor:pointer}
+  .parc-tg input{position:absolute;opacity:0}
+  .parc-tg .sw{width:44px;height:26px;border-radius:999px;background:#E6DCE2;position:relative;flex:none;transition:.2s;margin-top:2px}
+  .parc-tg .sw::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.15);transition:.2s}
+  .parc-tg input:checked + .sw{background:var(--mint)}
+  .parc-tg input:checked + .sw::after{left:21px}
+  .parc-tg input:focus-visible + .sw{outline:2px solid var(--pink);outline-offset:2px}
+  .parc-tg b{display:block;font-family:var(--f-brand);font-size:14px;color:var(--ink)}
+  .parc-tg small{color:var(--soft);font-size:12px;font-weight:500}
+  .parc-f{display:grid;grid-template-columns:1.4fr 1fr;gap:12px;margin-top:12px}
+  @media (max-width:640px){ .parc-f{grid-template-columns:1fr} }
+  .parc-ban{background:linear-gradient(110deg,#EAF8EF,#F2EEFD);border:1.6px solid #CDEFD8;border-radius:16px;padding:12px 14px;margin-bottom:12px;font-size:13.5px;color:var(--ink)}
+  .parc-ban b{font-family:var(--f-brand)}
+  .parc-ban small{display:block;color:var(--soft);margin-top:2px}
   .pg-box{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:14px;border:1.6px dashed var(--lilac);border-radius:18px;background:var(--lilac-l)}
   .pg-box .f{grid-column:auto}
   .form{display:grid;grid-template-columns:1fr 1fr;gap:14px}
@@ -789,7 +804,18 @@
           <div class="cat-head"><span>Itens do catálogo</span><span class="cat-cond" id="catCond"></span></div>
           <div id="fCat"></div>
         </div>
-        <div class="pg-box">
+        <div class="parc-box">
+          <label class="parc-tg"><input type="checkbox" name="parceria" id="fParc"><span class="sw"></span><span><b>🤝 Festa em parceria / permuta</b><small>Sem cobrança (ou valor simbólico). Não entra em "A receber" nem no faturamento cheio.</small></span></label>
+          <div class="parc-f" id="parcFields" style="display:none">
+            <label class="f">Contrapartida da parceria
+              <input name="parceriaObs" placeholder="Ex.: divulgação no Instagram, permuta com fotógrafo…">
+            </label>
+            <label class="f">Valor cobrado na parceria (R$)
+              <input type="number" name="valorParceria" min="0" step="5" placeholder="0 = sem cobrança">
+            </label>
+          </div>
+        </div>
+        <div class="pg-box" id="pgBox">
           <label class="f">💳 Forma de pagamento
             <select name="formaPgto">
               <option value="sinal">Sinal + restante antes do arquivo final</option>
@@ -1053,7 +1079,7 @@
   }
   const extrasTotal = ex => (ex||[]).reduce((t,x)=>t+(+x.valor||0),0);
   const VALOR_MANUAL_AG = ["ec","curione"];   // parceiras com valores combinados à parte
-  const valorBase = i => (VALOR_MANUAL_AG.includes(i.assessoria) && +i.valorManual>0) ? +i.valorManual : calcTotal(i.pacote, i.itens);
+  const valorBase = i => i.parceria ? (+i.valorParceria||0) : (VALOR_MANUAL_AG.includes(i.assessoria) && +i.valorManual>0) ? +i.valorManual : calcTotal(i.pacote, i.itens);
   // festa só com peças avulsas (ex.: só o convite infantil): prazo manual e prévia sem "identidade visual"
   const soAvulso = (pacote, itens) => !pacote && (itens||[]).length>0 && itens.every(k=>ALL[k] && ALL[k].g==="avulso");
   // ajustes: cada rodada soma dias úteis ao prazo (padrão 3), editável; ou data final manual
@@ -1069,7 +1095,7 @@
   const pagoTotal = i => (i.pagamentos||[]).reduce((t,x)=>t+(+x.valor||0),0);
   const saldoDe = i => Math.max(0,(+i.valor||0) - pagoTotal(i));
   const FORMAS = {sinal:"Sinal + restante antes do arquivo final", avista:"À vista", parcelado:"3x sem juros"};
-  function pgStatus(i){ const v=+i.valor||0, p=pagoTotal(i); if(!v) return {k:"sem",l:"Sem valor",bg:"#F1ECEF",fg:"#7E6E82"};
+  function pgStatus(i){ const v=+i.valor||0, p=pagoTotal(i); if(!v && i.parceria) return {k:"parc",l:"Parceria 🤝",bg:"#EAF8EF",fg:"#2F8F55"}; if(!v) return {k:"sem",l:"Sem valor",bg:"#F1ECEF",fg:"#7E6E82"};
     if(p>=v) return {k:"ok",l:"Quitado ✓",bg:"#EAF8EF",fg:"#2F8F55"}; if(p>0) return {k:"sinal",l:"Sinal pago",bg:"#FFF6DE",fg:"#A47414"}; return {k:"pend",l:"Pagamento pendente",bg:"#FFEEEA",fg:"#C0503E"}; }
   // checklist: o que vem em cada pacote (das propostas)
   const artes = n => [...Array(n)].map((_,k)=>`Arte adicional ${k+1}`);
@@ -1230,7 +1256,7 @@
         </div>
       </div>
       ${(i.pacote||(i.itens||[]).length)?`<div class="tema">${tagsHtml(i)}</div>`:""}
-      ${(()=>{ const sd=saldoDe(i), st=pgStatus(i), pr=ckProg(i); return `<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">${+i.valor?`<span class="pgb" style="background:${st.bg};color:${st.fg}">💳 ${st.k==="ok"?"quitado":st.k==="sinal"?`falta ${brl(sd)}`:"a receber"}</span>`:""}${pr.n?`<span class="ckb">✅ ${pr.ok}/${pr.n} peças</span>`:""}</div>`; })()}
+      ${(()=>{ const sd=saldoDe(i), st=pgStatus(i), pr=ckProg(i); return `<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">${i.parceria?`<span class="pgb" style="background:#EAF8EF;color:#2F8F55">🤝 parceria</span>`:""}${+i.valor?`<span class="pgb" style="background:${st.bg};color:${st.fg}">💳 ${st.k==="ok"?"quitado":st.k==="sinal"?`falta ${brl(sd)}`:"a receber"}</span>`:""}${pr.n?`<span class="ckb">✅ ${pr.ok}/${pr.n} peças</span>`:""}</div>`; })()}
       ${(i.extras||[]).filter(x=>!x.feito).length?`<span class="xtra">➕ ${(i.extras||[]).filter(x=>!x.feito).length} extra${(i.extras||[]).filter(x=>!x.feito).length>1?"s":""} pendente${(i.extras||[]).filter(x=>!x.feito).length>1?"s":""}</span>`:""}
       <div class="meta">
         ${i.dataFesta?`<span>🎉 ${fmtDate(i.dataFesta)}</span>`:""}
@@ -1297,7 +1323,8 @@
       $("histWrap").style.display = "none";
     }
     if(!it){ form.pgData.value = today(); form.formaPgto.value = "sinal"; }
-    else { form.formaPgto.value = it.formaPgto || "sinal"; form.pgData.value = today(); }
+    else { form.formaPgto.value = it.formaPgto || "sinal"; form.pgData.value = today();
+      form.parceria.checked = !!it.parceria; form.parceriaObs.value = it.parceriaObs || ""; form.valorParceria.value = it.parceria && +it.valorParceria ? it.valorParceria : ""; }
     // recupera rascunho
     const dk = draftKey(), dr = loadDraft(dk); $("draftBar").style.display="none"; $("draftSt").textContent="";
     if(dr && (!it || dr.t > (it.atualizadoEm||0))){
@@ -1306,7 +1333,7 @@
       $("draftBar").style.display="flex";
       setTimeout(()=>{ const b=$("draftDiscard"); if(b) b.onclick=()=>{ storeDraft(dk,null); const e=editing; closeModal(); openModal(e); }; },0);
     }
-    renderTipo(); renderCatalog(); renderPrazo();
+    renderTipo(); renderCatalog(); renderPrazo(); syncParc();
     renderFiles(); renderPrevGrid();
     $("mBody").scrollTop = 0; document.body.style.overflow="hidden";
     $("drop").style.opacity = $("dropPrev").style.opacity = assets ? 1 : .5;
@@ -1326,9 +1353,12 @@
       if(empty) return; storeDraft(draftKey(), d);
       $("draftSt").textContent = "✓ rascunho salvo " + new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}); }, 350); }
   function applyDraft(d){
-    Object.entries(d.f||{}).forEach(([k,v])=>{ const el=form.elements[k]; if(el && el.type!=="file" && el.type!=="radio") el.value=v; });
+    form.parceria.checked = false;
+    Object.entries(d.f||{}).forEach(([k,v])=>{ const el=form.elements[k]; if(!el || el.type==="file" || el.type==="radio") return; if(el.type==="checkbox") el.checked=!!v; else el.value=v; });
     curTipo=d.curTipo||curTipo; curPacote=d.curPacote||""; curValorMan=d.curValorMan||""; curItens=d.curItens||[]; draftFiles=d.draftFiles||[]; draftPrev=d.draftPrev||[];
   }
+  function syncParc(){ const on=$("fParc").checked; $("parcFields").style.display = on ? "" : "none"; $("pgBox").style.display = on && !(+form.valorParceria.value>0) ? "none" : ""; }
+  $("fParc").addEventListener("change", syncParc); form.valorParceria.addEventListener("input", syncParc);
   form.addEventListener("input", scheduleDraft); form.addEventListener("change", scheduleDraft);
   $("fCat").addEventListener("click", ()=>setTimeout(scheduleDraft,0)); $("fTipo").addEventListener("change", scheduleDraft);
   function closeModal(){ if($("overlay").classList.contains("open")) { clearTimeout(draftTimer); } $("overlay").classList.remove("open"); editing=null; if(!pvId && !fdId) document.body.style.overflow=""; }
@@ -1480,6 +1510,10 @@
     v.itens = curItens.filter(k=>{ const x=ALL[k]; return !(x && x.inclusoEm && x.inclusoEm.includes(curPacote)); });
     if(soAvulso(v.pacote, v.itens)){ v.prazo = v.prazoManual || ""; } else { v.prazoManual = ""; }
     v.valorManual = VALOR_MANUAL_AG.includes(v.assessoria) && +curValorMan>0 ? +curValorMan : "";
+    v.parceria = !!fd.get("parceria");
+    v.valorParceria = v.parceria ? Math.max(0, +v.valorParceria||0) : "";
+    if(!v.parceria) v.parceriaObs = "";
+    v.valorRef = calcTotal(v.pacote, v.itens);
     v.valor = valorBase(v) + extrasTotal(editing ? editing.extras : []);
     delete v["cat-pacote"]; delete v["cat-adicional"]; delete v["cat-avulso"];
     const pgNovo = Math.max(0, +v.pgValor||0), pgData = v.pgData || today(), pgMeio = v.pgMeio || "Pix";
@@ -1496,6 +1530,7 @@
       if((editing.pacote||null)!==v.pacote || JSON.stringify(editing.itens||[])!==JSON.stringify(v.itens))
         hist.push({t:now,msg:`Catálogo: ${[v.pacote,...v.itens].filter(Boolean).map(k=>ALL[k]?.nome).join(", ")||"nenhum item"} (${brl(v.valor)})`});
       if((editing.briefingEm||"")!==(v.briefingEm||"") && v.briefingEm) hist.push({t:now,msg:`Briefing enviado em ${fmtDate(v.briefingEm)} · entrega até ${fmtDate(v.prazo)}`});
+      if(!!editing.parceria!==v.parceria) hist.push({t:now,msg:v.parceria?`Marcada como parceria 🤝${v.parceriaObs?" · "+v.parceriaObs:""}`:"Deixou de ser parceria"});
       if(editing.assessoria!==v.assessoria) hist.push({t:now,msg:`Movida para ${A[v.assessoria].nome}`});
       const added = draftFiles.length - (editing.briefings||[]).length;
       if(added>0) hist.push({t:now,msg:`${added} briefing${added>1?"s":""} adicionado${added>1?"s":""}`});
@@ -2000,6 +2035,7 @@
         <div class="kpi"><div class="ic" style="background:var(--aqua-l)">🎟️</div><div class="v" data-count="${Math.round(ticket)}" data-money="1">R$ 0</div><div class="l">Ticket médio</div></div>
         <div class="kpi"><div class="ic" style="background:var(--mint-l)">⏰</div><div class="v" data-count="${pctPrazo}" data-suf="%">0%</div><div class="l">Entregas no prazo</div></div>
         <div class="kpi"><div class="ic" style="background:var(--coral-l)">🎨</div><div class="v" data-count="${emProd}">0</div><div class="l">Em produção agora</div></div>
+        <div class="kpi"><div class="ic" style="background:#EAF8EF">🤝</div><div class="v" data-count="${P.filter(i=>i.parceria).length}">0</div><div class="l">Parcerias · ${brl(P.filter(i=>i.parceria).reduce((t,i)=>t+(+(i.valorRef ?? calcTotal(i.pacote,i.itens))||0),0))} em referência</div></div>
         <div class="kpi"><div class="ic" style="background:#FFF6DE">💳</div><div class="v" data-count="${items.reduce((t,i)=>t+saldoDe(i),0)}" data-money="1">R$ 0</div><div class="l">A receber · ${items.filter(i=>saldoDe(i)>0).length} festa${items.filter(i=>saldoDe(i)>0).length===1?"":"s"}</div></div>
       </div>
 
@@ -2300,6 +2336,7 @@
           <div class="fd-tags">
             <select class="st-sel" id="fdStatus" style="background:${s.bg};color:${s.fg}" title="Mudar status">${STATUS.map(x=>`<option value="${x.id}" ${x.id===it.status?"selected":""}>● ${x.nome}</option>`).join("")}</select>
             ${cd?`<span class="countdown">⏳ ${cd}</span>`:""}
+            ${it.parceria?`<span class="chip" style="background:#EAF8EF;border-color:#CDEFD8;color:#2F8F55">🤝 Parceria</span>`:""}
             ${it.valor?`<span class="chip">💰 ${brl(it.valor)}</span>`:""}
           </div>
         </div>
@@ -2345,7 +2382,9 @@
           </section>
           <section class="fd-card" id="pgCard">${(()=>{ const v=+it.valor||0, pg=pagoTotal(it), sd=saldoDe(it), st=pgStatus(it), pct=v?Math.min(100,Math.round(pg/v*100)):0;
             const finalStage=["aprovacao","aprovada","entregue"].includes(it.status);
-            return `<h3><span>💳 <em>Pagamento</em></span><span class="chip" style="font-size:12px;background:${st.bg};color:${st.fg};border-color:transparent">${st.l}</span></h3>
+            const parcBan = it.parceria ? `<div class="parc-ban">🤝 <b>Festa em parceria / permuta</b>${it.parceriaObs?` · ${esc(it.parceriaObs)}`:""}<small>Valor de referência do catálogo: ${brl(it.valorRef ?? calcTotal(it.pacote,it.itens))}${+it.valorParceria?` · cobrado na parceria: ${brl(+it.valorParceria)}`:" · sem cobrança"}</small></div>` : "";
+            if(it.parceria && !v) return `<h3><span>💳 <em>Pagamento</em></span><span class="chip" style="font-size:12px;background:${st.bg};color:${st.fg};border-color:transparent">${st.l}</span></h3>${parcBan}<div class="pf-empty" style="text-align:left;padding:0">Nada a receber nesta festa 💚${(it.extras||[]).length?"":""}</div>`;
+            return `<h3><span>💳 <em>Pagamento</em></span><span class="chip" style="font-size:12px;background:${st.bg};color:${st.fg};border-color:transparent">${st.l}</span></h3>${parcBan}
             <div style="font-size:13px;color:var(--soft);margin:-6px 0 12px">${FORMAS[it.formaPgto||"sinal"]}</div>
             <div class="pg-sum"><div><small>Total</small><b>${brl(v)}</b></div><div><small>Recebido</small><b style="color:#2F8F55">${brl(pg)}</b></div><div><small>Falta</small><b style="color:${sd?"#C0503E":"#2F8F55"}">${brl(sd)}</b></div></div>
             <div class="pg-bar"><div style="width:${pct}%"></div></div>
