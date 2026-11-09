@@ -808,6 +808,9 @@
         <label class="f">Data da festa
           <input type="date" name="dataFesta">
         </label>
+        <label class="f">🧾 Fechada em <span style="font-weight:500;color:var(--soft)">(dia que a cliente fechou · conta no "Vendido")</span>
+          <input type="date" name="dataFechamento">
+        </label>
         <label class="f">Briefing enviado em
           <input type="date" name="briefingEm" id="fBriefEm">
         </label>
@@ -1351,8 +1354,8 @@
       $("mTitle").textContent = "Cadastrar debutante";
       $("histWrap").style.display = "none";
     }
-    if(!it){ form.pgData.value = today(); form.formaPgto.value = "sinal"; }
-    else { form.formaPgto.value = it.formaPgto || "sinal"; form.pgData.value = today();
+    if(!it){ form.pgData.value = today(); form.formaPgto.value = "sinal"; form.dataFechamento.value = today(); }
+    else { form.dataFechamento.value = fechadoIso(it); form.formaPgto.value = it.formaPgto || "sinal"; form.pgData.value = today();
       form.urgente.checked = !!it.urgente; form.taxaUrgencia.value = it.urgente && +it.taxaUrgencia ? it.taxaUrgencia : ""; form.prazoUrgente.value = it.prazoUrgente || "";
       form.parceria.checked = !!it.parceria; form.parceriaObs.value = it.parceriaObs || ""; form.valorParceria.value = it.parceria && +it.valorParceria ? it.valorParceria : ""; }
     // recupera rascunho
@@ -1977,7 +1980,12 @@
   ];
   let metaMensal = null, dashPeriod = "mes", fraseIx = Math.floor(Math.random()*FRASES.length), showTbl = false;
   const monthKey = ts => { const d=new Date(ts); return d.getFullYear()*100+d.getMonth(); };
-  const fechadoEm = i => i.criadoEm || Date.now();
+  // data em que a festa foi FECHADA (vendida): campo próprio; se não tiver, usa a data mais antiga entre cadastro, briefing e 1º pagamento
+  const isoTs = iso => new Date(iso+"T12:00:00").getTime();
+  function fechadoIso(i){ if(i.dataFechamento) return i.dataFechamento;
+    const c=[i.criadoEm?isoD(new Date(i.criadoEm)):null, i.briefingEm||null, ...(i.pagamentos||[]).map(x=>x.data)].filter(Boolean).sort();
+    return c[0] || today(); }
+  const fechadoEm = i => isoTs(fechadoIso(i));
   function inPeriod(i, p){
     const d=new Date(fechadoEm(i)), n=new Date();
     if(p==="tudo") return true;
@@ -2431,6 +2439,7 @@
               <dt>Briefing enviado</dt><dd>${it.briefingEm?fmtDate(it.briefingEm):"—"}</dd>
               <dt>Entrega prevista</dt><dd>${it.prazo?fmtDate(it.prazo):"—"}</dd>
               ${it.entregueEm?`<dt>Entregue em</dt><dd>${fmtDate(it.entregueEm)}</dd>`:""}
+              <dt>Fechada em</dt><dd>${fmtDate(fechadoIso(it))}${it.dataFechamento?"":`<small>automático</small>`}</dd>
               <dt>Cadastrada em</dt><dd>${it.criadoEm?new Date(it.criadoEm).toLocaleDateString("pt-BR"):"—"}</dd>
               ${it.tipo==="debutante"||!it.tipo?"":""}
               ${(it.dataFesta && festasDaSemana(0).some(x=>x.id===it.id))?`<dt>Post da semana</dt><dd>${it.postFeito?"✓ feito":"pendente 📸"}</dd>`:""}
