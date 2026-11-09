@@ -241,6 +241,19 @@
   .draft-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--mint-l);border:1.6px solid #CDEFD8;color:#2F8F55;border-radius:14px;padding:9px 14px;margin-bottom:14px;font-family:var(--f-brand);font-size:13px;font-weight:600}
   .draft-bar button{margin-left:auto}
   .draft-st{font-family:var(--f-brand);font-size:12px;color:var(--soft);align-self:center}
+  .urg-box{grid-column:1/-1;padding:14px;border:1.6px solid var(--line);border-radius:18px;background:#fff}
+  .urg-box .parc-tg input:checked + .sw{background:#FFB547}
+  .urg-f{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+  .urg-pct{display:flex;gap:6px;margin-top:6px}
+  .urg-pct button{font-family:var(--f-brand);font-size:12px;font-weight:600;border:1.6px dashed #FFB547;background:#FFF8EA;color:#A46A0A;border-radius:999px;padding:4px 10px;cursor:pointer}
+  @media (max-width:640px){ .urg-f{grid-template-columns:1fr} }
+  .cu-l{list-style:none;margin:0 0 8px;padding:0;display:flex;flex-direction:column;gap:6px}
+  .cu-l li{display:flex;align-items:center;gap:10px;padding:8px 12px;border:1.6px solid var(--pink);background:var(--pink-l);border-radius:14px;font-size:14px;font-weight:600;color:var(--ink)}
+  .cu-l li span:first-child{flex:1}.cu-l .p{font-family:var(--f-brand);color:var(--pink);white-space:nowrap}
+  .cu-add{display:grid;grid-template-columns:1fr 110px auto;gap:6px}
+  .cu-add input{padding:10px 12px;border:1.6px solid var(--line);border-radius:12px;font-weight:600;outline:none;min-width:0;background:#fff}
+  .cu-add input:focus{border-color:var(--lilac)}
+  @media (max-width:640px){ .cu-add{grid-template-columns:1fr 1fr} .cu-add #cuNome{grid-column:1/-1} }
   .parc-box{grid-column:1/-1;padding:14px;border:1.6px solid var(--line);border-radius:18px;background:#fff}
   .parc-tg{display:flex;align-items:flex-start;gap:12px;cursor:pointer}
   .parc-tg input{position:absolute;opacity:0}
@@ -806,6 +819,18 @@
           <div class="cat-head"><span>Itens do catálogo</span><span class="cat-cond" id="catCond"></span></div>
           <div id="fCat"></div>
         </div>
+        <div class="urg-box">
+          <label class="parc-tg"><input type="checkbox" name="urgente" id="fUrg"><span class="sw"></span><span><b>⚡ Taxa de urgência</b><small>Para pedidos com prazo mais curto que o normal. A taxa soma no valor da festa.</small></span></label>
+          <div class="urg-f" id="urgFields" style="display:none">
+            <label class="f">Taxa (R$)
+              <input type="number" name="taxaUrgencia" min="0" step="5" placeholder="Ex.: 100">
+              <span class="urg-pct"><button type="button" data-urgp="20">+20%</button><button type="button" data-urgp="30">+30%</button><button type="button" data-urgp="50">+50%</button></span>
+            </label>
+            <label class="f">Entregar até (prazo urgente)
+              <input type="date" name="prazoUrgente">
+            </label>
+          </div>
+        </div>
         <div class="parc-box">
           <label class="parc-tg"><input type="checkbox" name="parceria" id="fParc"><span class="sw"></span><span><b>🤝 Festa em parceria / permuta</b><small>Sem cobrança (ou valor simbólico). Não entra em "A receber" nem no faturamento cheio.</small></span></label>
           <div class="parc-f" id="parcFields" style="display:none">
@@ -1081,18 +1106,19 @@
   }
   const extrasTotal = ex => (ex||[]).reduce((t,x)=>t+(+x.valor||0),0);
   const VALOR_MANUAL_AG = ["ec","curione"];   // parceiras com valores combinados à parte
-  const valorBase = i => i.parceria ? (+i.valorParceria||0) : (VALOR_MANUAL_AG.includes(i.assessoria) && +i.valorManual>0) ? +i.valorManual : calcTotal(i.pacote, i.itens);
+  const valorBase = i => i.parceria ? (+i.valorParceria||0) : ((VALOR_MANUAL_AG.includes(i.assessoria) && +i.valorManual>0) ? +i.valorManual : calcTotal(i.pacote, i.itens) + customTotal(i.itensCustom)) + (i.urgente ? (+i.taxaUrgencia||0) : 0);
   // festa só com peças avulsas (ex.: só o convite infantil): prazo manual e prévia sem "identidade visual"
-  const soAvulso = (pacote, itens) => !pacote && (itens||[]).length>0 && itens.every(k=>ALL[k] && ALL[k].g==="avulso");
+  const soAvulso = (pacote, itens, custom) => !pacote && ((itens||[]).length + (custom||[]).length)>0 && (itens||[]).every(k=>ALL[k] && ALL[k].g==="avulso");
+  const customTotal = arr => (arr||[]).reduce((t,x)=>t+(+x.valor||0),0);
   // ajustes: cada rodada soma dias úteis ao prazo (padrão 3), editável; ou data final manual
   const AJ_DIAS = 3;
-  function prazoBase(i){ if(soAvulso(i.pacote,i.itens)) return i.prazoManual||""; const et=calcPrazos(i.briefingEm); return et ? et[2].ate : (i.prazoBase||""); }
+  function prazoBase(i){ if(soAvulso(i.pacote,i.itens,i.itensCustom)) return i.prazoManual||""; const et=calcPrazos(i.briefingEm); return et ? et[2].ate : (i.prazoBase||""); }
   const ajDias = i => (i.ajustes||[]).reduce((t,a)=>t+(+a.dias||0),0);
   function prazoFinal(i){ if(i.prazoOverride) return i.prazoOverride; const b=prazoBase(i); if(!b) return i.prazo||""; const d=ajDias(i); return d>0 ? addUteis(b,d) : b; }
   function addRodada(next, motivo){ next.prazoBase = next.prazoBase || prazoBase(next) || next.prazo || "";
     next.ajustes = [...(next.ajustes||[]), {id:uid(), em:today(), dias:AJ_DIAS, motivo:motivo||""}]; next.prazo = prazoFinal(next); return next; }
-  function rotuloPeca(i){ if(!soAvulso(i.pacote,i.itens)) return {up:"IDENTIDADE VISUAL", tit:"Identidade visual", pecas:["Peças da ","identidade"], prev:["Prévia da ","identidade"]};
-    const conv = i.itens.every(k=>/convite/i.test(ALL[k].nome));
+  function rotuloPeca(i){ if(!soAvulso(i.pacote,i.itens,i.itensCustom)) return {up:"IDENTIDADE VISUAL", tit:"Identidade visual", pecas:["Peças da ","identidade"], prev:["Prévia da ","identidade"]};
+    const conv = (i.itens||[]).length>0 && !(i.itensCustom||[]).length && i.itens.every(k=>/convite/i.test(ALL[k].nome));
     return conv ? {up:"CONVITE", tit:"Convite", pecas:["Seu ","convite"], prev:["Prévia do ","convite"]} : {up:"PEÇAS PERSONALIZADAS", tit:"Peças personalizadas", pecas:["Suas ","peças"], prev:["Prévia das ","peças"]}; }
   const pagoTotal = i => (i.pagamentos||[]).reduce((t,x)=>t+(+x.valor||0),0);
   const saldoDe = i => Math.max(0,(+i.valor||0) - pagoTotal(i));
@@ -1116,7 +1142,8 @@
   function checklistDe(i){
     const c = CHECKS[i.pacote] || {base:[],pecas:[]};
     const add = (i.itens||[]).filter(k=>ALL[k] && !(ALL[k].inclusoEm||[]).includes(i.pacote)).map(k=>ALL[k].nome);
-    return [{g:"Base da identidade",l:c.base},{g:"Peças da festa",l:c.pecas},{g:"Adicionais e avulsos",l:add}].filter(x=>x.l.length);
+    const cus = (i.itensCustom||[]).map(x=>x.nome);
+    return [{g:"Base da identidade",l:c.base},{g:"Peças da festa",l:c.pecas},{g:"Adicionais e avulsos",l:add},{g:"Itens personalizados",l:cus}].filter(x=>x.l.length);
   }
   function ckProg(i){ const all=checklistDe(i).flatMap(x=>x.l); const ok=all.filter(l=>(i.checklist||{})[l]).length; return {ok,n:all.length}; }
   function calcTotal(pacote, itens){
@@ -1258,7 +1285,7 @@
         </div>
       </div>
       ${(i.pacote||(i.itens||[]).length)?`<div class="tema">${tagsHtml(i)}</div>`:""}
-      ${(()=>{ const sd=saldoDe(i), st=pgStatus(i), pr=ckProg(i); return `<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">${i.parceria?`<span class="pgb" style="background:#EAF8EF;color:#2F8F55">🤝 parceria</span>`:""}${+i.valor?`<span class="pgb" style="background:${st.bg};color:${st.fg}">💳 ${st.k==="ok"?"quitado":st.k==="sinal"?`falta ${brl(sd)}`:"a receber"}</span>`:""}${pr.n?`<span class="ckb">✅ ${pr.ok}/${pr.n} peças</span>`:""}</div>`; })()}
+      ${(()=>{ const sd=saldoDe(i), st=pgStatus(i), pr=ckProg(i); return `<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">${i.urgente?`<span class="pgb" style="background:#FFF3DC;color:#A46A0A">⚡ urgente</span>`:""}${i.parceria?`<span class="pgb" style="background:#EAF8EF;color:#2F8F55">🤝 parceria</span>`:""}${+i.valor?`<span class="pgb" style="background:${st.bg};color:${st.fg}">💳 ${st.k==="ok"?"quitado":st.k==="sinal"?`falta ${brl(sd)}`:"a receber"}</span>`:""}${pr.n?`<span class="ckb">✅ ${pr.ok}/${pr.n} peças</span>`:""}</div>`; })()}
       ${(i.extras||[]).filter(x=>!x.feito).length?`<span class="xtra">➕ ${(i.extras||[]).filter(x=>!x.feito).length} extra${(i.extras||[]).filter(x=>!x.feito).length>1?"s":""} pendente${(i.extras||[]).filter(x=>!x.feito).length>1?"s":""}</span>`:""}
       <div class="meta">
         ${i.dataFesta?`<span>🎉 ${fmtDate(i.dataFesta)}</span>`:""}
@@ -1307,7 +1334,7 @@
     $("confirm").classList.remove("show"); $("delBtn").style.display = it ? "" : "none";
     if(it){
       ["debutante","assessoria","status","dataFesta","briefingEm","obs","prazoManual"].forEach(k=>{ if(form[k]) form[k].value = it[k]||""; });
-      curTipo = it.tipo || "debutante"; curPacote = it.pacote || ""; curItens = [...(it.itens||[])]; curValorMan = it.valorManual || "";
+      curTipo = it.tipo || "debutante"; curPacote = it.pacote || ""; curItens = [...(it.itens||[])]; curValorMan = it.valorManual || ""; curCustom = structuredClone(it.itensCustom||[]);
       draftFiles = structuredClone(it.briefings||[]);
       draftPrev = structuredClone(it.previas||[]);
       $("mAg").textContent = A[it.assessoria]?.nome || "";
@@ -1319,13 +1346,14 @@
       form.assessoria.value = A[tab] ? tab : "direto";
       form.status.value = "aguardando";
       draftFiles = []; draftPrev = [];
-      curTipo = $("tipoF").value || "debutante"; curPacote = ""; curItens = []; curValorMan = "";
+      curTipo = $("tipoF").value || "debutante"; curPacote = ""; curItens = []; curValorMan = ""; curCustom = [];
       $("mAg").textContent = "Nova festa";
       $("mTitle").textContent = "Cadastrar debutante";
       $("histWrap").style.display = "none";
     }
     if(!it){ form.pgData.value = today(); form.formaPgto.value = "sinal"; }
     else { form.formaPgto.value = it.formaPgto || "sinal"; form.pgData.value = today();
+      form.urgente.checked = !!it.urgente; form.taxaUrgencia.value = it.urgente && +it.taxaUrgencia ? it.taxaUrgencia : ""; form.prazoUrgente.value = it.prazoUrgente || "";
       form.parceria.checked = !!it.parceria; form.parceriaObs.value = it.parceriaObs || ""; form.valorParceria.value = it.parceria && +it.valorParceria ? it.valorParceria : ""; }
     // recupera rascunho
     const dk = draftKey(), dr = loadDraft(dk); $("draftBar").style.display="none"; $("draftSt").textContent="";
@@ -1335,7 +1363,7 @@
       $("draftBar").style.display="flex";
       setTimeout(()=>{ const b=$("draftDiscard"); if(b) b.onclick=()=>{ storeDraft(dk,null); const e=editing; closeModal(); openModal(e); }; },0);
     }
-    renderTipo(); renderCatalog(); renderPrazo(); syncParc();
+    renderTipo(); renderCatalog(); renderPrazo(); syncParc(); syncUrg();
     renderFiles(); renderPrevGrid();
     $("mBody").scrollTop = 0; document.body.style.overflow="hidden";
     $("drop").style.opacity = $("dropPrev").style.opacity = assets ? 1 : .5;
@@ -1347,7 +1375,7 @@
   const DRAFTS = {}; let draftTimer=null;
   const draftKey = () => editing ? "edit-"+editing.id : "new";
   function collectDraft(){ const fd=new FormData(form); const f={}; for(const [k,v] of fd.entries()){ if(!k.startsWith("cat-") && k!=="tipo") f[k]=v; }
-    return {f, curTipo, curPacote, curValorMan, curItens:[...curItens], draftFiles:structuredClone(draftFiles), draftPrev:structuredClone(draftPrev), t:Date.now()}; }
+    return {f, curTipo, curPacote, curValorMan, curCustom:structuredClone(curCustom), curItens:[...curItens], draftFiles:structuredClone(draftFiles), draftPrev:structuredClone(draftPrev), t:Date.now()}; }
   function storeDraft(key, d){ DRAFTS[key]=d; try{ d ? localStorage.setItem("fcc-draft-"+key, JSON.stringify(d)) : localStorage.removeItem("fcc-draft-"+key); }catch(e){} }
   function loadDraft(key){ if(DRAFTS[key]) return DRAFTS[key]; try{ const r=localStorage.getItem("fcc-draft-"+key); return r?JSON.parse(r):null; }catch(e){ return null; } }
   function scheduleDraft(){ if(!$("overlay").classList.contains("open")) return; clearTimeout(draftTimer); draftTimer=setTimeout(()=>{
@@ -1355,10 +1383,13 @@
       if(empty) return; storeDraft(draftKey(), d);
       $("draftSt").textContent = "✓ rascunho salvo " + new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}); }, 350); }
   function applyDraft(d){
-    form.parceria.checked = false;
+    form.parceria.checked = false; form.urgente.checked = false;
     Object.entries(d.f||{}).forEach(([k,v])=>{ const el=form.elements[k]; if(!el || el.type==="file" || el.type==="radio") return; if(el.type==="checkbox") el.checked=!!v; else el.value=v; });
-    curTipo=d.curTipo||curTipo; curPacote=d.curPacote||""; curValorMan=d.curValorMan||""; curItens=d.curItens||[]; draftFiles=d.draftFiles||[]; draftPrev=d.draftPrev||[];
+    curTipo=d.curTipo||curTipo; curPacote=d.curPacote||""; curValorMan=d.curValorMan||""; curCustom=d.curCustom||[]; curItens=d.curItens||[]; draftFiles=d.draftFiles||[]; draftPrev=d.draftPrev||[];
   }
+  function syncUrg(){ $("urgFields").style.display = $("fUrg").checked ? "" : "none"; updTotal(); }
+  $("fUrg").addEventListener("change", syncUrg); form.taxaUrgencia.addEventListener("input", updTotal);
+  document.querySelectorAll("[data-urgp]").forEach(b=>b.onclick=()=>{ const base=(VALOR_MANUAL_AG.includes(form.assessoria.value)&&+curValorMan>0)?+curValorMan:calcTotal(curPacote,curItens)+customTotal(curCustom); form.taxaUrgencia.value=Math.round(base*(+b.dataset.urgp)/100); updTotal(); scheduleDraft(); });
   function syncParc(){ const on=$("fParc").checked; $("parcFields").style.display = on ? "" : "none"; $("pgBox").style.display = on && !(+form.valorParceria.value>0) ? "none" : ""; }
   $("fParc").addEventListener("change", syncParc); form.valorParceria.addEventListener("input", syncParc);
   form.addEventListener("input", scheduleDraft); form.addEventListener("change", scheduleDraft);
@@ -1388,7 +1419,7 @@
     $("files").querySelectorAll(".icon-btn").forEach(b=>b.onclick=()=>{ draftFiles.splice(+b.dataset.ix,1); renderFiles(); });
   }
 
-  let curTipo = "debutante", curPacote = "", curItens = [], curValorMan = "";
+  let curTipo = "debutante", curPacote = "", curItens = [], curValorMan = "", curCustom = [];
   function renderTipo(){
     $("fTipo").innerHTML = TIPOS.map(t=>`<label class="item-opt"><input type="radio" name="tipo" value="${t.id}" ${t.id===curTipo?"checked":""}><span>${t.emoji} ${t.nome}</span></label>`).join("");
     $("fTipo").querySelectorAll("input").forEach(r=>r.onchange=()=>{ curTipo=r.value; renderCatalog(); renderPrazo(); syncNome(); });
@@ -1398,8 +1429,10 @@
     const t = TP[curTipo]; $("nomeLbl").textContent = t.nomeLbl; form.debutante.placeholder = t.ph;
     if(!editing) $("mTitle").textContent = "Cadastrar " + (curTipo==="debutante"?"debutante":curTipo==="infantil"?"festa infantil":"evento");
   }
-  function updTotal(){ const man = VALOR_MANUAL_AG.includes(form.assessoria.value) && +curValorMan>0;
-    $("catTotal").textContent = brl(man ? +curValorMan : calcTotal(curPacote,curItens)); $("catTotLbl").textContent = man ? "Valor combinado" : "Valor total à vista";
+  function totalForm(){ const man = VALOR_MANUAL_AG.includes(form.assessoria.value) && +curValorMan>0; const urg = $("fUrg") && $("fUrg").checked ? (+form.taxaUrgencia.value||0) : 0;
+    return {man, urg, v:(man ? +curValorMan : calcTotal(curPacote,curItens) + customTotal(curCustom)) + urg}; }
+  function updTotal(){ const t = totalForm();
+    $("catTotal").textContent = brl(t.v); $("catTotLbl").textContent = (t.man ? "Valor combinado" : "Valor total à vista") + (t.urg ? ` (com urgência +${brl(t.urg)})` : "");
     const vm=$("fValorMan"); if(vm) vm.placeholder = calcTotal(curPacote,curItens)||"0"; }
   function renderCatalog(){
     const key = catKey(curTipo, form.assessoria.value), cat = CATALOGOS[key];
@@ -1422,8 +1455,17 @@
       + (legacy.length?`<div class="cat-g"><h4>Itens antigos</h4><div class="tema">${legacy.map(k=>`<span class="tag" style="background:#F1ECEF;color:#7E6E82">${esc(ALL[k].nome)}</span>`).join("")}</div></div>`:"")
       + (VALOR_MANUAL_AG.includes(form.assessoria.value) ? `<label class="vman">✍️ Valor combinado com a ${esc(A[form.assessoria.value].nome)} <small>opcional · substitui o valor do catálogo</small>
           <span class="vman-in"><span>R$</span><input type="number" min="0" step="5" id="fValorMan" value="${esc(curValorMan)}" placeholder="${calcTotal(curPacote,curItens)||"0"}"></span></label>` : "")
-      + `<div class="cat-total"><span id="catTotLbl">${VALOR_MANUAL_AG.includes(form.assessoria.value)&&+curValorMan>0?"Valor combinado":"Valor total à vista"}</span><b id="catTotal">${brl(VALOR_MANUAL_AG.includes(form.assessoria.value)&&+curValorMan>0?+curValorMan:calcTotal(curPacote,curItens))}</b></div>`;
+      + `<div class="cat-g"><h4>✍️ Itens personalizados <span style="text-transform:none;letter-spacing:0;font-weight:500">(ex.: só monograma, logo, arte avulsa)</span></h4>
+          ${curCustom.length?`<ul class="cu-l">${curCustom.map(x=>`<li><span>${esc(x.nome)}</span><span class="p">${+x.valor?brl(+x.valor):"sem valor"}</span><button type="button" class="icon-btn" data-cudel="${esc(x.id)}" title="Remover">×</button></li>`).join("")}</ul>`:""}
+          <div class="cu-add"><input id="cuNome" placeholder="O que foi pedido? (ex.: Monograma)"><input id="cuValor" type="number" min="0" step="5" placeholder="R$"><button type="button" class="btn ghost" id="cuAdd">Adicionar</button></div>
+          <div class="ex-presets" style="margin-top:8px">${["Monograma","Logo","Convite","Tag","Save the date","Painel","Estampa"].map(n=>`<button type="button" class="ex-pre cu-pre" data-cupre="${n}">${n}</button>`).join("")}</div></div>`
+      + `<div class="cat-total"><span id="catTotLbl"></span><b id="catTotal"></b></div>`;
     const vm=$("fValorMan"); if(vm) vm.oninput=()=>{ curValorMan=vm.value; updTotal(); scheduleDraft(); };
+    updTotal();
+    const cuAdd=()=>{ const n=$("cuNome").value.trim(); if(!n){ $("cuNome").focus(); return; } curCustom=[...curCustom,{id:uid(),nome:n,valor:Math.max(0,+$("cuValor").value||0)}]; renderCatalog(); renderPrazo(); scheduleDraft(); setTimeout(()=>$("cuNome").focus(),0); };
+    $("cuAdd").onclick=cuAdd; $("cuNome").onkeydown=e=>{ if(e.key==="Enter"){ e.preventDefault(); cuAdd(); } }; $("cuValor").onkeydown=e=>{ if(e.key==="Enter"){ e.preventDefault(); cuAdd(); } };
+    $("fCat").querySelectorAll("[data-cupre]").forEach(b=>b.onclick=()=>{ $("cuNome").value=b.dataset.cupre; $("cuValor").focus(); });
+    $("fCat").querySelectorAll("[data-cudel]").forEach(b=>b.onclick=()=>{ curCustom=curCustom.filter(x=>x.id!==b.dataset.cudel); renderCatalog(); renderPrazo(); scheduleDraft(); });
     $("fCat").querySelectorAll('input[name="cat-pacote"]').forEach(r=>{
       r.onclick = ()=>{ curPacote = (curPacote===r.value) ? "" : r.value; renderCatalog(); renderPrazo(); }; // clicar de novo desmarca
     });
@@ -1445,7 +1487,7 @@
     </div>`;
   }
   function renderPrazo(){
-    const man = soAvulso(curPacote, curItens);
+    const man = soAvulso(curPacote, curItens, curCustom);
     $("prazoManWrap").style.display = man ? "" : "none";
     if(man){ const d=$("fPrazoMan").value; $("prazoBox").innerHTML = `<div class="prz-empty">✍️ Peça avulsa: o prazo não é calculado automaticamente. ${d?`Entrega combinada para <b>${fmtLong(d)}</b>.`:"Coloque acima a data que você combinou com a cliente."}</div>`; return; }
     const iso = $("fBriefEm").value, et = calcPrazos(iso);
@@ -1510,7 +1552,11 @@
     v.prazo = et ? et[2].ate : (editing && !editing.briefingEm ? (editing.prazo||"") : "");
     v.tipo = curTipo; v.pacote = curPacote || null;
     v.itens = curItens.filter(k=>{ const x=ALL[k]; return !(x && x.inclusoEm && x.inclusoEm.includes(curPacote)); });
-    if(soAvulso(v.pacote, v.itens)){ v.prazo = v.prazoManual || ""; } else { v.prazoManual = ""; }
+    v.itensCustom = curCustom.map(x=>({...x}));
+    if(soAvulso(v.pacote, v.itens, v.itensCustom)){ v.prazo = v.prazoManual || ""; } else { v.prazoManual = ""; }
+    v.urgente = !!fd.get("urgente"); v.taxaUrgencia = v.urgente ? Math.max(0,+v.taxaUrgencia||0) : 0;
+    if(v.urgente && v.prazoUrgente) v.prazoOverride = v.prazoUrgente;
+    if(!v.urgente){ if(editing && editing.urgente && editing.prazoOverride && editing.prazoOverride===editing.prazoUrgente) v.prazoOverride = ""; v.prazoUrgente = ""; }
     v.valorManual = VALOR_MANUAL_AG.includes(v.assessoria) && +curValorMan>0 ? +curValorMan : "";
     v.parceria = !!fd.get("parceria");
     v.valorParceria = v.parceria ? Math.max(0, +v.valorParceria||0) : "";
@@ -1532,6 +1578,7 @@
       if((editing.pacote||null)!==v.pacote || JSON.stringify(editing.itens||[])!==JSON.stringify(v.itens))
         hist.push({t:now,msg:`Catálogo: ${[v.pacote,...v.itens].filter(Boolean).map(k=>ALL[k]?.nome).join(", ")||"nenhum item"} (${brl(v.valor)})`});
       if((editing.briefingEm||"")!==(v.briefingEm||"") && v.briefingEm) hist.push({t:now,msg:`Briefing enviado em ${fmtDate(v.briefingEm)} · entrega até ${fmtDate(v.prazo)}`});
+      if(!!editing.urgente!==v.urgente) hist.push({t:now,msg:v.urgente?`⚡ Urgência: +${brl(v.taxaUrgencia)}${v.prazoUrgente?` · entrega até ${fmtDate(v.prazoUrgente)}`:""}`:"Urgência removida"});
       if(!!editing.parceria!==v.parceria) hist.push({t:now,msg:v.parceria?`Marcada como parceria 🤝${v.parceriaObs?" · "+v.parceriaObs:""}`:"Deixou de ser parceria"});
       if(editing.assessoria!==v.assessoria) hist.push({t:now,msg:`Movida para ${A[v.assessoria].nome}`});
       const added = draftFiles.length - (editing.briefings||[]).length;
@@ -2348,6 +2395,7 @@
           <div class="fd-tags">
             <select class="st-sel" id="fdStatus" style="background:${s.bg};color:${s.fg}" title="Mudar status">${STATUS.map(x=>`<option value="${x.id}" ${x.id===it.status?"selected":""}>● ${x.nome}</option>`).join("")}</select>
             ${cd?`<span class="countdown">⏳ ${cd}</span>`:""}
+            ${it.urgente?`<span class="chip" style="background:#FFF3DC;border-color:#FFD58A;color:#A46A0A">⚡ Urgente</span>`:""}
             ${it.parceria?`<span class="chip" style="background:#EAF8EF;border-color:#CDEFD8;color:#2F8F55">🤝 Parceria</span>`:""}
             ${it.valor?`<span class="chip">💰 ${brl(it.valor)}</span>`:""}
           </div>
@@ -2355,12 +2403,14 @@
       </div>
       <div class="fd-grid anim">
         <div class="fd-col">
-          ${(()=>{ const groups=checklistDe(it); if(!groups.length) return `<section class="fd-card"><h3><span>✅ <em>Checklist</em></span></h3><div class="mini-empty">Escolha um pacote no catálogo para ver o checklist do que está incluso.</div></section>`;
+          ${(()=>{ const groups=checklistDe(it); const ckAdd = `<div class="cu-add" style="margin-top:12px"><input id="ckNome" placeholder="Anotar item feito à mão (ex.: Monograma, Logo)"><input id="ckValor" type="number" min="0" step="5" placeholder="R$ (opcional)"><button type="button" class="btn ghost" id="ckAdd">+ Item</button></div>`;
+            if(!groups.length) return `<section class="fd-card" id="ckCard"><h3><span>✅ <em>Checklist</em></span></h3><div class="mini-empty">Sem pacote marcado. Anote abaixo o que foi pedido e feito (ex.: só monograma, logo).</div>${ckAdd}</section>`;
             const pr=ckProg(it), pct=pr.n?Math.round(pr.ok/pr.n*100):0, ck=it.checklist||{};
             return `<section class="fd-card" id="ckCard"><h3><span>✅ Checklist do <em>pacote</em></span><span style="display:flex;gap:10px"><button class="link" data-ckall="1">marcar tudo</button>${pr.ok?`<button class="link" data-ckall="0">limpar</button>`:""}</span></h3>
               <div class="ck-top"><div class="tr"><div style="width:${pct}%"></div></div><b>${pr.ok}/${pr.n}</b></div>
               ${pct===100?`<div class="pg-alert" style="background:var(--mint-l);border-color:#CDEFD8;color:#2F8F55">🎉 Tudo pronto! Todas as peças do pacote foram feitas.</div>`:""}
               ${groups.map(g=>`<div class="ck-g">${g.g}</div><ul class="ck-l">${g.l.map(l=>`<li class="${ck[l]?"ok":""}"><label><input type="checkbox" data-ck="${esc(l)}" ${ck[l]?"checked":""}>${esc(l)}</label></li>`).join("")}</ul>`).join("")}
+              ${ckAdd}
             </section>`; })()}
           <section class="fd-card"><h3><span>📝 <em>Briefing</em></span>${it.briefingEm?`<span class="chip" style="font-size:12.5px">enviado em ${fmtDate(it.briefingEm)}</span>`:""}</h3>
             ${bf.length?`${bImgs.length?`<div class="bf-imgs">${bImgs.map((f,ix)=>`<figure data-lb="b${ix}"><img src="${esc(fileUrl(f))}" alt="${esc(f.name)}" loading="lazy"></figure>`).join("")}</div>`:""}
@@ -2387,7 +2437,9 @@
             </dl>
           </section>
           <section class="fd-card"><h3><span>🛍️ Itens <em>contratados</em></span></h3>
-            ${ids.length?`<ul class="it-list">${ids.map(k=>{const x=ALL[k]; const inc=x.inclusoEm&&x.inclusoEm.includes(it.pacote); return `<li><span>${x.g==="pacote"?"Pacote ":""}${esc(x.nome)}<small>${esc(x.ds||"")}</small></span><span class="p">${inc?"incluso":brl(x.preco)}</span></li>`;}).join("")}</ul>
+            ${(ids.length||(it.itensCustom||[]).length||it.urgente)?`<ul class="it-list">${ids.map(k=>{const x=ALL[k]; const inc=x.inclusoEm&&x.inclusoEm.includes(it.pacote); return `<li><span>${x.g==="pacote"?"Pacote ":""}${esc(x.nome)}<small>${esc(x.ds||"")}</small></span><span class="p">${inc?"incluso":brl(x.preco)}</span></li>`;}).join("")}
+              ${(it.itensCustom||[]).map(x=>`<li><span>✍️ ${esc(x.nome)}<small>item personalizado</small></span><span class="p">${+x.valor?brl(+x.valor):"—"}</span></li>`).join("")}
+              ${it.urgente?`<li><span>⚡ Taxa de urgência<small>${it.prazoUrgente?"entrega urgente até "+fmtDate(it.prazoUrgente):"prazo encurtado"}</small></span><span class="p">${brl(+it.taxaUrgencia||0)}</span></li>`:""}</ul>
               ${+it.valorManual>0?`<div class="it-total" style="margin-top:8px;font-size:13px"><span>✍️ Valor combinado com a ${esc(A[it.assessoria]?.nome||"assessoria")} (catálogo: ${brl(calcTotal(it.pacote,it.itens))})</span><span>${brl(+it.valorManual)}</span></div>`:""}
               ${(it.extras||[]).length?`<div class="it-total" style="margin-top:8px;font-size:13px"><span>Pacote e itens</span><span>${brl(valorBase(it))}</span></div><div class="it-total" style="margin-top:2px;font-size:13px"><span>Pedidos extras</span><span>${brl(extrasTotal(it.extras))}</span></div>`:""}
               <div class="it-total"><span>Total à vista</span><b>${brl(it.valor||0)}</b></div>`:`<div class="mini-empty">Nenhum item marcado.</div>`}
@@ -2425,7 +2477,7 @@
             </div>
           </section>
           <section class="fd-card" id="przCard"><h3><span>⏳ Prazo de <em>entrega</em></span>${it.prazo?`<span class="chip" style="font-size:12px">entrega final ${fmtDate(it.prazo)}</span>`:""}</h3>
-            ${soAvulso(it.pacote,it.itens) ? `<div class="prz"><div class="prz-top"><span>Entrega combinada</span><b>${it.prazo?"até "+fmtLong(it.prazo):"a definir"}</b></div><div class="prz-note" style="background:var(--lilac-l);color:#7A5CCB">✍️ Peça avulsa: prazo definido manualmente de acordo com a demanda.</div></div>` : prazoHtml(it.briefingEm) || `<div class="prz-empty">Coloque a data do briefing para calcular o prazo.${it.prazo?`<br>Prazo anotado: <b>${fmtDate(it.prazo)}</b>`:""}</div>`}
+            ${soAvulso(it.pacote,it.itens,it.itensCustom) ? `<div class="prz"><div class="prz-top"><span>Entrega combinada</span><b>${it.prazo?"até "+fmtLong(it.prazo):"a definir"}</b></div><div class="prz-note" style="background:var(--lilac-l);color:#7A5CCB">✍️ Peça avulsa: prazo definido manualmente de acordo com a demanda.</div></div>` : prazoHtml(it.briefingEm) || `<div class="prz-empty">Coloque a data do briefing para calcular o prazo.${it.prazo?`<br>Prazo anotado: <b>${fmtDate(it.prazo)}</b>`:""}</div>`}
             ${(()=>{ const aj=it.ajustes||[], base=prazoBase(it)||it.prazoBase||"", d=ajDias(it);
               return `<div class="aj">
                 <div class="aj-h"><b>🔁 Rodadas de ajuste</b><small>cada ajuste soma ${AJ_DIAS} dias úteis, e você pode mudar</small></div>
@@ -2467,6 +2519,12 @@
     if($("pgAdd")) $("pgAdd").onclick=()=>addPg(Math.max(0,+$("pgV").value||0), $("pgDesc").value.trim(), $("pgD").value, $("pgM").value);
     $("fdInner").querySelectorAll("[data-pgdel]").forEach(b=>b.onclick=()=>{ const x=(it.pagamentos||[]).find(y=>y.id===b.dataset.pgdel); savePg((it.pagamentos||[]).filter(y=>y.id!==b.dataset.pgdel), `Pagamento removido: ${x?brl(x.valor):""}`); });
     // checklist
+    if($("ckAdd")){ const go=async()=>{ const n=$("ckNome").value.trim(); if(!n){ $("ckNome").focus(); return; } const val=Math.max(0,+$("ckValor").value||0);
+        const next=structuredClone(it); next.itensCustom=[...(it.itensCustom||[]),{id:uid(),nome:n,valor:val}]; next.valor=valorBase(next)+extrasTotal(next.extras);
+        if(soAvulso(next.pacote,next.itens,next.itensCustom) && !next.briefingEm) next.prazo=prazoFinal(next);
+        next.atualizadoEm=Date.now(); next.historico=[...(it.historico||[]),{t:Date.now(),msg:`Item personalizado: ${n}${val?` (${brl(val)})`:""}`}];
+        try{ await saveItem(next); toast("Item anotado ✍️"); }catch(e){} };
+      $("ckAdd").onclick=go; $("ckNome").onkeydown=e=>{ if(e.key==="Enter") go(); }; }
     const saveCk = async (ck, msg) => { const next=structuredClone(it); next.checklist=ck; next.atualizadoEm=Date.now(); if(msg) next.historico=[...(it.historico||[]),{t:Date.now(),msg}]; try{ await saveItem(next); }catch(e){} };
     $("fdInner").querySelectorAll("[data-ck]").forEach(cb=>cb.onchange=()=>{ const ck={...(it.checklist||{})}; if(cb.checked) ck[cb.dataset.ck]=true; else delete ck[cb.dataset.ck];
       const all=checklistDe(it).flatMap(g=>g.l), done=all.every(l=>ck[l]); saveCk(ck, done?"Checklist completo 🎉":null); if(done) toast("Checklist completo! 🎉"); });
