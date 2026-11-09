@@ -1947,11 +1947,17 @@
 
   function renderDash(){
     const now=new Date(), mk=monthKey(now), prevMk=monthKey(new Date(now.getFullYear(),now.getMonth()-1,1));
-    const doMes = items.filter(i=>monthKey(fechadoEm(i))===mk), doMesAnt = items.filter(i=>monthKey(fechadoEm(i))===prevMk);
-    const fatMes = doMes.reduce((t,i)=>t+(+i.valor||0),0), fatAnt = doMesAnt.reduce((t,i)=>t+(+i.valor||0),0);
+    // dinheiro conta pela DATA DE CADA PAGAMENTO; "vendido" conta pela data de cadastro da festa
+    const PAGS = items.flatMap(i=>(i.pagamentos||[]).filter(x=>x.data).map(x=>({v:+x.valor||0, d:x.data, it:i})));
+    const mkIso = iso => { const [y,m]=iso.split("-").map(Number); return y*100+(m-1); };
+    const pagIn = p => PAGS.filter(x=>{ const k=mkIso(x.d), n=new Date(); if(p==="tudo") return true; if(p==="ano") return Math.floor(k/100)===n.getFullYear();
+      if(p==="3m"){ const lim=monthKey(new Date(n.getFullYear(),n.getMonth()-2,1)); return k>=lim && k<=monthKey(n); } return k===monthKey(n); });
+    const doMes = items.filter(i=>monthKey(fechadoEm(i))===mk);
+    const fatMes = PAGS.filter(x=>mkIso(x.d)===mk).reduce((t,x)=>t+x.v,0), fatAnt = PAGS.filter(x=>mkIso(x.d)===prevMk).reduce((t,x)=>t+x.v,0);
     const meta = metaMensal || 0, pct = meta ? Math.min(999, Math.round(fatMes/meta*100)) : 0;
-    const P = items.filter(i=>inPeriod(i,dashPeriod)), fatP = P.reduce((t,i)=>t+(+i.valor||0),0);
-    const comValor = P.filter(i=>+i.valor>0), ticket = comValor.length ? fatP/comValor.length : 0;
+    const P = items.filter(i=>inPeriod(i,dashPeriod)), vendP = P.reduce((t,i)=>t+(+i.valor||0),0);
+    const PP = pagIn(dashPeriod), fatP = PP.reduce((t,x)=>t+x.v,0);
+    const comValor = P.filter(i=>+i.valor>0), ticket = comValor.length ? vendP/comValor.length : 0;
     const finalizadas = items.filter(i=>["aprovada","entregue"].includes(i.status) && i.prazo);
     const noPrazo = finalizadas.filter(i=>!i.entregueEm || i.entregueEm <= i.prazo).length;
     const pctPrazo = finalizadas.length ? Math.round(noPrazo/finalizadas.length*100) : 100;
@@ -1964,7 +1970,8 @@
 
     // faturamento 6 meses
     const months=[...Array(6)].map((_,k)=>{ const d=new Date(now.getFullYear(), now.getMonth()-5+k, 1); const key=monthKey(d);
-      const its=items.filter(i=>monthKey(fechadoEm(i))===key); return {lbl:MESES[d.getMonth()], ano:d.getFullYear(), v:its.reduce((t,i)=>t+(+i.valor||0),0), n:its.length}; });
+      const ps=PAGS.filter(x=>mkIso(x.d)===key); const vend=items.filter(i=>monthKey(fechadoEm(i))===key);
+      return {lbl:MESES[d.getMonth()], ano:d.getFullYear(), v:ps.reduce((t,x)=>t+x.v,0), n:ps.length, vend:vend.reduce((t,i)=>t+(+i.valor||0),0), nf:vend.length}; });
     const maxV = Math.max(meta, ...months.map(m=>m.v), 1)*1.12;
     const CW=640, CH=250, pl=8, pb=30, pt=14, bw=54, gap=(CW-pl*2-bw*6)/5;
     const yOf = v => pt + (CH-pt-pb)*(1-v/maxV);
@@ -1981,7 +1988,7 @@
       <text x="${CW}" y="${yOf(meta)-6}" text-anchor="end" font-family="Fredoka" font-size="12" fill="#7E6E82" font-weight="600">meta ${brl(meta)}</text>` : "";
 
     // por assessoria / tipo / pacotes
-    const porAg = AGENCIAS.map(a=>{ const its=P.filter(i=>i.assessoria===a.id); return {...a, v:its.reduce((t,i)=>t+(+i.valor||0),0), n:its.length}; });
+    const porAg = AGENCIAS.map(a=>{ const its=P.filter(i=>i.assessoria===a.id); return {...a, v:PP.filter(x=>x.it.assessoria===a.id).reduce((t,x)=>t+x.v,0), n:its.length}; });
     const maxAg = Math.max(1,...porAg.map(a=>a.v));
     const porTipo = TIPOS.map(t=>{ const its=P.filter(i=>(i.tipo||"debutante")===t.id); return {...t, v:its.reduce((s,i)=>s+(+i.valor||0),0), n:its.length}; });
     const maxT = Math.max(1,...porTipo.map(t=>t.n));
@@ -2030,7 +2037,8 @@
       </div>
 
       <div class="c12 kpis">
-        <div class="kpi"><div class="ic" style="background:var(--pink-l)">💰</div><div class="v" data-count="${fatP}" data-money="1">R$ 0</div><div class="l">Faturamento · ${periodLbl[dashPeriod].toLowerCase()}${dashPeriod==="mes"?`<span class="delta ${delta>0?"up":delta<0?"down":"eq"}">${delta>0?"▲":delta<0?"▼":"="} ${Math.abs(delta)}% vs mês passado</span>`:""}</div></div>
+        <div class="kpi"><div class="ic" style="background:var(--pink-l)">💰</div><div class="v" data-count="${fatP}" data-money="1">R$ 0</div><div class="l">Recebido · ${periodLbl[dashPeriod].toLowerCase()} <span style="opacity:.7">(pela data do pagamento)</span>${!fatP&&vendP?`<br><span style="color:#A47414">💡 registre os pagamentos na tela de cada festa</span>`:""}${dashPeriod==="mes"?`<span class="delta ${delta>0?"up":delta<0?"down":"eq"}">${delta>0?"▲":delta<0?"▼":"="} ${Math.abs(delta)}% vs mês passado</span>`:""}</div></div>
+        <div class="kpi"><div class="ic" style="background:#FFF0E0">🧾</div><div class="v" data-count="${vendP}" data-money="1">R$ 0</div><div class="l">Vendido · ${periodLbl[dashPeriod].toLowerCase()} <span style="opacity:.7">(festas fechadas)</span></div></div>
         <div class="kpi"><div class="ic" style="background:var(--lilac-l)">🎉</div><div class="v" data-count="${P.length}">0</div><div class="l">Festas fechadas</div></div>
         <div class="kpi"><div class="ic" style="background:var(--aqua-l)">🎟️</div><div class="v" data-count="${Math.round(ticket)}" data-money="1">R$ 0</div><div class="l">Ticket médio</div></div>
         <div class="kpi"><div class="ic" style="background:var(--mint-l)">⏰</div><div class="v" data-count="${pctPrazo}" data-suf="%">0%</div><div class="l">Entregas no prazo</div></div>
@@ -2040,9 +2048,9 @@
       </div>
 
       <section class="panel c8">
-        <div class="ph"><div><div class="sub">Últimos 6 meses</div><h3>Faturamento <em>mensal</em></h3></div>
+        <div class="ph"><div><div class="sub">Últimos 6 meses</div><h3>Recebido <em>por mês</em></h3></div>
           <button class="link" id="tblBtn">${showTbl?"ver gráfico":"ver tabela"}</button></div>
-        ${showTbl?`<table class="dt"><tr><th>Mês</th><th class="n">Festas</th><th class="n">Faturamento</th></tr>${months.map(m=>`<tr><td>${m.lbl}/${m.ano}</td><td class="n">${m.n}</td><td class="n">${brl(m.v)}</td></tr>`).join("")}</table>`
+        ${showTbl?`<table class="dt"><tr><th>Mês</th><th class="n">Pagamentos</th><th class="n">Recebido</th><th class="n">Festas fechadas</th><th class="n">Vendido</th></tr>${months.map(m=>`<tr><td>${m.lbl}/${m.ano}</td><td class="n">${m.n}</td><td class="n">${brl(m.v)}</td><td class="n">${m.nf}</td><td class="n">${brl(m.vend)}</td></tr>`).join("")}</table>`
           :`<div class="chart" id="chart"><svg viewBox="0 0 ${CW} ${CH}" role="img" aria-label="Faturamento por mês">
             ${[0.25,0.5,0.75].map(f=>`<line x1="0" x2="${CW}" y1="${yOf(maxV*f)}" y2="${yOf(maxV*f)}" stroke="#F1EAEF" stroke-width="1"/>`).join("")}
             <line x1="0" x2="${CW}" y1="${CH-pb}" y2="${CH-pb}" stroke="#EADFE6" stroke-width="1.5"/>
@@ -2101,7 +2109,7 @@
             </svg>
             <div class="pct"><b ${meta?`data-count="${pct}" data-suf="%"`:""}>${meta?"0%":"—"}</b><span>da meta</span></div>
           </div>
-          <div class="meta-txt">Meta de ${MESES[now.getMonth()]}
+          <div class="meta-txt">Recebido em ${MESES[now.getMonth()]}
             <b data-count="${fatMes}" data-money="1">R$ 0</b>
             de ${meta?brl(meta):"—"}
             <div class="falta">${!meta?"Defina sua meta para acompanhar 🎯":falta?`Faltam <b style="display:inline;font-size:inherit;font-family:inherit">${brl(falta)}</b>, cerca de ${festasFaltam} festa${festasFaltam>1?"s":""} 💪`:"Meta batida! Você é incrível 🏆"}</div>
@@ -2138,7 +2146,7 @@
     const tip=$("tip");
     D.querySelectorAll("#chart g.col").forEach(g=>{
       const m=months[+g.dataset.k];
-      g.onmousemove=e=>{ tip.innerHTML=`${m.lbl}/${m.ano}<br><b>${brl(m.v)}</b> · ${m.n} festa${m.n===1?"":"s"}${meta?`<br>${Math.round(m.v/meta*100)}% da meta`:""}`; tip.style.opacity=1; tip.style.left=(e.clientX+14)+"px"; tip.style.top=(e.clientY-10)+"px"; };
+      g.onmousemove=e=>{ tip.innerHTML=`${m.lbl}/${m.ano}<br><b>${brl(m.v)}</b> recebido · ${m.n} pagamento${m.n===1?"":"s"}${meta?`<br>${Math.round(m.v/meta*100)}% da meta`:""}<br><span style="opacity:.75">vendido: ${brl(m.vend)} (${m.nf} festa${m.nf===1?"":"s"})</span>`; tip.style.opacity=1; tip.style.left=(e.clientX+14)+"px"; tip.style.top=(e.clientY-10)+"px"; };
       g.onmouseleave=()=>tip.style.opacity=0;
     });
     if(meta && fatMes>=meta){ let k="festa-meta-"+mk, seen=false; try{ seen=localStorage.getItem(k); localStorage.setItem(k,"1"); }catch(e){ seen=renderDash._c===mk; } renderDash._c=mk; if(!seen) confetti(); }
