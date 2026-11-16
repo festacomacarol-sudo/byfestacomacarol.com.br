@@ -4,19 +4,19 @@
 <meta name="robots" content="noindex">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Proposta Casamento · MR Arts Produções</title>
-<meta name="description" content="Identidade visual para casamentos: pacotes Eternity e Royal Wedding, website e galeria de fotos.">
+<title>Proposta Eventos · MR Arts Produções</title>
+<meta name="description" content="Identidade visual para eventos corporativos, formaturas, 18 anos e festas adultas: pacotes Signature e Deluxe.">
 <meta name="theme-color" content="#FAF8F1">
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Festa com a Carol">
 <meta property="og:locale" content="pt_BR">
-<meta property="og:url" content="https://byfestacomacarol.com.br/propostacasamentomrproducoes/">
-<meta property="og:title" content="Proposta Casamento · MR Arts Produções">
-<meta property="og:description" content="Identidade visual autoral para casamentos. Veja pacotes, valores, website, galeria de fotos e portfólio.">
-<meta property="og:image" content="https://byfestacomacarol.com.br/propostacasamentomrproducoes/previa.jpg?v=2">
-<meta property="og:image:secure_url" content="https://byfestacomacarol.com.br/propostacasamentomrproducoes/previa.jpg?v=2">
+<meta property="og:url" content="https://byfestacomacarol.com.br/propostaeventosmrproducoes/">
+<meta property="og:title" content="Proposta Eventos · MR Arts Produções">
+<meta property="og:description" content="Identidade visual para eventos corporativos, formaturas, 18 anos e festas adultas. Veja pacotes, valores e portfólio.">
+<meta property="og:image" content="https://byfestacomacarol.com.br/propostaeventosmrproducoes/previa.jpg?v=2">
+<meta property="og:image:secure_url" content="https://byfestacomacarol.com.br/propostaeventosmrproducoes/previa.jpg?v=2">
 <meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -189,22 +189,53 @@ section{padding-block:56px}
 .tip{background:var(--pink-l);border-radius:14px;padding:12px 14px;font-size:14px;color:var(--ink)}
 .tip b{color:#C23D7A}
 
-#galeria-adicional .pic{background:var(--paper);padding:24px 18px}
-#galeria-adicional .pic img{max-width:280px;border-radius:0;background:none}
-@media (max-width:820px){#galeria-adicional .pic img{max-width:220px}}
-.solo{font-size:14.5px;color:var(--soft);background:var(--lilac-l);border-radius:12px;padding:10px 14px}
-.solo b{color:#6D52B8}
-.solo-picks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
-.solo-picks button{font:inherit;cursor:pointer;display:grid;gap:2px;text-align:left;border:1.5px solid var(--line);background:var(--bg);border-radius:14px;padding:12px 14px;color:var(--ink);transition:border-color .2s,background .2s}
-.solo-picks button b{font-family:var(--f-brand);font-weight:600;font-size:15px}
-.solo-picks button span{font-size:13px;color:var(--soft);font-weight:700}
-.solo-picks button[aria-pressed="true"]{border-color:var(--pink);background:var(--pink-l)}
-.solo-picks button[aria-pressed="true"] b::after{content:" ✓";color:var(--pink)}
-.pricecard.solo-mode{border-color:var(--aqua)}
-.pricecard.solo-mode .deliver,.pricecard.solo-mode .pk small{display:none}
-.gal-toggle{font:inherit;font-family:var(--f-brand);font-weight:600;font-size:15px;border:1.5px solid var(--pink);color:var(--pink);background:var(--paper);border-radius:14px;padding:12px 16px;cursor:pointer;transition:background .2s,color .2s}
-.gal-toggle[aria-pressed="true"]{background:var(--pink);color:#fff}
-.gal-toggle:active{transform:scale(.98)}
+/* adicionais */
+.adds{margin-top:24px;background:var(--paper);border:1.5px solid var(--line);border-radius:28px;padding:24px}
+.adds-h{display:grid;gap:4px;margin-bottom:16px}
+.adds-h .tagline{font-family:var(--f-brand);font-weight:600;font-size:12.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--pink)}
+.adds-h h3{font-family:var(--f-display);font-weight:700;font-size:40px;line-height:1}
+.adds-h p{color:var(--soft);font-size:15px}
+.add-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:640px){.add-grid{grid-template-columns:1fr}.adds{padding:18px}}
+.add{position:relative;display:grid;gap:6px;align-content:start;background:var(--bg);border:1.5px solid var(--line);border-radius:20px;padding:18px 18px 16px;cursor:pointer;transition:border-color .25s,background .25s,transform .15s;min-width:0}
+.add.wide{grid-column:1/-1}
+.add:hover{border-color:var(--lilac)}
+.add:active{transform:scale(.99)}
+.add input{position:absolute;opacity:0;pointer-events:none}
+.masc-strip{display:flex;align-items:flex-start;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;margin:2px 0 6px}
+.masc-strip::-webkit-scrollbar{display:none}
+.add .masc-strip img{flex:0 0 auto;width:auto;height:clamp(150px,15vw,172px);max-width:none;object-fit:contain;border-radius:14px;scroll-snap-align:start;background:var(--paper)}
+@media (max-width:640px){.add .masc-strip img{height:170px}}
+.add .ic{width:42px;height:42px;border-radius:14px;background:var(--pink-l);color:var(--pink);display:grid;place-items:center}
+.add .ic svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.add img{width:100%;height:auto;border-radius:14px;background:var(--paper);display:block}
+.add b{font-family:var(--f-brand);font-weight:600;font-size:18px}
+.add p{font-size:14px;color:var(--soft)}
+.add .ap{font-family:var(--f-brand);font-weight:600;font-size:20px;color:var(--ink);font-variant-numeric:tabular-nums}
+.add .inc{display:none;font-style:normal;font-size:13px;font-weight:800;color:#2D7F4F}
+.add .tick{position:absolute;top:16px;right:16px;width:26px;height:26px;border-radius:50%;border:1.5px solid var(--line);background:var(--paper);transition:background .2s,border-color .2s}
+.add.on{border-color:var(--pink);background:var(--paper)}
+.add.on .tick{background:var(--pink);border-color:var(--pink)}
+.add.on .tick::after{content:"";position:absolute;left:8px;top:4px;width:6px;height:11px;border:solid #fff;border-width:0 2.4px 2.4px 0;transform:rotate(45deg)}
+.add.incl{cursor:default;border-style:dashed}
+.add.incl .ap{text-decoration:line-through;color:var(--soft);font-size:16px}
+.add.incl .inc{display:block}
+.add.incl .tick{background:var(--mint);border-color:var(--mint)}
+.add.incl .tick::after{content:"";position:absolute;left:8px;top:4px;width:6px;height:11px;border:solid #fff;border-width:0 2.4px 2.4px 0;transform:rotate(45deg)}
+.add input:focus-visible ~ .tick{outline:3px solid var(--lilac);outline-offset:2px}
+.addline{margin-top:6px;font-size:14px;color:var(--soft)}
+.addline b{color:var(--pink)}
+
+/* avulsos */
+.av-grid{margin-top:24px}
+.av-total{margin-top:14px;display:flex;align-items:center;justify-content:space-between;gap:14px 20px;flex-wrap:wrap;background:var(--paper);border:1.5px solid var(--pink);border-radius:22px;padding:18px 22px}
+.av-total div{display:grid;gap:2px;min-width:0}
+.av-total small{font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--soft)}
+.av-total b{font-family:var(--f-brand);font-weight:600;font-size:34px;line-height:1.1;font-variant-numeric:tabular-nums}
+.av-total span{font-size:14px;color:var(--soft)}
+.av-total.empty .btn{opacity:.45;pointer-events:none}
+@media (max-width:640px){.av-total .btn{width:100%;justify-content:center}}
+
 
 /* painéis de led */
 .led-media{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;margin-top:24px;padding-bottom:4px}
@@ -416,6 +447,22 @@ tfoot td{font-weight:800;border-bottom:0}
 footer{text-align:center;padding-block:28px 40px;color:var(--soft);font-size:13px}
 footer img{width:120px;height:auto;opacity:.9}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:#fff;font-weight:700;padding:10px 18px;border-radius:999px;z-index:60}
+
+/* para quem */
+.aud-wrap{padding-block:16px 8px}
+.aud{background:var(--paper);border:1.5px solid var(--line);border-radius:32px;padding:32px 28px;display:grid;gap:24px}
+.aud-h{display:grid;gap:8px;max-width:640px}
+.aud-h h2{font-family:var(--f-display);font-weight:700;font-size:clamp(40px,6vw,54px);line-height:1}
+.aud-h p{color:var(--soft)}
+.aud-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.aud-c{border-radius:20px;padding:20px 18px;display:grid;gap:6px;align-content:start}
+.aud-c:nth-child(1){background:var(--pink-l)}.aud-c:nth-child(2){background:var(--lilac-l)}.aud-c:nth-child(3){background:var(--aqua-l)}.aud-c:nth-child(4){background:var(--mint-l)}
+.aud-c svg{width:28px;height:28px;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;margin-bottom:4px}
+.aud-c:nth-child(1) svg{stroke:#C23D7A}.aud-c:nth-child(2) svg{stroke:#6D52B8}.aud-c:nth-child(3) svg{stroke:#1F7F9E}.aud-c:nth-child(4) svg{stroke:#2D7F4F}
+.aud-c b{font-family:var(--f-brand);font-weight:600;font-size:18px;line-height:1.2}
+.aud-c p{font-size:14px;color:var(--soft)}
+@media (max-width:860px){.aud-grid{grid-template-columns:1fr 1fr}}
+@media (max-width:480px){.aud-grid{grid-template-columns:1fr}.aud{padding:22px 18px}}
 </style>
 </head>
 <body>
@@ -426,6 +473,7 @@ footer img{width:120px;height:auto;opacity:.9}
   <ul>
     <li><a href="#parceria">MR Arts</a></li>
     <li><a href="#paineis">Painéis de LED</a></li>
+    <li><a href="#publico">Para quem</a></li>
     <li><a href="#pacotes">Pacotes</a></li>
     <li><a href="#comparar">Comparar</a></li>
     <li><a href="#processo">Como funciona</a></li>
@@ -442,18 +490,29 @@ footer img{width:120px;height:auto;opacity:.9}
   <div class="copy">
     <span class="kicker">Festa com a Carol<span class="hide-m"> · Identidade visual</span></span>
     <h1 aria-label="Proposta Comercial"><span>P</span><span>r</span><span>o</span><span>p</span><span>o</span><span>s</span><span>t</span><span>a</span><span class="l2">Comercial</span></h1>
-    <span class="tag15">Casamento</span>
+    <span class="tag15">Eventos<span class="hide-m"> · Corporativo · Formatura · 18 anos</span></span>
     <span class="partner-pill">Parceria MR Arts Produções</span>
-    <p>Uma identidade visual autoral e fora da caixinha, que traduz a essência do casal em cada detalhe. Aqui vocês veem o que cada pacote inclui, quanto custa e quando recebem.</p>
+    <p>Identidade visual sob medida para eventos corporativos, formaturas, 18 anos e celebrações adultas. Aqui você vê o que cada pacote inclui, quanto custa e quando recebe.</p>
     <div class="ctas"><a class="btn pri" href="#pacotes">Ver pacotes e valores</a><a class="btn sec" href="#portfolio">Ver portfólio</a></div>
   </div>
   <div class="collage" aria-hidden="true">
-    <img class="c1" src="img/fc2.jpg" alt="" style="object-position:center 30%">
-    <img class="c2" src="img/fc3.jpg" alt="" style="object-position:center">
-    <img class="c3" src="img/fc4.jpg" alt="" style="object-position:center 40%">
-    <img class="c4" src="img/fc1.jpg" alt="" style="object-position:center 25%">
+    <img class="c1" src="img/fotoev2.jpg" alt="" style="aspect-ratio:4/5;width:44%;object-position:50% center">
+    <img class="c2" src="img/fotoev1.jpg" alt="" style="aspect-ratio:4/5;width:44%;top:4%;object-position:55% center">
+    <img class="c4" src="img/fotoev3.jpg" alt="" style="aspect-ratio:3/4;width:48%;left:24%;top:30%;object-position:50% 30%">
   </div>
 </header>
+
+<section id="publico" class="aud-wrap">
+  <div class="aud">
+    <div class="aud-h"><span class="eyebrow">Para quem é</span><h2>Uma identidade à altura do seu evento</h2><p>Paletas, tipografia e elementos escolhidos para transmitir elegância, autoridade e presença, do convite à última peça.</p></div>
+    <div class="aud-grid">
+      <div class="aud-c"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18"/></svg><b>Eventos corporativos</b><p>Lançamentos, convenções, confraternizações e ações de marca.</p></div>
+      <div class="aud-c"><svg viewBox="0 0 24 24"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c3 2.5 9 2.5 12 0v-5M22 9v6"/></svg><b>Formaturas</b><p>Colação, baile e toda a papelaria da turma.</p></div>
+      <div class="aud-c"><svg viewBox="0 0 24 24"><path d="M8 3h8l-1 7a3 3 0 0 1-6 0z"/><path d="M12 13v7M8.5 21h7"/></svg><b>18 anos</b><p>Uma celebração moderna, jovem e sofisticada.</p></div>
+      <div class="aud-c"><svg viewBox="0 0 24 24"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/></svg><b>Festas adultas</b><p>Aniversários, bodas, pool parties e celebrações especiais.</p></div>
+    </div>
+  </div>
+</section>
 
 <section id="parceria" class="parc-wrap">
   <div class="parc">
@@ -466,9 +525,9 @@ footer img{width:120px;height:auto;opacity:.9}
       </div>
     </div>
     <div class="perks">
-      <div class="perk"><b>Brinde</b><span>galeria de fotos com moldura</span><p>Em qualquer pacote: a página onde os convidados tiram fotos com a moldura da festa e enviam para o álbum.</p></div>
+      <div class="perk"><b>Brinde</b><span>moldura de fotos exclusiva</span><p>Em qualquer pacote: a câmera com a moldura da festa, para os convidados tirarem fotos e enviarem para a galeria.</p></div>
       <div class="perk"><b>R$ 70 a R$ 100</b><span>painéis de LED</span><p>Monograma, fundo e assinatura no formato do LED e do mapa projetado.</p></div>
-      <div class="perk"><b>R$ 500</b><span>Eternity</span><p>Identidade completa. À vista, ou 3x de R$ 173,33 sem juros.</p></div>
+      <div class="perk"><b>R$ 300</b><span>Signature</span><p>Identidade completa. À vista, ou 3x de R$ 106,67 sem juros.</p></div>
     </div>
   </div>
 </section>
@@ -476,16 +535,15 @@ footer img{width:120px;height:auto;opacity:.9}
 <section id="pacotes">
   <div class="eyebrow">Pacotes e valores</div>
   <h2 class="h2">Escolha sua <em>experiência</em></h2>
-  <p class="lead">Selecione o pacote e a forma de pagamento. O valor e a lista de itens se atualizam na hora.</p>
+  <p class="lead">Selecione o pacote e a forma de pagamento. Marque os adicionais que quiser. O valor e a lista de itens se atualizam na hora.</p>
 
   <div class="chooser">
     <div>
       <div class="controls">
         <label id="lbl-pk">Pacote</label>
         <div class="seg" role="group" aria-labelledby="lbl-pk">
-          <button type="button" id="btn-glamour" data-pk="glamour" aria-pressed="true">Eternity</button>
-          <button type="button" id="btn-royal" data-pk="royal" aria-pressed="false">Royal Wedding</button>
-          <button type="button" id="btn-solo" data-pk="solo" aria-pressed="false">Sem identidade</button>
+          <button type="button" id="btn-mini" data-pk="mini" aria-pressed="true">Signature</button>
+          <button type="button" id="btn-brilho" data-pk="brilho" aria-pressed="false">Deluxe</button>
         </div>
         <label id="lbl-pay">Pagamento</label>
         <div class="seg pay" role="group" aria-labelledby="lbl-pay">
@@ -495,12 +553,8 @@ footer img{width:120px;height:auto;opacity:.9}
       </div>
 
       <div class="pricecard" id="pricecard" aria-live="polite">
-        <div class="pk"><small>Experiência</small><span id="pk-name">Eternity</span></div>
+        <div class="pk"><small>Experiência</small><span id="pk-name">Signature</span></div>
         <p class="desc" id="pk-desc"></p>
-        <div class="solo-picks" id="solo-picks" hidden>
-          <button type="button" id="solo-site" data-solo="site" aria-pressed="false"><b>Website</b><span>R$ 350</span></button>
-          <button type="button" id="solo-gal" data-solo="gal" aria-pressed="false"><b>Galeria de fotos</b><span>R$ 120</span></button>
-        </div>
         <div class="price"><span class="big" id="p-big"></span><span class="unit" id="p-unit"></span></div>
         <p class="priceline" id="p-line"></p>
         <span class="save" id="p-save"></span>
@@ -516,43 +570,17 @@ footer img{width:120px;height:auto;opacity:.9}
     </div>
   </div>
 
-  <div class="avulso" id="galeria-adicional">
-    <div class="pic"><img src="img/galeria.png" alt="Galeria de fotos do casamento de Nicole e Rafael aberta no celular" loading="lazy"></div>
-    <div class="body">
-      <span class="tagline">Adicional</span>
-      <h3>Galeria de fotos com moldura</h3>
-      <p>Uma página do casamento onde os convidados tiram fotos com a moldura exclusiva ou enviam as do celular. Todas as fotos ficam reunidas num álbum só, com curtidas e comentários, e você baixa tudo de uma vez.</p>
-      <ul>
-        <li>Câmera com moldura da festa</li>
-        <li>Envio de fotos do celular</li>
-        <li>Álbum com curtidas e comentários</li>
-        <li>Download de todas as fotos</li>
-        <li>Acesso por link ou QR code</li>
-        <li>Na identidade do casamento</li>
-      </ul>
-      <a href="https://byfestacomacarol.com.br/galerianicole&amp;rafael/" target="_blank" rel="noopener" style="font-weight:700;color:#6D52B8;font-size:14px">Ver galeria de exemplo</a>
-      <div class="pr"><b>Brinde</b><span>em qualquer pacote, pela parceria com a MR Arts Produções</span></div>
-      <p class="solo"><b>Só a galeria, sem identidade visual:</b> R$ 120</p>
-      <button type="button" class="gal-toggle" id="gal-toggle" aria-pressed="false">Adicionar à minha proposta</button>
-    </div>
-  </div>
-
-  <div class="avulso" id="website-avulso">
-    <div class="pic"><img src="img/website.png" alt="Website do casamento de Juliana e Vitor em dois celulares" loading="lazy"></div>
-    <div class="body">
-      <span class="tagline">Opção avulsa · incluso no Royal Wedding</span>
-      <h3>Website do casamento</h3>
-      <p>O convite infinito em formato web: um link para enviar aos convidados, criado com a identidade do casamento. Também pode ser contratado sozinho.</p>
-      <ul>
-        <li>Contagem regressiva</li>
-        <li>Cerimônia e recepção</li>
-        <li>Confirmação de presença</li>
-        <li>Dress code</li>
-        <li>Versão celular e computador</li>
-        <li>Na identidade do casamento</li>
-      </ul>
-      <span style="display:flex;gap:6px 16px;flex-wrap:wrap"><a href="https://byfestacomacarol.com.br/site-juliana-e-vitor/juliana-e-vitor-desktop.html" target="_blank" rel="noopener" style="font-weight:700;color:#6D52B8;font-size:14px">Ver site da Juliana e Vitor</a><a href="https://www.festacomacarol.com.br/casamento-milena-e-natan" target="_blank" rel="noopener" style="font-weight:700;color:#6D52B8;font-size:14px">Ver site da Milena e Natan</a></span>
-      <div class="pr"><b>R$ 350</b><span>à vista · ou 3x de R$ 123,33 sem juros (total R$ 370)</span></div>
+  <div class="adds" id="adicionais">
+    <div class="adds-h"><span class="tagline">Adicionais</span><h3>Complete a experiência</h3><p>Toque para somar ao valor do pacote.</p></div>
+    <div class="add-grid">
+      <label class="add" for="add-conv"><input type="checkbox" id="add-conv" data-add="conv">
+        <span class="ic"><svg viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M10 18.5h4M9 8h6M9 11h6M9 14h3"/></svg></span>
+        <b>Convite interativo</b><p>PDF com links clicáveis: confirmação de presença, localização no Google Maps e lista de presentes. Para incluir no Signature.</p>
+        <span class="ap">+ R$ 35</span><em class="inc">Já incluso no Deluxe</em><i class="tick"></i></label>
+      <label class="add" for="add-mold"><input type="checkbox" id="add-mold" data-add="mold">
+        <span class="ic"><svg viewBox="0 0 24 24"><path d="M4 8.5A2.5 2.5 0 0 1 6.5 6h1.7l1.3-2h5l1.3 2h1.7A2.5 2.5 0 0 1 20 8.5v8a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 16.5z"/><circle cx="12" cy="12.5" r="3.5"/></svg></span>
+        <b>Moldura de fotos exclusiva</b><p>Uma câmera com a moldura da festa, aberta pelo celular por link ou QR code. Os convidados tiram fotos e enviam direto para a galeria da festa ou postam no Instagram.</p>
+        <span class="ap">Brinde MR Arts Produções</span><em class="inc"></em><i class="tick"></i></label>
     </div>
   </div>
 </section>
@@ -563,7 +591,7 @@ footer img{width:120px;height:auto;opacity:.9}
   <p class="lead">A MR Arts Produções leva painéis de LED e mapa projetado para a festa. Se o cliente quiser só a arte do telão, sem a identidade visual completa, temos a opção express.</p>
   <div class="led-media" aria-label="Exemplos de painéis de LED e mapa projetado"><img class="wide" src="img/mr/ledfoto.jpg" alt="Mapa projetado com monograma e painel de LED no DJ"><video src="img/mr/led1.mp4" poster="img/mr/led1.jpg" muted loop playsinline autoplay preload="metadata"></video><video src="img/mr/led2.mp4" poster="img/mr/led2.jpg" muted loop playsinline autoplay preload="metadata"></video><video src="img/mr/led4.mp4" poster="img/mr/led4.jpg" muted loop playsinline autoplay preload="metadata"></video></div>
   <div class="led-list">
-    <div class="led-opt"><span class="bd"><small>Opção express · sem identidade visual</small><b>Painel express</b><p>Para quem quer só o telão, sem contratar a identidade visual completa. As artes são criadas direto no formato dos painéis de LED e do mapa projetado da MR Arts Produções:</p><span class="inc"><span><em>Monograma</em> com as iniciais do casal</span><span><em>Fundo</em> com as cores e os elementos do tema</span><span><em>Assinatura</em> com o nome do casal</span></span></span>
+    <div class="led-opt"><span class="bd"><small>Opção express · sem identidade visual</small><b>Painel express</b><p>Para quem quer só o telão, sem contratar a identidade visual completa. As artes são criadas direto no formato dos painéis de LED e do mapa projetado da MR Arts Produções:</p><span class="inc"><span><em>Monograma</em> com as iniciais do homenageado ou da marca</span><span><em>Fundo</em> com as cores e os elementos do tema</span><span><em>Assinatura</em> com o nome do homenageado ou do evento</span></span></span>
       <span class="ft"><span class="pr"><small>valor do painel</small>R$ 270</span><a class="add" href="../propostapainelmrproducoes/">Ver opção express →</a></span></div>
   </div>
   
@@ -571,15 +599,15 @@ footer img{width:120px;height:auto;opacity:.9}
 
 <section id="comparar">
   <div class="eyebrow">Lado a lado</div>
-  <h2 class="h2">Eternity ou <em>Royal Wedding</em>?</h2>
+  <h2 class="h2">Signature ou <em>Deluxe</em>?</h2>
   <p class="lead">Os dois têm a mesma base. As linhas destacadas mostram exatamente o que muda.</p>
   <div class="tablebox">
     <table>
-      <thead><tr><th scope="col" style="font-family:var(--f-body);font-size:14px;color:var(--soft)">Item</th><th scope="col">Eternity<small>R$ 500 à vista</small></th><th scope="col">Royal Wedding<small>R$ 800 à vista</small></th></tr></thead>
+      <thead><tr><th scope="col" style="font-family:var(--f-body);font-size:14px;color:var(--soft)">Item</th><th scope="col">Signature<small>R$ 300 à vista</small></th><th scope="col">Deluxe<small>R$ 500 à vista</small></th></tr></thead>
       <tbody id="cmp"></tbody>
       <tfoot>
-        <tr><td>À vista</td><td class="num">R$ 500</td><td class="num">R$ 800</td></tr>
-        <tr><td>Parcelado (3x sem juros)</td><td class="num">3x R$ 173,33<br><small style="color:var(--soft);font-weight:600">total R$ 520</small></td><td class="num">3x R$ 273,33<br><small style="color:var(--soft);font-weight:600">total R$ 820</small></td></tr>
+        <tr><td>À vista</td><td class="num">R$ 300</td><td class="num">R$ 500</td></tr>
+        <tr><td>Parcelado (3x sem juros)</td><td class="num">3x R$ 106,67<br><small style="color:var(--soft);font-weight:600">total R$ 320</small></td><td class="num">3x R$ 173,33<br><small style="color:var(--soft);font-weight:600">total R$ 520</small></td></tr>
       </tfoot>
     </table>
   </div>
@@ -591,7 +619,7 @@ footer img{width:120px;height:auto;opacity:.9}
   <h2 class="h2">Processo <em>criativo</em></h2>
   <p class="lead">Você acompanha e aprova cada etapa. Nada é finalizado sem o seu ok.</p>
   <ol class="steps" id="steps">
-    <li><b>Briefing</b><span>Você preenche o formulário de branding contando sobre vocês, a história do casal e o estilo do casamento.</span></li>
+    <li><b>Briefing</b><span>Você preenche o formulário de branding contando sobre o evento, o público, a marca ou o homenageado e o estilo desejado.</span></li>
     <li><b>Direção criativa</b><span>Defino o conceito: cores, tipografia e o clima visual da festa.</span></li>
     <li><b>Preview da identidade</b><span>Você vê uma prévia da identidade visual e aprova.</span></li>
     <li><b>Criação dos demais elementos</b><span>Convite, save the date, tag, estampas e as artes escolhidas.</span></li>
@@ -637,17 +665,10 @@ footer img{width:120px;height:auto;opacity:.9}
 <section id="portfolio">
   <div class="eyebrow">Portfólio</div>
   <h2 class="h2">Identidades <em>recentes</em></h2>
-  <p class="lead">Identidades de casamento criadas recentemente, do clássico delicado ao irreverente. Escolha um para ver o conceito, a paleta e as peças aplicadas. Toque nas imagens para ampliar.</p>
+  <p class="lead">Projetos adultos e corporativos criados recentemente. Escolha um para ver o conceito, a paleta e as peças aplicadas em produtos. Toque nas imagens para ampliar.</p>
   <div class="pf-tabs" role="tablist" aria-label="Projetos" id="pf-tabs"></div>
   <div id="pf-panel" class="pf-panel" role="tabpanel"></div>
 
-  <div class="also">
-    <div class="eyebrow">Também no Royal Wedding</div>
-    <div class="feature">
-      <figure class="wide"><button type="button" data-lb="img/website.png" data-g="site" aria-label="Ampliar website"><img src="img/website.png" alt="Website do casamento de Juliana e Vitor" loading="lazy"></button>
-        <figcaption class="wcap"><span><b>Website do casamento</b>O convite infinito em formato web, com contagem regressiva, cerimônia, recepção, dress code e confirmação de presença.</span><span style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn pri" href="https://byfestacomacarol.com.br/site-juliana-e-vitor/juliana-e-vitor-desktop.html" target="_blank" rel="noopener">Site Juliana &amp; Vitor</a><a class="btn sec" href="https://www.festacomacarol.com.br/casamento-milena-e-natan" target="_blank" rel="noopener">Site Milena &amp; Natan</a></span></figcaption></figure>
-    </div>
-  </div>
 </section>
 
 <section id="carol">
@@ -667,22 +688,21 @@ footer img{width:120px;height:auto;opacity:.9}
   <div class="eyebrow">Dúvidas frequentes</div>
   <h2 class="h2">Ficou alguma <em>dúvida</em>?</h2>
   <div class="faq">
-    <details><summary>Qual a diferença entre Eternity e Royal Wedding?</summary><div class="a">O Royal Wedding tem tudo do Eternity e mais: 6 estampas (em vez de 4), 6 artes adicionais (em vez de 3), arte para o convite da daminha e do pajem e o website do casamento (convite infinito). No Royal Wedding, o website substitui o convite interativo, porque cumpre a mesma função. Veja a tabela em <a href="#comparar">Comparar</a>.</div></details>
+    <details><summary>Qual a diferença entre Signature e Deluxe?</summary><div class="a">O Deluxe tem tudo do Signature e mais: convite interativo (em vez do estático), 3 estampas (em vez de 2), 5 artes adicionais (em vez de 2), monograma exclusivo, ilustração personalizada para mascote e elementos gráficos personalizados e exclusivos (opcional). Veja a tabela em <a href="#comparar">Comparar</a>.</div></details>
     <details><summary>A impressão está inclusa?</summary><div class="a">Não. Eu entrego o design (os arquivos digitais em alta resolução), prontos para você levar à gráfica de sua preferência ou usar no digital.</div></details>
     <details><summary>Como recebo os arquivos?</summary><div class="a">Numa pasta no Google Drive, com todos os arquivos em alta resolução, organizados e prontos para impressão ou uso digital.</div></details>
     <details><summary>O prazo começa a contar quando?</summary><div class="a">A partir do dia em que você me envia o formulário de branding preenchido. Antes disso o prazo não corre. O total é de cerca de 12 dias úteis (segunda a sexta).</div></details>
     <details><summary>Pedir ajustes atrasa a entrega?</summary><div class="a">Pode atrasar. Os ajustes fazem parte do processo, mas cada rodada de alteração adiciona tempo ao prazo final.</div></details>
-    <details><summary>Posso contratar só o website?</summary><div class="a">Pode. O website avulso custa R$ 350 à vista ou 3x de R$ 123,33 sem juros (total R$ 370). Ele já vem incluso na Experiência Royal Wedding.</div></details>
-    <details><summary>Como funciona a galeria de fotos?</summary><div class="a">Pela parceria com a MR Arts Produções, ela vem de brinde em qualquer pacote. Se quiser só a galeria, sem identidade visual, sai por R$ 120. Os convidados abrem a galeria por link ou QR code, tiram fotos com a moldura exclusiva da festa ou enviam do celular, e tudo fica reunido num álbum com curtidas e comentários. Depois você baixa todas as fotos de uma vez. <a href="https://byfestacomacarol.com.br/galerianicole&amp;rafael/" target="_blank" rel="noopener">Ver exemplo</a></div></details>
-    <details><summary>O que são as "artes adicionais à sua escolha"?</summary><div class="a">São peças extras que você escolhe de acordo com o casamento, como menu, painel, adesivo, caixinha, manual dos padrinhos e outras. O Eternity inclui 3 e o Royal Wedding inclui 6.</div></details>
-    <details><summary>Como funciona o parcelamento?</summary><div class="a">Em até 3x sem juros. No parcelado o valor total é um pouco maior: Eternity R$ 520 (3x R$ 173,33) e Royal Wedding R$ 820 (3x R$ 273,33). À vista sai R$ 500 e R$ 800.</div></details>
+    <details><summary>Como funcionam os adicionais?</summary><div class="a">São extras que você soma ao pacote: a moldura de fotos exclusiva (de brinde pela parceria com a MR Arts Produções) e, no Signature, o convite interativo (R$ 35). No Deluxe, o convite interativo já está incluso.</div></details>
+    <details><summary>O que são as "artes adicionais à sua escolha"?</summary><div class="a">São peças extras que você escolhe de acordo com o evento, como menu, painel, toppers, adesivos, crachás e outras. O Signature inclui 2 e o Deluxe inclui 5.</div></details>
+    <details><summary>Como funciona o parcelamento?</summary><div class="a">Em até 3x sem juros. No parcelado o valor total é um pouco maior: Signature R$ 320 (3x R$ 106,67) e Deluxe R$ 520 (3x R$ 173,33). À vista sai R$ 300 e R$ 500.</div></details>
   </div>
 </section>
 
 <section id="contratar">
   <div class="final">
-    <div class="eyebrow">Vamos criar juntas?</div>
-    <h2 class="h2">Será um prazer criar o universo visual do <em>casamento</em></h2>
+    <div class="eyebrow">Vamos criar juntos?</div>
+    <h2 class="h2">Será um prazer criar a identidade do seu <em>evento</em></h2>
     <p class="sum" id="sum"></p>
     <a class="go" id="go-bottom" href="#" target="_blank" rel="noopener">Falar com a Carol no WhatsApp</a>
     <div class="contacts">
@@ -700,7 +720,7 @@ footer img{width:120px;height:auto;opacity:.9}
   <a href="#portfolio"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3 16l5-5 4 4 3-3 6 6"/><circle cx="16" cy="9" r="1.5"/></svg>Portfólio</a>
   <a href="#duvidas"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.7.3-1 .8-1 1.5v.4"/><circle cx="12" cy="16.8" r=".6" fill="currentColor"/></svg>Dúvidas</a>
 </nav>
-<footer><img src="img/logo.png" alt="" width="873" height="486"><p>Festa com a Carol · Proposta comercial Casamento · MR Arts Produções</p></footer>
+<footer><img src="img/logo.png" alt="" width="873" height="486"><p>Festa com a Carol · Proposta comercial Eventos · MR Arts Produções</p></footer>
 
 <div class="lb" id="lb" hidden role="dialog" aria-modal="true" aria-label="Imagem ampliada">
   <button type="button" class="x" id="lb-x" aria-label="Fechar">×</button>
@@ -713,126 +733,96 @@ footer img{width:120px;height:auto;opacity:.9}
 <script>
 const WHATS = "5511958042920";
 const PK = {
-  glamour:{name:"Eternity",vista:500,parc:520,
-    desc:"Para casais que desejam uma identidade visual completa, sofisticada e fora da caixinha, com todos os elementos essenciais para um casamento estilo Pinterest."},
-  solo:{name:"Sem identidade visual",vista:0,parc:0,
-    desc:"Para quem já tem a identidade do casamento e quer só o website, só a galeria de fotos ou os dois."},
-  royal:{name:"Royal Wedding",vista:800,parc:820,
-    desc:"A experiência mais completa, rica e detalhada, para casais que desejam um projeto robusto, artístico e memorável, inteiramente personalizado."}
+  mini:{name:"Signature",vista:300,parc:320,
+    desc:"Para eventos adultos e corporativos que buscam uma identidade visual completa, elegante e marcante, com todos os elementos essenciais para um universo harmonioso e profissional."},
+  brilho:{name:"Deluxe",vista:500,parc:520,
+    desc:"A experiência mais completa e detalhada, para eventos que desejam um projeto único, artístico e memorável, com identidade visual ampla e direção estética aprofundada."}
 };
 // g / r = o que cada pacote tem (true, false ou um número)
 const ITEMS = [
-  {grp:"Base da identidade"},
-  {t:"Conceito visual exclusivo",g:1,r:1,a:"A ideia central do casamento, criada só para vocês. Nada de modelo pronto."},
-  {t:"Paleta de cores refinada",g:1,r:1,a:"As cores oficiais do casamento, combinadas para usar em tudo: convite, decoração, lembrancinhas."},
-  {t:"Tipografia curada",g:1,r:1,a:"As fontes (estilos de letra) escolhidas para os nomes do casal e todos os textos."},
-  {t:"Monograma exclusivo",g:1,r:1,a:"Um símbolo com as iniciais do casal, para usar em convite, tags, painel e lembrancinhas."},
-  {t:"Estampas e patterns personalizados",g:4,r:6,a:"Desenhos que se repetem, para usar em papéis, caixinhas, sacolas e fundos.",diff:1},
-  {t:"Criação/curadoria de elementos visuais",g:1,r:1,a:"Ilustrações e detalhes visuais criados ou selecionados para o tema."},
-  {t:"Guia de Identidade Visual completo",g:1,r:1,a:"Um documento que reúne cores, fontes, monograma e estampas, para qualquer fornecedor seguir o mesmo padrão."},
-  {t:"Mockups premium de apresentação",g:1,r:1,a:"Simulações realistas mostrando como as artes ficam aplicadas (canecas, caixas, sacolas), para você visualizar antes de produzir."},
-  {grp:"Peças do casamento"},
-  {t:"Convite físico (design)",g:1,r:1,a:"A arte do convite pronta para impressão. A impressão não está inclusa."},
-  {t:"Convite interativo",g:1,r:"site",a:"Versão digital do convite para enviar no celular aos convidados.",diff:1},
+  {grp:"Documento de identidade visual (PDF)"},
+  {t:"Paleta de cores",g:1,r:1,a:"As cores oficiais da festa, combinadas para usar em tudo: convite, decoração, lembrancinhas."},
+  {t:"Tipografia",g:1,r:1,a:"As fontes (estilos de letra) escolhidas para o nome do evento e todos os textos."},
+  {t:"Elementos visuais",g:1,r:1,a:"Ilustrações e detalhes do tema, criados ou selecionados para a festa."},
+  {t:"Mockups e exemplos de aplicação",g:1,r:1,a:"Simulações realistas mostrando como as artes ficam aplicadas (canecas, caixas, sacolas), para você visualizar antes de produzir."},
+  {t:"Estampas personalizadas",g:2,r:3,a:"Desenhos que se repetem, de acordo com o tema ou a paleta, para papéis, caixinhas, sacolas e fundos.",diff:1},
+  {grp:"Peças do evento"},
+  {t:"Convite digital",g:"estático",r:"interativo",lg:"Convite digital estático",lr:"Convite interativo",exB:1,a:"Estático: a arte do convite para enviar pelo celular. Interativo: PDF com links clicáveis para confirmar presença, abrir o local no Google Maps e ver a lista de presentes.",diff:1},
   {t:"Save the date",g:1,r:1,a:"O aviso de “reserve a data”, enviado antes do convite."},
-  {t:"Tag personalizada",g:1,r:1,a:"Etiqueta com a identidade do casamento, para lembrancinhas e embalagens."},
-  {t:"Artes adicionais à sua escolha",g:3,r:6,a:"Você escolhe as peças: menu, painel, adesivo, caixinha, manual dos padrinhos e outras.",diff:1},
-  {grp:"Exclusividades Royal Wedding"},
-  {t:"Arte para o convite da daminha e do pajem",g:0,r:1,a:"Arte exclusiva do Royal Wedding para convidar a daminha e o pajem.",diff:1},
-  {t:"Website / Convite infinito",g:0,r:1,a:"O site do casamento em formato web, com a identidade visual. Ele também faz o papel do convite interativo: é o link que os convidados recebem.",diff:1},
-  {grp:"Adicional"},
-  {t:"Galeria de fotos com moldura",g:"brinde",r:"brinde",nolist:1,a:""}
+  {t:"Tag para lembrancinhas",g:1,r:1,a:"Etiqueta com a identidade da festa, para lembrancinhas e embalagens."},
+  {t:"Artes adicionais à sua escolha",g:2,r:5,a:"Você escolhe as peças: menu, painel, toppers, adesivos e outras.",diff:1},
+  {grp:"Exclusividades Deluxe"},
+  {t:"Monograma exclusivo",g:0,r:1,a:"Um símbolo com as iniciais do homenageado ou da marca, para usar em convite, tags, painel e brindes.",diff:1},
+  {t:"Ilustração personalizada para mascote",g:0,r:1,a:"Um mascote ilustrado exclusivamente para o evento, para aplicar nas peças.",diff:1},
+  {t:"Elementos gráficos personalizados e exclusivos (opcional)",g:0,r:1,a:"Elementos gráficos criados especialmente para o evento, se você quiser.",diff:1},
+  {grp:"Adicionais"},
+  {t:"Moldura de fotos exclusiva",g:"brinde",r:"brinde",nolist:1,a:""}
 ];
+const ADDS={conv:{t:"Convite interativo",v:35,inBrilho:1},mold:{t:"Moldura de fotos exclusiva",v:0}};
 const brl = v => "R$ " + v.toLocaleString("pt-BR",{minimumFractionDigits: v%1?2:0, maximumFractionDigits:2});
 const parcela = v => (Math.round(v/3*100)/100);
 const CK = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.3l2.3 2.2 4.7-5"/></svg>';
-let state = {pk:"glamour", pay:"vista", gal:true, site:false};
-try{const s=JSON.parse(localStorage.getItem("fcc-cas-mr")||"null"); if(s&&PK[s.pk]) state=s;}catch(e){}
+let state = {pk:"mini", pay:"vista", adds:["mold"]};
+try{const s=JSON.parse(localStorage.getItem("fcc-ev-mr")||"null"); if(s&&PK[s.pk]){state=s;state.adds=(state.adds||[]).filter(k=>ADDS[k]);}}catch(e){}
 
 function render(){
-  const solo = state.pk==="solo";
   const p = PK[state.pk];
   document.querySelectorAll("[data-pk]").forEach(b=>b.setAttribute("aria-pressed", b.dataset.pk===state.pk));
   document.querySelectorAll("[data-pay]").forEach(b=>b.setAttribute("aria-pressed", b.dataset.pay===state.pay));
-  document.getElementById("pricecard").classList.toggle("royal", state.pk==="royal");
-  document.getElementById("pricecard").classList.toggle("solo-mode", solo);
-  document.getElementById("solo-picks").hidden = !solo;
-  document.querySelectorAll("[data-solo]").forEach(b=>{const on=!!state[b.dataset.solo];b.setAttribute("aria-pressed",on);});
-  const gt=document.getElementById("gal-toggle"); gt.setAttribute("aria-pressed",!!state.gal); gt.textContent = state.gal ? "Adicionado à proposta ✓" : "Adicionar à minha proposta";
+  document.getElementById("pricecard").classList.toggle("royal", state.pk==="brilho");
+  const isB = state.pk==="brilho";
+  const act = state.adds.filter(k=>!(isB&&ADDS[k].inBrilho));
+  const add = act.reduce((t,k)=>t+ADDS[k].v,0);
+  document.querySelectorAll("[data-add]").forEach(i=>{const k=i.dataset.add, inc=isB&&ADDS[k].inBrilho, card=i.closest(".add");
+    i.disabled=inc; i.checked=!inc&&state.adds.includes(k); card.classList.toggle("incl",inc); card.classList.toggle("on",i.checked);});
   document.getElementById("pk-name").textContent = p.name;
   document.getElementById("pk-desc").textContent = p.desc;
   const big=document.getElementById("p-big"), unit=document.getElementById("p-unit"), line=document.getElementById("p-line"), save=document.getElementById("p-save");
-  let vista, parc, addTxt="";
-  if(solo){
-    vista = (state.site?350:0) + (state.gal?120:0);
-    parc  = (state.site?370:0) + (state.gal?120:0);
+  const addTxt = add ? "Pacote " + brl(state.pay==="vista"?p.vista:p.parc) + " + adicionais " + brl(add) + ". " : "";
+  if(state.pay==="vista"){
+    big.textContent = brl(p.vista+add); unit.textContent = "à vista";
+    line.innerHTML = addTxt + "Ou <b>3x de " + brl(parcela(p.parc+add)) + "</b> sem juros (total " + brl(p.parc+add) + ").";
+    save.textContent = "Você economiza " + brl(p.parc-p.vista) + " pagando à vista"; save.className="save";
   } else {
-    const add = 0;
-    vista = p.vista+add; parc = p.parc+add;
-    addTxt = add ? "Pacote " + brl(state.pay==="vista"?p.vista:p.parc) + " + galeria " + brl(add) + ". " : "";
-  }
-  save.hidden = false;
-  if(solo && !vista){
-    big.textContent = "R$ 0"; unit.textContent = ""; line.innerHTML = "Escolha o website, a galeria ou os dois."; save.hidden = true;
-  } else if(state.pay==="vista"){
-    big.textContent = brl(vista); unit.textContent = "à vista";
-    line.innerHTML = addTxt + "Ou <b>3x de " + brl(parcela(parc)) + "</b> sem juros (total " + brl(parc) + ").";
-    if(parc>vista){save.textContent = "Você economiza " + brl(parc-vista) + " pagando à vista"; save.className="save";} else save.hidden=true;
-  } else {
-    big.textContent = "3x " + brl(parcela(parc)); unit.textContent = "sem juros";
-    line.innerHTML = addTxt + "Total parcelado: <b>" + brl(parc) + "</b>. À vista sai " + brl(vista) + ".";
+    big.textContent = "3x " + brl(parcela(p.parc+add)); unit.textContent = "sem juros";
+    line.innerHTML = addTxt + "Total parcelado: <b>" + brl(p.parc+add) + "</b>. À vista sai " + brl(p.vista+add) + ".";
     save.textContent = "Parcelas iguais, sem juros"; save.className="save alt";
   }
   // lista
   const ul=document.getElementById("itemlist"); ul.innerHTML=""; let n=0;
-  const addLi=(t,price,ans)=>{n++;const li=document.createElement("li");li.className="item ex";
-    li.innerHTML='<details><summary><span class="ck">'+CK+'</span><span>'+t+'</span><span class="q">'+price+'</span></summary><p class="ans">'+ans+'</p></details>';ul.appendChild(li);};
-  const GAL_ANS="Página onde os convidados tiram fotos com a moldura da festa ou enviam do celular, reunidas num álbum com curtidas e comentários.";
-  if(solo){
-    if(state.site) addLi("Website do casamento","R$ 350","Um link para enviar aos convidados, com contagem regressiva, cerimônia, recepção, dress code e confirmação de presença.");
-    if(state.gal) addLi("Galeria de fotos com moldura","R$ 120",GAL_ANS);
-  } else {
-    ITEMS.forEach(it=>{
-      if(it.grp||it.nolist) return;
-      const v = it[state.pk==="glamour"?"g":"r"]; if(!v || v==="site") return; n++;
-      const li=document.createElement("li"); li.className="item"+((state.pk==="royal"&&it.g===0)?" ex":"");
-      const qty = v>1 ? '<span class="qty">'+v+'</span> ' : "";
-      const badge = (state.pk==="royal"&&it.g===0) ? '<span class="badge">Só Royal Wedding</span>' : "";
-      li.innerHTML='<details><summary><span class="ck">'+CK+'</span><span>'+qty+it.t+badge+'</span><span class="q">o que é?</span></summary><p class="ans">'+it.a+'</p></details>';
-      ul.appendChild(li);
-    });
-    if(state.gal) addLi('Galeria de fotos com moldura<span class="badge">Brinde</span>',"brinde",GAL_ANS);
-  }
-  document.getElementById("count").textContent = n+(n===1?" item":" itens");
+  ITEMS.forEach(it=>{
+    if(it.grp||it.nolist) return;
+    const v = it[isB?"r":"g"]; if(!v) return; n++;
+    const li=document.createElement("li"); li.className="item"+((isB&&(it.g===0||it.exB))?" ex":"");
+    const qty = typeof v==="number"&&v>1 ? '<span class="qty">'+v+'</span> ' : "";
+    const badge = (isB&&(it.g===0||it.exB)) ? '<span class="badge">Só Deluxe</span>' : "";
+    const label = (isB?it.lr:it.lg)||it.t;
+    li.innerHTML='<details><summary><span class="ck">'+CK+'</span><span>'+qty+label+badge+'</span><span class="q">o que é?</span></summary><p class="ans">'+it.a+'</p></details>';
+    ul.appendChild(li);
+  });
+  act.forEach(k=>{n++;const li=document.createElement("li");li.className="item ex";
+    li.innerHTML='<details><summary><span class="ck">'+CK+'</span><span>'+ADDS[k].t+'<span class="badge">Adicional</span></span><span class="q">'+(ADDS[k].v?'+ '+brl(ADDS[k].v):'brinde')+'</span></summary><p class="ans">Adicional escolhido por você.</p></details>';ul.appendChild(li);});
+  document.getElementById("count").textContent = n+" itens";
   const box=document.querySelector(".items"), mb=document.getElementById("more-items");
   if(!box.dataset.init){box.classList.add("clip");box.dataset.init=1;}
   mb.textContent = box.classList.contains("clip") ? "Ver todos os "+n+" itens" : "Mostrar menos";
-  mb.hidden = n<=5;
   // whatsapp
-  const payTxt = state.pay==="vista" ? "à vista ("+brl(vista)+")" : "em 3x sem juros ("+brl(parc)+")";
-  let choice, msg;
-  if(solo){
-    const picks=[state.site?"o website":"",state.gal?"a galeria de fotos com moldura":""].filter(Boolean).join(" e ");
-    choice = picks ? "Só "+picks+", sem identidade visual" : "Sem identidade visual";
-    msg = picks ? "Olá, Carol! Vi a proposta de Casamento pela MR Arts Produções e quero só "+picks+", sem identidade visual, pagamento "+payTxt+". Podemos conversar?" : "Olá, Carol! Vi a proposta de Casamento pela MR Arts Produções e queria conversar sobre o website e a galeria de fotos.";
-    document.getElementById("sum").innerHTML = "Sua escolha: <span>"+choice+"</span>"+(picks?", "+payTxt:"")+". <a href='#pacotes' style='font-size:14px;color:var(--soft)'>mudar</a>";
-  } else {
-    const galTxt = state.gal ? ", com a galeria de fotos de brinde" : "";
-    msg = "Olá, Carol! Vi a proposta de Casamento pela MR Arts Produções e quero a Experiência "+p.name+galTxt+", pagamento "+payTxt+". Podemos conversar?";
-    document.getElementById("sum").innerHTML = "Sua escolha: <span>Experiência "+p.name+"</span>"+galTxt+", "+payTxt+". <a href='#pacotes' style='font-size:14px;color:var(--soft)'>mudar</a>";
-  }
-  document.getElementById("go-bottom").href="https://wa.me/"+WHATS+"?text="+encodeURIComponent(msg);
-  try{localStorage.setItem("fcc-cas-mr",JSON.stringify(state));}catch(e){}
+  const payTxt = state.pay==="vista" ? "à vista ("+brl(p.vista+add)+")" : "em 3x sem juros ("+brl(p.parc+add)+")";
+  const addMsg = act.length ? ", com "+act.map(k=>ADDS[k].t).join(" e ") : "";
+  const msg = "Olá, Carol! Vi a proposta de Eventos pela MR Arts Produções e quero a Experiência "+p.name+addMsg+", pagamento "+payTxt+". Podemos conversar?";
+  const url = "https://wa.me/"+WHATS+"?text="+encodeURIComponent(msg);
+  document.getElementById("go-bottom").href=url;
+  document.getElementById("sum").innerHTML = "Sua escolha: <span>Experiência "+p.name+"</span>"+addMsg+", "+payTxt+". <a href='#pacotes' style='font-size:14px;color:var(--soft)'>mudar</a>";
+  try{localStorage.setItem("fcc-ev-mr",JSON.stringify(state));}catch(e){}
 }
-document.querySelectorAll("[data-pk]").forEach(b=>b.addEventListener("click",()=>{state.pk=b.dataset.pk;if(state.pk==="solo"&&!state.site&&!state.gal)state.site=true;render();}));
+document.querySelectorAll("[data-pk]").forEach(b=>b.addEventListener("click",()=>{state.pk=b.dataset.pk;render();}));
 document.querySelectorAll("[data-pay]").forEach(b=>b.addEventListener("click",()=>{state.pay=b.dataset.pay;render();}));
-document.querySelectorAll("[data-solo]").forEach(b=>b.addEventListener("click",()=>{const k=b.dataset.solo;state[k]=!state[k];render();}));
-document.getElementById("gal-toggle").addEventListener("click",()=>{state.gal=!state.gal;render();});
+document.querySelectorAll("[data-add]").forEach(i=>i.addEventListener("change",()=>{const k=i.dataset.add;state.adds=state.adds.filter(x=>x!==k);if(i.checked)state.adds.push(k);render();}));
 
 // comparação
 (function(){
   const tb=document.getElementById("cmp");
-  const cell=v=> v==="site"? '<td class="via">pelo website</td>' : typeof v==="string"? '<td class="via">'+v+'</td>' : v===0? '<td class="no" aria-label="Não incluso">—</td>' : v===1? '<td class="yes" aria-label="Incluso">✓</td>' : '<td class="num">'+v+'</td>';
+  const cell=v=> typeof v==="string"? '<td class="via">'+v+'</td>' : v===0? '<td class="no" aria-label="Não incluso">—</td>' : v===1? '<td class="yes" aria-label="Incluso">✓</td>' : '<td class="num">'+v+'</td>';
   tb.innerHTML = ITEMS.map(it=> it.grp ? '<tr class="group"><td colspan="3">'+it.grp+'</td></tr>'
     : '<tr'+(it.diff?' class="diff"':'')+'><td>'+it.t+'</td>'+cell(it.g)+cell(it.r)+'</tr>').join("");
 })();
@@ -856,14 +846,22 @@ dt.addEventListener("input",calc);
 
 // portfólio
 const PROJ=[
-  {id:"milena",name:"Milena e Natan",short:"Milena & Natan",site:"https://www.festacomacarol.com.br/casamento-milena-e-natan",tab:"Clássico delicado",theme:"Copos-de-leite · Casamento",
-   quote:"Neste momento único e cheio de significado, Milena e Natan celebram o amor em sua forma mais pura, em um cenário que traduz leveza, sensibilidade e essência.",
-   pal:["#353017","#929293","#DDD3B2","#F5F5F5"],
-   imgs:[["-m1","Convite e envelopes"],["-m2","Convite com laço"],["-m3","Almofadas"],["-m4","Caixa"],["-m5","Cavalete de boas-vindas"],["-m6","Chinelos"],["-m7","Cartões de dress code"]]},
-  {id:"maria",name:"Maria & Gabriel",short:"Maria & Gabriel",tab:"Old school",theme:"Tattoo old school · O casamento do ano",
-   quote:"Nesta edição especial, Maria e Gabriel estampam a capa com a manchete mais esperada: o amor venceu, e vai ser comemorado em grande estilo.",
-   pal:["#BB3919","#FFFFFF","#000000"],
-   imgs:[["-m1","Embalagem de fritas"],["-m2","Cavalete de boas-vindas"],["-m3","Almofadas"],["-m4","Ecobags"],["-m5","Caneca"],["-m6","Chinelos"],["-m7","Adesivos"]]}
+  {id:"clarah",name:"Clarah Passos",short:"Clarah",tab:"18 anos",theme:"Noite e dourado · 18 anos",
+   quote:"Para celebrar os 18 anos de Clarah Passos, a identidade visual foi construída a partir de uma estética moderna, jovem e sofisticada, inspirada na atmosfera noturna e na energia de uma grande celebração.",
+   pal:["#1B223F","#DDB4AE","#F3E7E6","#C9A55A"],
+   imgs:[["-m1","Drinks e porta-copos"],["-m2","Menu e mesa"],["-m3","Caixa"],["-m4","Sacola"],["-m5","Chinelos"],["-m6","Almofadas"],["-m7","Gloss"]]},
+  {id:"lilian",name:"Lilian Pediatra",short:"Lilian",tab:"Corporativo",theme:"Identidade corporativa · Consultório",
+   quote:"Identidade visual corporativa aplicada em backdrop, cavalete, caixas, canecas e ecobags.",
+   pal:[],
+   imgs:[["-m1","Backdrop"],["-m2","Cavalete"],["-m3","Caixa"],["-m4","Caneca"],["-m5","Ecobags"]]},
+  {id:"delirio",name:"Pool Party Delírio",short:"Delírio",tab:"Pool party",theme:"Festa adulta · Pool party",
+   quote:"Uma pool party com identidade vibrante, aplicada em caixa, almofadas, ecobags, caneca e chinelos.",
+   pal:[],
+   imgs:[["-m1","Caixa"],["-m2","Almofadas"],["-m3","Ecobags"],["-m4","Caneca"],["-m5","Chinelos"]]},
+  {id:"ana",name:"Ana Luiza",tab:"Sweet sixteen",theme:"Florais em rosé · Sweet sixteen",
+   quote:"Existem momentos que florescem com suavidade e permanecem para sempre. Os 16 anos de Ana Luiza revelam uma fase marcada pela delicadeza e pelo cuidado.",
+   pal:["#F9EDED","#E1ACA5","#DBC6C7","#CEAAAC","#C9A55A"],
+   imgs:[["-m1","Convite com envelope"],["-m2","Caixa"],["-m3","Copos térmicos"],["-m4","Ecobags"],["-m5","Embalagem de fritas"],["-m6","Caixa de lembrança"],["-m7","Chinelos"]]}
 ];
 const pfTabs=document.getElementById("pf-tabs"), pfPanel=document.getElementById("pf-panel");
 function pfShow(id){
@@ -872,13 +870,13 @@ function pfShow(id){
   const src=n=>"img/id/"+p.id+n+".jpg";
   pfPanel.innerHTML=
    '<div class="pf-head"><div class="pf-meta"><span class="theme">'+p.theme+'</span><h3>'+p.name+'</h3><blockquote>'+p.quote+'</blockquote>'+
-   (p.site?'<a class="btn sec" href="'+p.site+'" target="_blank" rel="noopener" style="justify-self:start">Ver o site do casamento</a>':'')+'<div class="sw">'+p.pal.map(c=>'<span><i style="background:'+c+'"></i>'+(c==="#C9A55A"?"dourado":c.toLowerCase())+'</span>').join("")+'</div></div>'+
+   '<div class="sw">'+p.pal.map(c=>'<span><i style="background:'+c+'"></i>'+(c==="#C9A55A"?"dourado":c.toLowerCase())+'</span>').join("")+'</div></div>'+
    '<button type="button" class="pf-cover" data-lb="'+src("01")+'" data-g="'+p.id+'" aria-label="Ampliar capa do projeto '+p.name+'"><img src="'+src("01")+'" alt="Logotipo do projeto '+p.name+'"></button></div>'+
    '<div class="pf-grid">'+p.imgs.map((m,i)=>'<button type="button" class="'+(i===0&&p.imgs.length%2?"big":"")+'" data-lb="'+src(m[0])+'" data-g="'+p.id+'" aria-label="Ampliar '+m[1]+'"><img src="'+src(m[0])+'" alt="'+m[1]+' do projeto '+p.name+'" loading="lazy"><figcaption>'+m[1]+'</figcaption></button>').join("")+'</div>';
   pfPanel.style.animation="none";pfPanel.offsetHeight;pfPanel.style.animation="";
 }
 PROJ.forEach(p=>{const b=document.createElement("button");b.type="button";b.className="pf-tab";b.setAttribute("role","tab");b.dataset.id=p.id;
-  b.innerHTML='<b>'+p.name.split(" ")[0]+'</b><small>'+p.tab+'</small>';b.addEventListener("click",()=>pfShow(p.id));pfTabs.appendChild(b);});
+  b.innerHTML='<b>'+(p.short||p.name.split(" ")[0])+'</b><small>'+p.tab+'</small>';b.addEventListener("click",()=>pfShow(p.id));pfTabs.appendChild(b);});
 pfShow(PROJ[0].id);
 const lb=document.getElementById("lb"), lbImg=document.getElementById("lb-img"); let list=[], idx=0;
 function openLb(src,g){list=[...document.querySelectorAll(g?'[data-g="'+g+'"]':"[data-lb]")].map(b=>b.dataset.lb);idx=list.indexOf(src);show();lb.hidden=false;document.getElementById("lb-x").focus();}
@@ -898,6 +896,7 @@ document.getElementById("copy").addEventListener("click",()=>{
   else toast("Selecione o número para copiar");
 });
 render();
+
 
 // seção ativa na barra
 (function(){const links=[...document.querySelectorAll('.nav ul a, .dock a')];
