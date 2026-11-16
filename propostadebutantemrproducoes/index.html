@@ -220,11 +220,12 @@ section{padding-block:56px}
 .led-opt .inc>span::before{content:"";position:absolute;left:0;top:2px;width:18px;height:18px;border-radius:50%;background:#F6E7C8}
 .led-opt .inc>span::after{content:"";position:absolute;left:6px;top:5px;width:5px;height:9px;border:solid #0E0E0E;border-width:0 2px 2px 0;transform:rotate(45deg)}
 .led-opt .inc em{font-style:normal;font-weight:700;color:#fff}
-@media (min-width:860px){.led-opt{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);grid-template-rows:auto auto;column-gap:22px;padding:16px}
+@media (min-width:860px){.led-opt{grid-template-columns:minmax(0,1fr) auto;column-gap:40px;align-items:end;padding:26px 30px}.led-list .led-opt .ft{flex-direction:column;align-items:flex-end;border-top:0;padding-top:0;margin:0}.led-list .led-opt .pr{text-align:right}
   .led-opt .scrs{grid-row:1/3;grid-template-columns:1fr 1fr;align-content:center}.led-opt .scrs .scr-0{grid-column:1/-1}
   .led-opt .bd{padding-top:6px}
   .scrs .scr-0 span{font-size:58px}.scrs .scr-0 span.long{font-size:38px}.scrs .scr-2 span{font-size:34px}}
-.led-opt{position:relative;display:grid;grid-template-rows:auto 1fr auto;background:#0E0E0E;color:#fff;border-radius:26px;padding:12px;cursor:pointer;border:1.5px solid #0E0E0E;transition:transform .2s,box-shadow .25s,border-color .25s}
+.led-opt{position:relative;display:grid;background:#0E0E0E;color:#fff;border-radius:26px;padding:22px;cursor:pointer;border:1.5px solid #0E0E0E;transition:transform .2s,box-shadow .25s,border-color .25s}
+.led-list div.led-opt{cursor:default}
 .led-opt:hover{transform:translateY(-3px);box-shadow:0 26px 50px -30px rgba(0,0,0,.7)}
 .led-opt input{position:absolute;opacity:0;pointer-events:none}
 .scr{position:relative;display:grid;place-items:center;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:#000;
@@ -242,7 +243,7 @@ section{padding-block:56px}
 .led-opt .ft{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin:10px 8px 6px;padding-top:14px;border-top:1px solid rgba(255,255,255,.14)}
 .led-opt .pr{font-family:var(--f-brand);font-weight:600;font-size:20px;white-space:nowrap}
 .led-opt .pr small{display:block;font-family:var(--f-text,inherit);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;opacity:.55;font-weight:700}
-.led-opt .add{flex:none;font-family:var(--f-brand);font-weight:600;font-size:14px;padding:10px 16px;border-radius:999px;border:1.5px solid rgba(255,255,255,.5);transition:background .2s,color .2s}
+.led-opt .add{flex:none;color:inherit;text-decoration:none;font-family:var(--f-brand);font-weight:600;font-size:14px;padding:10px 16px;border-radius:999px;border:1.5px solid rgba(255,255,255,.5);transition:background .2s,color .2s}
 .led-opt .add .y{display:none}
 .led-opt.on{border-color:#F6E7C8;box-shadow:0 0 0 3px rgba(246,231,200,.35)}
 .led-opt.on .add{background:#fff;color:#0E0E0E;border-color:#fff}
@@ -558,18 +559,14 @@ footer img{width:120px;height:auto;opacity:.9}
 
 <section id="paineis">
   <div class="eyebrow">Painéis de LED e mapa projetado</div>
-  <h2 class="h2">Sua identidade <em>no telão</em></h2>
-  <p class="lead">O valor é o desenvolvimento da arte do painel, no formato dos painéis de LED e do mapa projetado da MR Arts Produções, usando a identidade visual da festa. Um valor único para o painel completo.</p>
+  <h2 class="h2">Painel <em>express</em></h2>
+  <p class="lead">A MR Arts Produções leva painéis de LED e mapa projetado para a festa. Se o cliente quiser só a arte do telão, sem a identidade visual completa, temos a opção express.</p>
   <div class="led-media" aria-label="Exemplos de painéis de LED e mapa projetado"><img class="wide" src="img/mr/ledfoto.jpg" alt="Mapa projetado com monograma e painel de LED no DJ"><video src="img/mr/led1.mp4" poster="img/mr/led1.jpg" muted loop playsinline autoplay preload="metadata"></video><video src="img/mr/led2.mp4" poster="img/mr/led2.jpg" muted loop playsinline autoplay preload="metadata"></video><video src="img/mr/led4.mp4" poster="img/mr/led4.jpg" muted loop playsinline autoplay preload="metadata"></video></div>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500&family=Great+Vibes&display=swap">
   <div class="led-list">
-    <label class="led-opt" for="led-0"><input type="checkbox" id="led-0" data-led="0" data-v="270" data-t="design de painel com monograma, fundo e assinatura">
-      <span class="scrs" aria-hidden="true"><span class="scr scr-0"><span>L</span></span><span class="scr scr-1"><span></span></span><span class="scr scr-2"><span>Luiza</span></span></span>
-      <span class="bd"><small>Design de painel · LED e mapa projetado</small><b>Painel completo</b><p>Desenvolvimento da arte do painel, animada e na medida exata da tela, com tudo o que ele precisa:</p>
-        <span class="inc"><span><em>Monograma</em> da debutante em destaque</span><span><em>Fundo</em> com as cores e os elementos da identidade</span><span><em>Assinatura</em> com o nome dela</span></span></span>
-      <span class="ft"><span class="pr"><small>desenvolvimento</small>R$ 270</span><span class="add"><span class="n">Adicionar painel</span><span class="y">Adicionado ✓</span></span></span></label>
+    <div class="led-opt"><span class="bd"><small>Opção express · sem identidade visual</small><b>Painel express</b><p>Para quem quer só o telão, sem contratar a identidade visual completa. As artes são criadas direto no formato dos painéis de LED e do mapa projetado da MR Arts Produções:</p><span class="inc"><span><em>Monograma</em> com as iniciais da debutante</span><span><em>Fundo</em> com as cores e os elementos do tema</span><span><em>Assinatura</em> com o nome dela</span></span></span>
+      <span class="ft"><span class="pr"><small>valor do painel</small>R$ 270</span><a class="add" href="../propostapainelmrproducoes/">Ver opção express →</a></span></div>
   </div>
-  <div class="led-total"><div><small>Painel de LED</small><b id="led-sum">R$ 0</b></div><span id="led-list">Toque em adicionar para incluir o painel. O valor é somado ao do pacote.</span></div>
+  
 </section>
 
 <section id="comparar">
@@ -923,23 +920,6 @@ document.getElementById("more-items").addEventListener("click",()=>{document.que
 // lightbox: deslizar no celular
 (function(){let x0=null;lb.addEventListener("touchstart",e=>{x0=e.touches[0].clientX;},{passive:true});
   lb.addEventListener("touchend",e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0;x0=null;if(Math.abs(dx)>45)document.getElementById(dx<0?"lb-n":"lb-p").click();});})();
-
-// painéis de led
-(function(){
-  const ins=[...document.querySelectorAll("[data-led]")];
-  window.ledSync=function(){
-    const sel=ins.filter(i=>{i.closest(".led-opt").classList.toggle("on",i.checked);return i.checked;});
-    const tot=sel.reduce((t,i)=>t+Number(i.dataset.v),0);
-    document.getElementById("led-sum").textContent="R$ "+tot;
-    document.getElementById("led-list").textContent=sel.length?sel.map(i=>i.dataset.t).join(" + ")+". Somado ao valor do pacote.":"Toque em adicionar para incluir o painel. O valor é somado ao do pacote.";
-    const go=document.getElementById("go-bottom"), sum=document.getElementById("sum");
-    if(go&&sel.length){try{const u=new URL(go.href);const t=u.searchParams.get("text")||"";go.href=u.origin+u.pathname+"?text="+encodeURIComponent(t.replace(/ Podemos conversar\?$/,"")+" Também quero o "+sel.map(i=>i.dataset.t).join(", ")+" (R$ "+tot+"). Podemos conversar?");}catch(e){}}
-    if(sum&&sel.length&&!sum.querySelector(".ledadd")){const s=document.createElement("span");s.className="ledadd";const lk=sum.querySelector("a");lk?sum.insertBefore(s,lk):sum.appendChild(s);}
-    const la=sum&&sum.querySelector(".ledadd"); if(la) la.textContent=sel.length?"+ painel de LED (R$ "+tot+"). ":"";
-  };
-  ins.forEach(i=>i.addEventListener("change",()=>{render();}));
-  const _r=render; render=function(){_r();ledSync();}; ledSync();
-})();
 </script>
 
 </body>
