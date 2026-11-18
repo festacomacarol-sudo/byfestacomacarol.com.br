@@ -298,12 +298,25 @@
   .card .prev-tag{position:absolute;top:12px;right:12px;font-family:var(--f-brand);font-size:11.5px;font-weight:600;background:rgba(255,255,255,.92);color:var(--pink);padding:4px 10px;border-radius:999px}
 
   /* grade de prévias no modal */
-  .prev-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;margin-top:10px}
+  .prev-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;margin-top:10px}
+  .pcell{display:flex;flex-direction:column;gap:6px}
+  .pcell .pthumb{flex:none;width:100%;min-height:0}
+  .pcell .pthumb img{position:absolute;inset:0}
+  .pcell .ptipo{font:inherit;font-size:12.5px;font-weight:700;padding:6px 8px;border:1.6px solid var(--line);border-radius:10px;background:var(--paper);color:var(--ink)}
+  .pcell .ppdf{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:var(--ink);cursor:pointer}
+  .pthumb.nopdf img{opacity:.45;filter:grayscale(.6)}
+  .tipo-lbl{position:absolute;left:50%;top:6px;transform:translateX(-50%);color:#fff;font-family:var(--f-brand);font-size:11px;font-weight:600;padding:3px 10px;border-radius:999px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.25);border:2px solid #fff;z-index:1}
+  .pv-tbtns{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 10px}
+  .pv-tbtns span{font-weight:800;font-size:13px}
+  .pv-tbtns button{font:inherit;font-weight:800;font-size:13px;padding:8px 14px;border-radius:999px;border:2px solid var(--c);background:#fff;color:var(--c);cursor:pointer}
+  .pv-tbtns button:hover{background:var(--c);color:#fff}
+  .lblw{position:relative;display:inline-block}
+  .lblw .tipo-lbl{top:8px}
   .pthumb{position:relative;aspect-ratio:1;border-radius:16px;overflow:hidden;border:1.6px solid var(--line);background:var(--lilac-l)}
   .pthumb img{width:100%;height:100%;object-fit:cover;display:block}
   .pthumb.capa{border-color:var(--pink);box-shadow:0 0 0 2px var(--pink-l)}
   .pthumb .capa-lbl{position:absolute;left:6px;bottom:6px;background:var(--pink);color:#fff;font-family:var(--f-brand);font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:999px}
-  .pthumb .pa{position:absolute;top:6px;width:28px;height:28px;border-radius:50%;border:0;background:rgba(255,255,255,.92);cursor:pointer;font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center}
+  .pthumb .pa{position:absolute;top:34px;width:28px;height:28px;border-radius:50%;border:0;background:rgba(255,255,255,.92);cursor:pointer;font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center}
   .pthumb .pa.star{left:6px;color:var(--pink)} .pthumb .pa.del{right:6px;color:#D9604C}
 
   /* página de prévia */
@@ -400,6 +413,17 @@
   .ex-row input:focus{border-color:var(--lilac)}
   .card .xtra{font-family:var(--f-brand);font-size:11.5px;font-weight:600;background:var(--coral-l);color:#C0503E;padding:3px 9px;border-radius:999px;align-self:flex-start}
 
+  .nx-box{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:var(--pink-l);border:2px solid var(--pink);border-radius:20px;padding:14px 16px;margin:0 0 16px}
+  .nx-box .ic{font-size:28px}
+  .nx-box div{flex:1;min-width:180px}
+  .nx-box small{display:block;font-size:12px;font-weight:700;opacity:.75;text-transform:uppercase;letter-spacing:.05em}
+  .nx-box b{font-size:18px;display:block}
+  .nx-box.late{background:#FFEEEA;border-color:#E2735D}
+  .meta .nx{color:var(--ink)}
+  .meta .nx.late{color:#C0503E}
+  .day .ev.previa{background:#FFF0EB;color:#C0503E}
+  .day .ev.previa.late{background:#C0503E;color:#fff}
+  .day .ev.previa.done{background:#EAF8EF;color:#2F8F55;text-decoration:line-through}
   /* ajustes no prazo */
   .aj{margin-top:14px;padding-top:14px;border-top:1.6px dashed var(--line)}
   .aj-h{display:flex;flex-direction:column;margin-bottom:8px}.aj-h b{font-family:var(--f-brand);font-weight:600}.aj-h small{color:var(--soft);font-size:12px}
@@ -890,9 +914,14 @@
       </form>
 
       <div class="section-t">Prévia da identidade</div>
+      <div class="pv-tbtns"><span>Subir:</span>
+        <button type="button" data-ptipo="monograma" style="--c:#FF6CA8">＋ Monograma</button>
+        <button type="button" data-ptipo="logo" style="--c:#9A85E6">＋ Logo</button>
+        <button type="button" data-ptipo="composicao" style="--c:#3FA86E">＋ Composição</button>
+      </div>
       <div class="drop" id="dropPrev">
         <strong>Arraste as artes da prévia aqui</strong> ou clique para escolher<br>
-        <small>Imagens (JPG, PNG, WEBP) — a primeira vira a capa. Clique na ★ para trocar a capa.</small>
+        <small>Imagens (JPG, PNG, WEBP) — a primeira vira a capa. Escolha em cima de cada arte o que ela é, e marque o que entra no PDF.</small>
         <input type="file" id="prevIn" multiple hidden accept="image/*">
       </div>
       <div class="uploading" id="uploadingPrev" style="display:none"></div>
@@ -1145,6 +1174,15 @@
   // ajustes: cada pedido de ajuste vira um NOVO prazo, contado a partir do dia do pedido (padrão 3 dias úteis, editável)
   // aprovação: quando a festa é marcada como "Aprovada", a arte final vence 2 dias úteis depois
   const AJ_DIAS = 3, ARTE_DIAS = 2;
+  const PREVIA_INCLUI = "monograma, logo e composição";
+  // tipo de cada arte da prévia: aparece em cima da imagem e escolhe o que vai para o PDF
+  const PV_TIPOS = [{id:"monograma",nome:"Monograma",cor:"#FF6CA8"},{id:"logo",nome:"Logo",cor:"#9A85E6"},{id:"composicao",nome:"Composição",cor:"#3FA86E"},{id:"outro",nome:"Outro",cor:"#7E6E82"}];
+  const PV_T = Object.fromEntries(PV_TIPOS.map(t=>[t.id,t]));
+  function rotulosPrev(list){
+    const nComp = (list||[]).filter(f=>f.tipoArte==="composicao").length; let k=0;
+    return (list||[]).map(f=>{ const t=PV_T[f.tipoArte]; if(!t) return ""; if(t.id==="composicao"){ k++; return nComp>1 ? `Composição ${k}` : "Composição"; } return t.nome; });
+  }
+  const noPdf = f => f.pdf !== false;
   function prazoBase(i){ if(soAvulso(i.pacote,i.itens,i.itensCustom)) return i.prazoManual||""; const et=calcPrazos(i.briefingEm, i.previaEm); return et ? et[2].ate : (i.prazoBase||""); }
   const ajDias = i => (i.ajustes||[]).reduce((t,a)=>t+(+a.dias||0),0);
   const ultAjuste = i => { const a=i.ajustes||[]; return a.length ? a[a.length-1] : null; };
@@ -1170,6 +1208,18 @@
     if(i.aprovadaEm) return addUteis(i.aprovadaEm, ARTE_DIAS);
     const last = ultAjuste(i); if(last && last.em) return addUteis(last.em, (+last.dias||0)+ARTE_DIAS);
     return i.prazoBase||i.prazo||"";
+  }
+  // próximo prazo da festa: o que você precisa enviar agora e até quando
+  function proximoPrazo(i){
+    if(!i || i.status==="entregue") return null;
+    if(soAvulso(i.pacote,i.itens,i.itensCustom)) return i.prazo ? {ic:"⏳", txt:"Entregar", d:i.prazo, k:"entrega"} : null;
+    if(i.status==="aprovada" || i.aprovadaEm) return {ic:"🎨", txt:"Enviar arte final", d: i.prazoOverride || (i.aprovadaEm ? addUteis(i.aprovadaEm,ARTE_DIAS) : i.prazo), k:"arte"};
+    const last = ultAjuste(i);
+    if(i.status==="ajustes" && last && last.em) return {ic:"🔁", txt:"Enviar ajuste", d:addUteis(last.em, +last.dias||0), k:"ajuste"};
+    if(i.status==="aprovacao") return {ic:"💬", txt:"Aguardando aprovação da cliente", d:"", k:"aguarda", info: i.previaEm ? `prévia enviada em ${fmtDate(i.previaEm)}` : ""};
+    if(!i.briefingEm) return null;
+    if(!i.previaEm) return {ic:"📨", txt:"Enviar prévia", d:addUteis(i.briefingEm, ETAPAS[0].d), k:"previa", info:PREVIA_INCLUI};
+    return i.prazo ? {ic:"⏳", txt:"Entrega", d:i.prazo, k:"entrega"} : null;
   }
   function addRodada(next, motivo){ next.prazoBase = next.prazoBase || prazoBase(next) || next.prazo || "";
     next.ajustes = [...(next.ajustes||[]), {id:uid(), em:today(), dias:AJ_DIAS, motivo:motivo||""}]; next.aprovadaEm = ""; next.prazo = prazoFinal(next); return next; }
@@ -1243,7 +1293,7 @@
     else if(previaEm){ info1 = `prévia enviada em ${fmtDate(previaEm)}`; }
     const ganho = d1-u1;
     return [
-      {...ETAPAS[0], d:Math.max(u1,1), ate:a1, info:info1},
+      {...ETAPAS[0], nome:"Esboço encantado · prévia", d:Math.max(u1,1), ate:a1, info:[`${PREVIA_INCLUI[0].toUpperCase()+PREVIA_INCLUI.slice(1)}`, info1].filter(Boolean).join(" · ")},
       {...ETAPAS[1], d:d12-u1, ate:fimDev, info: ganho>0 ? `+${ganho} dia${ganho>1?"s":""} de margem da prévia adiantada` : ""},
       {...ETAPAS[2], ate:addUteis(fimDev,ETAPAS[2].d), info:"2 dias úteis após a aprovação (previsão)"}
     ]; }
@@ -1366,7 +1416,8 @@
       <div class="meta">
         ${i.dataFesta?`<span>🎉 ${fmtDate(i.dataFesta)}</span>`:""}
         ${i.briefingEm?`<span>📝 Briefing ${fmtDate(i.briefingEm).slice(0,5)}</span>`:(["aguardando"].includes(i.status)?`<span>📝 Aguardando briefing</span>`:"")}
-        ${i.prazo?`<span class="${late?"late":""}">⏳ Entrega até ${fmtDate(i.prazo)}${late?" · atrasado":""}</span>`:""}
+        ${(()=>{ const p=proximoPrazo(i); if(!p) return ""; const lt=p.d && p.d<today(); return `<span class="nx ${lt?"late":""}" style="font-weight:800">${p.ic} ${p.txt}${p.d?` até ${fmtDate(p.d).slice(0,5)}`:""}${lt?" · atrasado":""}</span>`; })()}
+        ${i.prazo && !["entregue"].includes(i.status)?`<span class="${late?"late":""}">🏁 Entrega final ${fmtDate(i.prazo).slice(0,5)}</span>`:""}
       </div>
       <div class="card-foot">
         <select class="pill" data-id="${esc(i.id)}" style="background:${s.bg};color:${s.fg}" title="Mudar status">
@@ -1586,14 +1637,22 @@
   });
 
   function renderPrevGrid(){
-    $("prevGrid").innerHTML = draftPrev.map((f,ix)=>`<div class="pthumb ${ix===0?"capa":""}">
+    const rots = rotulosPrev(draftPrev);
+    $("prevGrid").innerHTML = draftPrev.map((f,ix)=>{ const t=PV_T[f.tipoArte];
+      return `<div class="pcell"><div class="pthumb ${ix===0?"capa":""} ${noPdf(f)?"":"nopdf"}">
         <img src="${esc(fileUrl(f))}" alt="">
+        <span class="tipo-lbl" style="background:${t?t.cor:"#B7AABB"}">${t?esc(rots[ix]):"sem tipo"}</span>
         ${ix===0?`<span class="capa-lbl">Capa</span>`:`<button class="pa star" data-ix="${ix}" title="Usar como capa">★</button>`}
-        <button class="pa del" data-ix="${ix}" title="Remover">×</button></div>`).join("");
-    $("prevGrid").querySelectorAll(".pa.star").forEach(b=>b.onclick=()=>{ const [f]=draftPrev.splice(+b.dataset.ix,1); draftPrev.unshift(f); renderPrevGrid(); });
-    $("prevGrid").querySelectorAll(".pa.del").forEach(b=>b.onclick=()=>{ draftPrev.splice(+b.dataset.ix,1); renderPrevGrid(); });
+        <button class="pa del" data-ix="${ix}" title="Remover">×</button></div>
+        <select class="ptipo" data-ix="${ix}" aria-label="O que é esta arte">
+          <option value="">O que é?</option>${PV_TIPOS.map(o=>`<option value="${o.id}" ${f.tipoArte===o.id?"selected":""}>${o.nome}</option>`).join("")}
+        </select>
+        <label class="ppdf"><input type="checkbox" data-ix="${ix}" ${noPdf(f)?"checked":""}> no PDF</label></div>`; }).join("");
+    $("prevGrid").querySelectorAll(".pa.star").forEach(b=>b.onclick=()=>{ const [f]=draftPrev.splice(+b.dataset.ix,1); draftPrev.unshift(f); renderPrevGrid(); scheduleDraft(); });
+    $("prevGrid").querySelectorAll(".pa.del").forEach(b=>b.onclick=()=>{ draftPrev.splice(+b.dataset.ix,1); renderPrevGrid(); scheduleDraft(); });
+    $("prevGrid").querySelectorAll(".ptipo").forEach(s=>s.onchange=()=>{ draftPrev[+s.dataset.ix].tipoArte=s.value||""; renderPrevGrid(); scheduleDraft(); });
+    $("prevGrid").querySelectorAll(".ppdf input").forEach(c=>c.onchange=()=>{ draftPrev[+c.dataset.ix].pdf=c.checked; renderPrevGrid(); scheduleDraft(); });
   }
-
   async function uploadInto(list, target, rerender, statusEl, onlyImages){
     if(!assets){ toast("Envio de arquivos indisponível nesta visualização."); return; }
     const arr = [...list].filter(f=>!onlyImages || (f.type||"").startsWith("image/"));
@@ -1618,7 +1677,10 @@
     dropEl.addEventListener("drop", e=>handler(e.dataTransfer.files));
   }
   wireDrop($("drop"), $("fileIn"), fl=>uploadInto(fl, draftFiles, renderFiles, $("uploading"), false));
-  wireDrop($("dropPrev"), $("prevIn"), fl=>uploadInto(fl, draftPrev, renderPrevGrid, $("uploadingPrev"), true));
+  let tipoPendente = "";
+  wireDrop($("dropPrev"), $("prevIn"), async fl=>{ const tp=tipoPendente; tipoPendente=""; const antes=draftPrev.length;
+    await uploadInto(fl, draftPrev, ()=>{ for(let k=antes;k<draftPrev.length;k++) if(tp && !draftPrev[k].tipoArte) draftPrev[k].tipoArte=tp; renderPrevGrid(); }, $("uploadingPrev"), true); });
+  document.querySelectorAll("[data-ptipo]").forEach(b=>b.onclick=()=>{ tipoPendente=b.dataset.ptipo; $("prevIn").click(); });
 
   $("saveBtn").onclick = async ()=>{
     const fd = new FormData(form);
@@ -1743,8 +1805,9 @@
       ${pv.length?`<section>
         <div class="pv-sub">${pv.length} arte${pv.length>1?"s":""}</div>
         <h3 class="pv-h3">${rotuloPeca(it).pecas[0]}<em>${rotuloPeca(it).pecas[1]}</em></h3>
-        <div class="pv-cover full" data-ix="0"><img src="${esc(lbList[0])}" alt="Capa da identidade"></div>
-        ${pv.length>1?`<div class="masonry">${pv.slice(1).map((f,ix)=>`<figure data-ix="${ix+1}"><img src="${esc(fileUrl(f))}" alt="" loading="lazy"></figure>`).join("")}</div>`:""}
+        ${(()=>{ const r=rotulosPrev(pv), lb=(f,ix)=>r[ix]?`<span class="tipo-lbl" style="background:${PV_T[f.tipoArte].cor};font-size:13px;padding:5px 14px;top:14px">${esc(r[ix])}</span>`:"";
+          return `<div class="pv-cover full" data-ix="0" style="position:relative">${lb(pv[0],0)}<img src="${esc(lbList[0])}" alt="Capa da identidade"></div>
+          ${pv.length>1?`<div class="masonry">${pv.slice(1).map((f,ix)=>`<figure data-ix="${ix+1}" style="position:relative">${lb(f,ix+1)}<img src="${esc(fileUrl(f))}" alt="" loading="lazy"></figure>`).join("")}</div>`:""}`; })()}
       </section>`:`<div class="pv-empty">Nenhuma arte na prévia ainda.<br>Clique em <b>Editar festa</b> e envie as imagens em “Prévia da identidade”.</div>`}
       <div class="pv-foot">Feito com carinho · <span>Festa com a Carol</span></div>`;
     $("pvInner").querySelectorAll("[data-ix]").forEach(el=>el.onclick=()=>{ lbList = pv.map(fileUrl); openLb(+el.dataset.ix); });
@@ -1940,8 +2003,8 @@
   // ---------- início com calendário ----------
   const isoD = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
   const MESES_L = ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
-  let calY = new Date().getFullYear(), calM = new Date().getMonth(), calSel = isoD(new Date()), calDir = "", calF = {festa:true, entrega:true, briefing:true};
-  const KIND = {festa:{l:"Festa",e:"🎉",bg:"#FFE8F1",fg:"#D1447F",dot:"#FF6CA8"}, entrega:{l:"Entrega",e:"⏳",bg:"#F2EEFD",fg:"#7A5CCB",dot:"#C7B8F6"}, briefing:{l:"Briefing",e:"📝",bg:"#EAF8FD",fg:"#2B8DAD",dot:"#ADE8F9"}};
+  let calY = new Date().getFullYear(), calM = new Date().getMonth(), calSel = isoD(new Date()), calDir = "", calF = {festa:true, entrega:true, briefing:true, previa:true};
+  const KIND = {festa:{l:"Festa",e:"🎉",bg:"#FFE8F1",fg:"#D1447F",dot:"#FF6CA8"}, entrega:{l:"Entrega",e:"⏳",bg:"#F2EEFD",fg:"#7A5CCB",dot:"#C7B8F6"}, briefing:{l:"Briefing",e:"📝",bg:"#EAF8FD",fg:"#2B8DAD",dot:"#ADE8F9"}, previa:{l:"Prévia",e:"📨",bg:"#FFF0EB",fg:"#C0503E",dot:"#FFA999"}};
   function eventos(){
     const map = {}; const add=(iso,ev)=>{ if(!iso) return; (map[iso]=map[iso]||[]).push(ev); };
     const hj = today();
@@ -1949,9 +2012,14 @@
       add(i.dataFesta, {k:"festa", it:i});
       if(i.prazo){ const done=["aprovada","entregue"].includes(i.status); add(i.prazo, {k:"entrega", it:i, done, late:!done && i.prazo<hj}); }
       if(i.briefingEm) add(i.briefingEm, {k:"briefing", it:i});
+      if(i.briefingEm && !soAvulso(i.pacote,i.itens,i.itensCustom)){
+        const dPrev = i.previaEm || addUteis(i.briefingEm, ETAPAS[0].d), feita = !!i.previaEm;
+        add(dPrev, {k:"previa", it:i, done:feita, late:!feita && dPrev<hj, rot:"Prévia", nx:{txt: feita?"prévia enviada ✓":"enviar prévia ("+PREVIA_INCLUI+")"}});
+      }
+      { const p=proximoPrazo(i); if(p && p.d && (p.k==="ajuste"||p.k==="arte") && p.d!==i.prazo) add(p.d, {k:"previa", it:i, late:p.d<hj, rot:p.k==="ajuste"?"Ajuste":"Arte final", nx:p}); }
       (i.extras||[]).forEach(x=>{ if(x.prazo) add(x.prazo, {k:"entrega", it:i, done:!!x.feito, late:!x.feito && x.prazo<hj, extra:x.nome}); });
     });
-    Object.values(map).forEach(l=>l.sort((a,b)=>["festa","entrega","briefing"].indexOf(a.k)-["festa","entrega","briefing"].indexOf(b.k)));
+    Object.values(map).forEach(l=>l.sort((a,b)=>["festa","previa","entrega","briefing"].indexOf(a.k)-["festa","previa","entrega","briefing"].indexOf(b.k)));
     return map;
   }
   function renderInicio(){
@@ -1976,8 +2044,8 @@
     const cells=[...Array(42)].map((_,k)=>{ const d=new Date(start); d.setDate(start.getDate()+k); return d; });
     const lastRowEmpty = cells.slice(35).every(d=>d.getMonth()!==calM); const C = lastRowEmpty ? cells.slice(0,35) : cells;
     const dayHtml = d => { const iso=isoD(d), evs=(EV[iso]||[]).filter(e=>calF[e.k]); const out=d.getMonth()!==calM, we=[0,6].includes(d.getDay());
-      const pills = evs.slice(0,3).map(e=>{ const cls = e.k==="entrega" ? (e.done?" done":e.late?" late":"") : "";
-        return `<span class="ev ${e.k}${cls}" title="${e.extra?esc(e.extra)+" · ":""}${esc(e.it.debutante||"")}">${e.extra?"➕":KIND[e.k].e} ${esc((e.it.debutante||"").split(" ")[0])}</span>`; }).join("");
+      const pills = evs.slice(0,3).map(e=>{ const cls = (e.k==="entrega"||e.k==="previa") ? (e.done?" done":e.late?" late":"") : "";
+        return `<span class="ev ${e.k}${cls}" title="${e.extra?esc(e.extra)+" · ":""}${esc(e.it.debutante||"")}">${e.extra?"➕":KIND[e.k].e} ${e.rot?esc(e.rot)+" · ":""}${esc((e.it.debutante||"").split(" ")[0])}</span>`; }).join("");
       return `<button class="day ${out?"out":""} ${we?"we":""} ${iso===hj?"today":""} ${iso===calSel?"sel":""}" data-d="${iso}" aria-label="${d.getDate()} de ${MESES_L[d.getMonth()]}${evs.length?`, ${evs.length} evento${evs.length>1?"s":""}`:""}">
         <span class="n">${d.getDate()}</span>${pills}${evs.length>3?`<span class="more">+${evs.length-3} mais</span>`:""}
         <span class="dots">${evs.slice(0,4).map(e=>`<i style="background:${KIND[e.k].dot}"></i>`).join("")}</span></button>`; };
@@ -1985,12 +2053,12 @@
     // dia selecionado
     const sd=new Date(calSel+"T12:00:00"), sEvs=(EV[calSel]||[]).filter(e=>calF[e.k]);
     const evCard = e => { const i=e.it, pv=(i.previas||[])[0], kd=KIND[e.k];
-      const extra = e.extra ? `extra: ${esc(e.extra)}${e.done?" ✓":e.late?" · ⚠ atrasado":""}` : e.k==="entrega" ? (e.done?"entregue ✓":e.late?"⚠ atrasada":"prazo final") : e.k==="briefing" ? "briefing enviado" : TP[i.tipo||"debutante"].badge;
+      const extra = e.extra ? `extra: ${esc(e.extra)}${e.done?" ✓":e.late?" · ⚠ atrasado":""}` : e.k==="entrega" ? (e.done?"entregue ✓":e.late?"⚠ atrasada":"prazo final") : e.k==="briefing" ? "briefing enviado" : e.k==="previa" ? `${esc(e.rot||"")} · ${esc(e.nx.txt)}${e.late?" · ⚠ atrasado":""}` : TP[i.tipo||"debutante"].badge;
       return `<div class="evc" data-fd="${esc(i.id)}"><span class="th" style="${pv?`background-image:url('${esc(fileUrl(pv))}')`:`background:linear-gradient(135deg,${kd.dot},#C7B8F6)`}">${pv?"":esc((i.debutante||"?")[0])}</span>
         <span class="tx"><b>${esc(i.debutante)}</b><small>${esc(A[i.assessoria]?.nome||"")} · ${extra}</small></span>
         <span class="kd" style="background:${kd.bg};color:${kd.fg}">${kd.e} ${kd.l}</span></div>`; };
     // próximos eventos
-    const prox=[]; for(let k=0;k<14;k++){ const d=new Date(); d.setDate(d.getDate()+k); const iso=isoD(d); (EV[iso]||[]).filter(e=>e.k!=="briefing" && !(e.k==="entrega"&&e.done)).forEach(e=>prox.push({iso,d,e})); }
+    const prox=[]; for(let k=0;k<14;k++){ const d=new Date(); d.setDate(d.getDate()+k); const iso=isoD(d); (EV[iso]||[]).filter(e=>e.k!=="briefing" && !((e.k==="entrega"||e.k==="previa")&&e.done)).forEach(e=>prox.push({iso,d,e})); }
 
     $("vInicio").innerHTML = `
       <div class="quick anim">
@@ -2019,7 +2087,7 @@
           <section class="sd">
             <div class="dt">próximos 14 dias</div>
             <h4 style="font-size:32px">Vem <em>aí</em> ✨</h4>
-            ${prox.length?`<ul class="tl">${prox.slice(0,7).map(({d,e})=>`<li data-fd="${esc(e.it.id)}"><span class="dd"><b>${d.getDate()}</b><span>${DIAS[d.getDay()]}</span></span><span class="tt"><b>${KIND[e.k].e} ${esc(e.it.debutante)}</b><small>${e.k==="festa"?"dia da festa":e.extra?"extra: "+esc(e.extra):"entrega da identidade"}${e.late?" · atrasada":""}</small></span></li>`).join("")}</ul>`
+            ${prox.length?`<ul class="tl">${prox.slice(0,7).map(({d,e})=>`<li data-fd="${esc(e.it.id)}"><span class="dd"><b>${d.getDate()}</b><span>${DIAS[d.getDay()]}</span></span><span class="tt"><b>${KIND[e.k].e} ${esc(e.it.debutante)}</b><small>${e.k==="festa"?"dia da festa":e.extra?"extra: "+esc(e.extra):e.k==="previa"?(e.rot==="Prévia"?(e.done?"prévia enviada ✓":"enviar prévia · "+PREVIA_INCLUI):e.rot==="Ajuste"?"enviar ajuste":"enviar arte final"):"entrega final"}${e.late?" · atrasada":""}</small></span></li>`).join("")}</ul>`
               :`<div class="free"><span class="e">☁️</span>Nada nos próximos dias.</div>`}
           </section>
         </aside>
@@ -2511,7 +2579,7 @@
               :`<div class="mini-empty">Nenhum briefing anexado ainda. <button class="link" data-edit>Anexar briefing</button></div>`}
           </section>
           <section class="fd-card"><h3><span>✨ ${rotuloPeca(it).prev[0]}<em>${rotuloPeca(it).prev[1]}</em></span>${pv.length?`<button class="link" data-prev>abrir prévia completa</button>`:""}</h3>
-            ${pv.length?`<div class="pv-thumbs">${pv.map((f,ix)=>`<img src="${esc(fileUrl(f))}" data-lb="p${ix}" alt="">`).join("")}</div>`:`<div class="mini-empty">Ainda sem artes na prévia. <button class="link" data-edit>Enviar artes</button></div>`}
+            ${pv.length?`<div class="pv-thumbs">${(()=>{ const r=rotulosPrev(pv); return pv.map((f,ix)=>`<span class="lblw">${r[ix]?`<span class="tipo-lbl" style="background:${PV_T[f.tipoArte].cor}">${esc(r[ix])}</span>`:""}<img src="${esc(fileUrl(f))}" data-lb="p${ix}" alt="" style="${noPdf(f)?"":"opacity:.5"}"></span>`).join(""); })()}</div>`:`<div class="mini-empty">Ainda sem artes na prévia. <button class="link" data-edit>Enviar artes</button></div>`}
           </section>
           ${it.obs?`<section class="fd-card"><h3><span>💬 <em>Observações</em></span></h3><p class="obs">${esc(it.obs)}</p></section>`:""}
         </div>
@@ -2523,6 +2591,8 @@
               <dt>Data da festa</dt><dd>${it.dataFesta?`${fmtDate(it.dataFesta)}<small>${DIAS[dowOf(it.dataFesta)]}</small>`:"—"}</dd>
               <dt>Contrato</dt><dd>${(it.contratos||[]).length?`✓ assinado${it.contratoEm?" em "+fmtDate(it.contratoEm):""}`:"pendente"}</dd>
               <dt>Briefing enviado</dt><dd>${it.briefingEm?fmtDate(it.briefingEm):"—"}</dd>
+              ${(()=>{ const p=proximoPrazo(it); return p?`<dt>Próximo prazo</dt><dd><b>${p.ic} ${p.txt}${p.d?" até "+fmtDate(p.d):""}</b></dd>`:""; })()}
+              ${it.previaEm?`<dt>Prévia enviada</dt><dd>${fmtDate(it.previaEm)}</dd>`:""}
               <dt>Entrega prevista</dt><dd>${it.prazo?fmtDate(it.prazo):"—"}</dd>
               ${it.entregueEm?`<dt>Entregue em</dt><dd>${fmtDate(it.entregueEm)}</dd>`:""}
               <dt>Fechada em</dt><dd>${fmtDate(fechadoIso(it))}${it.dataFechamento?"":`<small>automático</small>`}</dd>
@@ -2572,6 +2642,9 @@
             </div>
           </section>
           <section class="fd-card" id="przCard"><h3><span>⏳ Prazo de <em>entrega</em></span>${it.prazo?`<span class="chip" style="font-size:12px">entrega final ${fmtDate(it.prazo)}</span>`:""}</h3>
+            ${(()=>{ const p=proximoPrazo(it); if(!p) return ""; const lt=p.d && p.d<today();
+              return `<div class="nx-box ${lt?"late":""}"><span class="ic">${p.ic}</span><div><small>${lt?"⚠ atrasado":"próximo passo"}</small><b>${p.txt}${p.d?` até ${fmtLong(p.d)}`:""}</b>${p.info?`<small>${esc(p.info)}</small>`:""}</div>
+                ${p.k==="previa"?`<button class="btn ghost" id="nxPrev" type="button">✓ Marcar prévia enviada hoje</button>`:""}</div>`; })()}
             ${soAvulso(it.pacote,it.itens,it.itensCustom) ? `<div class="prz"><div class="prz-top"><span>Entrega combinada</span><b>${it.prazo?"até "+fmtLong(it.prazo):"a definir"}</b></div><div class="prz-note" style="background:var(--lilac-l);color:#7A5CCB">✍️ Peça avulsa: prazo definido manualmente de acordo com a demanda.</div></div>` : prazoHtml(it) || `<div class="prz-empty">Coloque a data do briefing para calcular o prazo.${it.prazo?`<br>Prazo anotado: <b>${fmtDate(it.prazo)}</b>`:""}</div>`}
             ${(()=>{ const aj=it.ajustes||[], base=prazoBase(it)||it.prazoBase||"", d=ajDias(it);
               return `<div class="aj">
@@ -2617,6 +2690,7 @@
       $("fdInner").querySelectorAll("[data-ctdel]").forEach(b=>b.onclick=()=>{ const f=(it.contratos||[])[+b.dataset.ctdel]; if(!f||!confirm(`Remover ${f.name}?`)) return;
         saveAj(n=>{ n.contratos=(n.contratos||[]).filter((_,k)=>k!==+b.dataset.ctdel); }, `Contrato removido (${f.name})`); });
     }
+    if($("nxPrev")) $("nxPrev").onclick=()=>quickStatus(it.id, "aprovacao");
     if($("mkPrev")) $("mkPrev").onchange=()=>{ const v=$("mkPrev").value; saveAj(n=>{ n.previaEm=v||""; }, n=>v?`Prévia enviada em ${fmtDate(v)} · entrega até ${fmtDate(n.prazo)}`:"Data da prévia removida"); };
     if($("mkApr")) $("mkApr").onchange=()=>{ const v=$("mkApr").value; saveAj(n=>{ n.aprovadaEm=v||""; }, n=>v?`Aprovada em ${fmtDate(v)} · arte final até ${fmtDate(n.prazo)}`:"Data de aprovação removida"); };
     $("fdInner").querySelectorAll("[data-ajp]").forEach(b=>b.onclick=()=>{ const r=(it.ajustes||[]).find(x=>x.id===b.dataset.ajp); setDias(r.id,(+r.dias||0)+1); });
@@ -2742,8 +2816,9 @@
     PDF_ROT = rotuloPeca(it);
     const JsPDF = await loadJsPDF();
     await Promise.all(['700 120px "Amatic SC"','600 30px Fredoka','500 30px Fredoka','400 30px Nunito','700 30px Nunito','500 30px Nunito','600 100px "Playfair Display"'].map(f=>document.fonts.load(f).catch(()=>{})));
-    const imgs = [];
-    for(const f of (it.previas||[])){ try{ imgs.push(await loadImg(fileUrl(f))); }catch(e){} }
+    const imgs = [], titulos = [];
+    { const all=it.previas||[], rots=rotulosPrev(all);
+      for(let k=0;k<all.length;k++){ const f=all[k]; if(!noPdf(f)) continue; try{ imgs.push(await loadImg(fileUrl(f))); titulos.push(rots[k]); }catch(e){} } }
     const total = 3 + imgs.length;
     const pdf = new JsPDF({unit:"mm", format:"a4", orientation:"portrait", compress:true});
     const COLORS=["#FF6CA8","#C7B8F6","#ADE8F9","#B2E5C1","#FFA999"];
@@ -2823,8 +2898,8 @@
     for(let i=0;i<imgs.length;i++){
       [cv,c]=basePage();
       c.font='700 64px "Amatic SC", "Arial Narrow", sans-serif'; c.fillStyle="#4A3B4E";
-      c.fillText(PDF_ROT.pecas[0], M, 170); const pw=c.measureText(PDF_ROT.pecas[0]).width;
-      c.fillStyle="#FF6CA8"; c.fillText(PDF_ROT.pecas[1], M+pw, 170);
+      if(titulos[i]){ c.fillStyle="#FF6CA8"; c.fillText(titulos[i], M, 170); }
+      else { c.fillText(PDF_ROT.pecas[0], M, 170); const pw=c.measureText(PDF_ROT.pecas[0]).width; c.fillStyle="#FF6CA8"; c.fillText(PDF_ROT.pecas[1], M+pw, 170); }
       c.font='600 24px Fredoka, Nunito, sans-serif'; c.fillStyle="#7E6E82"; c.textAlign="right"; c.fillText((it.debutante||"").toUpperCase(), W-M, 165); c.textAlign="left";
       fitImg(c, imgs[i], M, 230, W-2*M, H-230-140, 30, "#EADFE6");
       footer(c,i+4,total);
