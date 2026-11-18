@@ -303,6 +303,7 @@
   .pcell .pthumb{flex:none;width:100%;min-height:0}
   .pcell .pthumb img{position:absolute;inset:0}
   .pcell .ptipo{font:inherit;font-size:12.5px;font-weight:700;padding:6px 8px;border:1.6px solid var(--line);border-radius:10px;background:var(--paper);color:var(--ink)}
+  .pcell .poutro{font:inherit;font-size:12.5px;padding:6px 8px;border:1.6px solid #7E6E82;border-radius:10px;background:#fff;color:var(--ink);width:100%;box-sizing:border-box}
   .pcell .ppdf{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:var(--ink);cursor:pointer}
   .pthumb.nopdf img{opacity:.45;filter:grayscale(.6)}
   .tipo-lbl{position:absolute;left:50%;top:6px;transform:translateX(-50%);color:#fff;font-family:var(--f-brand);font-size:11px;font-weight:600;padding:3px 10px;border-radius:999px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.25);border:2px solid #fff;z-index:1}
@@ -918,6 +919,9 @@
         <button type="button" data-ptipo="monograma" style="--c:#FF6CA8">＋ Monograma</button>
         <button type="button" data-ptipo="logo" style="--c:#9A85E6">＋ Logo</button>
         <button type="button" data-ptipo="composicao" style="--c:#3FA86E">＋ Composição</button>
+        <button type="button" data-ptipo="estampa" style="--c:#2BA3D1">＋ Estampa</button>
+        <button type="button" data-ptipo="convite" style="--c:#EE7A5C">＋ Convite</button>
+        <button type="button" data-ptipo="outro" style="--c:#7E6E82">＋ Outro</button>
       </div>
       <div class="drop" id="dropPrev">
         <strong>Arraste as artes da prévia aqui</strong> ou clique para escolher<br>
@@ -1176,11 +1180,14 @@
   const AJ_DIAS = 3, ARTE_DIAS = 2;
   const PREVIA_INCLUI = "monograma, logo e composição";
   // tipo de cada arte da prévia: aparece em cima da imagem e escolhe o que vai para o PDF
-  const PV_TIPOS = [{id:"monograma",nome:"Monograma",cor:"#FF6CA8"},{id:"logo",nome:"Logo",cor:"#9A85E6"},{id:"composicao",nome:"Composição",cor:"#3FA86E"},{id:"outro",nome:"Outro",cor:"#7E6E82"}];
+  const PV_TIPOS = [{id:"monograma",nome:"Monograma",cor:"#FF6CA8"},{id:"logo",nome:"Logo",cor:"#9A85E6"},{id:"composicao",nome:"Composição",cor:"#3FA86E"},{id:"estampa",nome:"Estampa",cor:"#2BA3D1"},{id:"convite",nome:"Convite",cor:"#EE7A5C"},{id:"outro",nome:"Outro",cor:"#7E6E82"}];
   const PV_T = Object.fromEntries(PV_TIPOS.map(t=>[t.id,t]));
+  // nome de cada arte; quando há mais de uma do mesmo tipo, numera (Composição 1, Composição 2…)
   function rotulosPrev(list){
-    const nComp = (list||[]).filter(f=>f.tipoArte==="composicao").length; let k=0;
-    return (list||[]).map(f=>{ const t=PV_T[f.tipoArte]; if(!t) return ""; if(t.id==="composicao"){ k++; return nComp>1 ? `Composição ${k}` : "Composição"; } return t.nome; });
+    const nome = f => { const t=PV_T[f.tipoArte]; if(!t) return ""; return t.id==="outro" ? ((f.tipoOutro||"").trim() || "Outro") : t.nome; };
+    const tot = {}, k = {};
+    (list||[]).forEach(f=>{ const n=nome(f); if(n) tot[n]=(tot[n]||0)+1; });
+    return (list||[]).map(f=>{ const n=nome(f); if(!n) return ""; k[n]=(k[n]||0)+1; return tot[n]>1 ? `${n} ${k[n]}` : n; });
   }
   const noPdf = f => f.pdf !== false;
   function prazoBase(i){ if(soAvulso(i.pacote,i.itens,i.itensCustom)) return i.prazoManual||""; const et=calcPrazos(i.briefingEm, i.previaEm); return et ? et[2].ate : (i.prazoBase||""); }
@@ -1647,10 +1654,12 @@
         <select class="ptipo" data-ix="${ix}" aria-label="O que é esta arte">
           <option value="">O que é?</option>${PV_TIPOS.map(o=>`<option value="${o.id}" ${f.tipoArte===o.id?"selected":""}>${o.nome}</option>`).join("")}
         </select>
+        ${f.tipoArte==="outro"?`<input class="poutro" data-ix="${ix}" value="${esc(f.tipoOutro||"")}" placeholder="O que é? (ex.: tag, menu)" maxlength="30">`:""}
         <label class="ppdf"><input type="checkbox" data-ix="${ix}" ${noPdf(f)?"checked":""}> no PDF</label></div>`; }).join("");
     $("prevGrid").querySelectorAll(".pa.star").forEach(b=>b.onclick=()=>{ const [f]=draftPrev.splice(+b.dataset.ix,1); draftPrev.unshift(f); renderPrevGrid(); scheduleDraft(); });
     $("prevGrid").querySelectorAll(".pa.del").forEach(b=>b.onclick=()=>{ draftPrev.splice(+b.dataset.ix,1); renderPrevGrid(); scheduleDraft(); });
     $("prevGrid").querySelectorAll(".ptipo").forEach(s=>s.onchange=()=>{ draftPrev[+s.dataset.ix].tipoArte=s.value||""; renderPrevGrid(); scheduleDraft(); });
+    $("prevGrid").querySelectorAll(".poutro").forEach(inp=>{ inp.oninput=()=>{ draftPrev[+inp.dataset.ix].tipoOutro=inp.value; scheduleDraft(); const r=rotulosPrev(draftPrev); $("prevGrid").querySelectorAll(".tipo-lbl").forEach((l,k)=>{ if(draftPrev[k] && PV_T[draftPrev[k].tipoArte]) l.textContent=r[k]; }); }; });
     $("prevGrid").querySelectorAll(".ppdf input").forEach(c=>c.onchange=()=>{ draftPrev[+c.dataset.ix].pdf=c.checked; renderPrevGrid(); scheduleDraft(); });
   }
   async function uploadInto(list, target, rerender, statusEl, onlyImages){
@@ -1679,8 +1688,11 @@
   wireDrop($("drop"), $("fileIn"), fl=>uploadInto(fl, draftFiles, renderFiles, $("uploading"), false));
   let tipoPendente = "";
   wireDrop($("dropPrev"), $("prevIn"), async fl=>{ const tp=tipoPendente; tipoPendente=""; const antes=draftPrev.length;
-    await uploadInto(fl, draftPrev, ()=>{ for(let k=antes;k<draftPrev.length;k++) if(tp && !draftPrev[k].tipoArte) draftPrev[k].tipoArte=tp; renderPrevGrid(); }, $("uploadingPrev"), true); });
-  document.querySelectorAll("[data-ptipo]").forEach(b=>b.onclick=()=>{ tipoPendente=b.dataset.ptipo; $("prevIn").click(); });
+    await uploadInto(fl, draftPrev, ()=>{ for(let k=antes;k<draftPrev.length;k++) if(tp && !draftPrev[k].tipoArte){ draftPrev[k].tipoArte=tp; if(tp==="outro") draftPrev[k].tipoOutro=outroPendente; } renderPrevGrid(); }, $("uploadingPrev"), true); });
+  let outroPendente = "";
+  document.querySelectorAll("[data-ptipo]").forEach(b=>b.onclick=()=>{
+    if(b.dataset.ptipo==="outro"){ const n=prompt("O que é essa arte? (ex.: tag, menu, rótulo)"); if(n===null) return; outroPendente=n.trim(); }
+    tipoPendente=b.dataset.ptipo; $("prevIn").click(); });
 
   $("saveBtn").onclick = async ()=>{
     const fd = new FormData(form);
