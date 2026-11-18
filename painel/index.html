@@ -795,10 +795,10 @@
   </form>
   <button class="lnk" id="gForgot" type="button">Esqueci a senha</button>
   <div class="err" id="gErr" role="alert"></div>
-  <div class="ver">versão 18/11 · 12h20</div>
+  <div class="ver">versão 18/11 · 12h35</div>
 </div></div>
 <button id="sairBtn" type="button">Sair</button>
-<div id="verTag">versão 18/11 · 12h20</div>
+<div id="verTag">versão 18/11 · 12h35</div>
 
 <header class="top">
   <div class="top-in">
@@ -956,6 +956,15 @@
       </div>
       <div class="uploading" id="uploadingPrev" style="display:none"></div>
       <div class="prev-grid" id="prevGrid"></div>
+
+      <div class="section-t">🎬 Save the date (vídeo no Google Drive)</div>
+      <div id="mVids"></div>
+      <div class="vd-add">
+        <input id="mVdLink" placeholder="Cole aqui o link do vídeo no Google Drive" inputmode="url">
+        <input id="mVdNome" placeholder="Nome (opcional)" maxlength="40">
+        <button class="btn ghost" id="mVdAdd" type="button">＋ Adicionar</button>
+      </div>
+      <small style="display:block;margin-top:6px;opacity:.75">No Drive, deixe o vídeo como “Qualquer pessoa com o link”. Ele entra no PDF da prévia como página clicável.</small>
 
       <div class="section-t">Briefings</div>
       <div class="drop" id="drop">
@@ -1515,6 +1524,7 @@
       curTipo = it.tipo || "debutante"; curPacote = it.pacote || ""; curItens = [...(it.itens||[])]; curValorMan = it.valorManual || ""; curCustom = structuredClone(it.itensCustom||[]);
       draftFiles = structuredClone(it.briefings||[]);
       draftPrev = structuredClone(it.previas||[]);
+      draftVids = structuredClone(it.videos||[]);
       $("mAg").textContent = A[it.assessoria]?.nome || "";
       $("mTitle").textContent = it.debutante;
       $("histWrap").style.display = "";
@@ -1523,7 +1533,7 @@
     } else {
       form.assessoria.value = A[tab] ? tab : "direto";
       form.status.value = "aguardando";
-      draftFiles = []; draftPrev = [];
+      draftFiles = []; draftPrev = []; draftVids = [];
       curTipo = $("tipoF").value || "debutante"; curPacote = ""; curItens = []; curValorMan = ""; curCustom = [];
       $("mAg").textContent = "Nova festa";
       $("mTitle").textContent = "Cadastrar debutante";
@@ -1542,7 +1552,7 @@
       setTimeout(()=>{ const b=$("draftDiscard"); if(b) b.onclick=()=>{ storeDraft(dk,null); const e=editing; closeModal(); openModal(e); }; },0);
     }
     renderTipo(); renderCatalog(); renderPrazo(); syncParc(); syncUrg();
-    renderFiles(); renderPrevGrid();
+    renderFiles(); renderPrevGrid(); renderVids();
     $("mBody").scrollTop = 0; document.body.style.overflow="hidden";
     $("drop").style.opacity = $("dropPrev").style.opacity = assets ? 1 : .5;
     $("viewPrevBtn").style.display = it ? "" : "none";
@@ -1726,6 +1736,17 @@
     dropEl.addEventListener("drop", e=>handler(e.dataTransfer.files));
   }
   wireDrop($("drop"), $("fileIn"), fl=>uploadInto(fl, draftFiles, renderFiles, $("uploading"), false));
+  let draftVids = [];
+  function renderVids(){
+    $("mVids").innerHTML = draftVids.map((v,ix)=>`<div class="vd-row"><span class="vd-ic">▶</span><div class="vd-tx"><b>${esc(v.name||"Save the date")}</b><small>Google Drive</small></div>
+      <a class="btn ghost" href="https://drive.google.com/file/d/${esc(v.drive)}/view" target="_blank" rel="noopener">Ver ↗</a>
+      <button class="link" type="button" data-mvdel="${ix}" style="font-size:18px;padding:6px">×</button></div>`).join("");
+    $("mVids").querySelectorAll("[data-mvdel]").forEach(b=>b.onclick=()=>{ draftVids.splice(+b.dataset.mvdel,1); renderVids(); });
+  }
+  $("mVdAdd").onclick=()=>{ const id=driveId($("mVdLink").value.trim());
+    if(!id){ toast("Não reconheci o link do Drive. Copie em Compartilhar → Copiar link."); $("mVdLink").focus(); return; }
+    draftVids.push({id:uid(), drive:id, name:$("mVdNome").value.trim()||"Save the date", t:Date.now()});
+    $("mVdLink").value=""; $("mVdNome").value=""; renderVids(); };
   let tipoPendente = "";
   wireDrop($("dropPrev"), $("prevIn"), async fl=>{ const tp=tipoPendente; tipoPendente=""; const antes=draftPrev.length;
     await uploadInto(fl, draftPrev, ()=>{ for(let k=antes;k<draftPrev.length;k++) if(tp && !draftPrev[k].tipoArte){ draftPrev[k].tipoArte=tp; if(tp==="outro") draftPrev[k].tipoOutro=outroPendente; } renderPrevGrid(); }, $("uploadingPrev"), true); });
@@ -1760,7 +1781,7 @@
     const now = Date.now();
     let it;
     if(editing){
-      it = {...structuredClone(editing), ...v, briefings:draftFiles, previas:draftPrev, atualizadoEm:now};
+      it = {...structuredClone(editing), ...v, briefings:draftFiles, previas:draftPrev, videos:draftVids, atualizadoEm:now};
       const hist = [...(editing.historico||[])];
       if(editing.status!==v.status && v.status==="entregue") it.entregueEm = today();
       if(editing.status!==v.status) hist.push({t:now,msg:`Status → ${S[v.status].nome}`});
@@ -1788,7 +1809,7 @@
       if(draftPrev.length) h0.push({t:now,msg:`${draftPrev.length} arte(s) na prévia`});
       const pags = pgNovo>0 ? [{id:uid(),valor:pgNovo,desc:pgNovo>=v.valor?"Pagamento total":"Sinal",data:pgData,meio:pgMeio}] : [];
       if(pgNovo>0) h0.push({t:now,msg:`Pagamento recebido: ${brl(pgNovo)} (${pgMeio})`});
-      it = {id:uid(), ...v, briefings:draftFiles, previas:draftPrev, pagamentos:pags, checklist:{}, criadoEm:now, atualizadoEm:now, historico:h0};
+      it = {id:uid(), ...v, briefings:draftFiles, previas:draftPrev, videos:draftVids, pagamentos:pags, checklist:{}, criadoEm:now, atualizadoEm:now, historico:h0};
       marcarStatus(it, "", v.status);
       if(v.status==="ajustes") addRodada(it);
       it.prazo = prazoFinal(it);
