@@ -102,7 +102,47 @@
     letter-spacing: 0.06em;
     font-size: 1rem;
     color: var(--navy);
-    margin-bottom: 26px;
+    margin-bottom: 12px;
+  }
+
+  .deadline{
+    text-align:center;
+    margin: 0 auto 28px;
+    max-width: 340px;
+  }
+  .deadline-ornament{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    color: var(--gold);
+    font-size: 0.55rem;
+  }
+  .deadline-ornament::before,
+  .deadline-ornament::after{
+    content:"";
+    flex:1;
+    max-width: 90px;
+    height:1px;
+  }
+  .deadline-ornament::before{ background: linear-gradient(90deg, transparent, var(--gold)); }
+  .deadline-ornament::after{ background: linear-gradient(90deg, var(--gold), transparent); }
+  .deadline-label{
+    display:block;
+    font-family:'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1.05rem;
+    color: rgba(28,43,74,0.75);
+    margin: 10px 0 2px;
+  }
+  .deadline-date{
+    display:block;
+    font-family:'Cinzel', serif;
+    font-weight: 500;
+    font-size: 1.25rem;
+    letter-spacing: 0.14em;
+    color: var(--gold-deep);
+    margin-bottom: 10px;
   }
 
   form{
@@ -327,6 +367,12 @@
 
   <div class="rule"></div>
   <div class="subtitle">Confirmação de Presença</div>
+  <div class="deadline">
+    <div class="deadline-ornament">&#9670;</div>
+    <span class="deadline-label">Confirmação máxima até</span>
+    <span class="deadline-date">27 de Janeiro</span>
+    <div class="deadline-ornament">&#9670;</div>
+  </div>
 
   <form id="rsvpForm">
     <div class="field">
