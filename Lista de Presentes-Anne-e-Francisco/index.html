@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lista de Presentes · Anne & Francisco</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Cinzel:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* VOICE: terno, elegante, divertido nos textos
+   IDEA: a continuação do convite de papel — mesmo papel, mesmos ramos
+   PICTURE: a própria lista de presentes, com ramos de folhas em traço verde
+   COLOUR and TYPE: papel branco, verde sálvia, cinza; Cormorant + Cinzel
+   LAYOUT: coluna central, cartões em grade, modal de Pix */
+:root{color-scheme:light;
+--bg:#fdfdfd;--card:#ffffff;
+--ink:#6d6d6d;--ink2:#4e4e4e;
+--green:#5f8a63;--line:#e4e6df;--soft:#eef3ec}
+:root[data-theme=light]{color-scheme:light}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg) url(img/papel.jpg) repeat;color:var(--ink);font:18px/1.5 "Cormorant Garamond",Georgia,serif;overflow-x:clip}
+.wrap{z-index:1;max-width:1040px;margin:0 auto;padding:clamp(32px,6vw,72px) max(5vw,16px) 120px;position:relative}
+.ramo{position:fixed;bottom:0;width:clamp(150px,22vw,320px);pointer-events:none;z-index:0}.ramo.l{left:0}.ramo.r{right:0}
+header{text-align:center;position:relative;z-index:1}
+.mono{width:clamp(200px,34vw,300px);height:auto;display:block;margin:0 auto}
+h1{font:500 clamp(11px,3.4vw,30px)/1.2 Cinzel,serif;letter-spacing:.28em;white-space:nowrap;color:var(--green);margin:22px 0 6px}
+.sub{font-style:italic;font-size:20px;max-width:560px;margin:10px auto 0}
+.info{font:400 15px/1.4 Cinzel,serif;letter-spacing:.12em;margin-top:18px;color:var(--ink)}
+.filters{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:34px 0 26px}
+.filters button{font:500 16px "Cormorant Garamond",serif;border:1px solid var(--line);background:var(--card);color:var(--ink2);padding:8px 16px;border-radius:99px;cursor:pointer;min-height:40px}
+.filters button[aria-pressed=true]{background:var(--green);color:#fff;border-color:var(--green)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,290px),1fr));gap:18px}
+.gift{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:0 20px 18px;overflow:hidden;display:flex;flex-direction:column;gap:6px;transition:transform .2s,box-shadow .2s}
+.gift:hover{transform:translateY(-3px);box-shadow:0 10px 28px -14px rgba(60,90,60,.35)}
+.gift .ph{margin:0 -20px 10px;background:var(--soft);aspect-ratio:4/3;overflow:hidden}
+.gift .ph img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s}.gift:hover .ph img{transform:scale(1.04)}.mono-ph{display:grid;place-items:center;background:#fdfdfd!important}.gift .mono-ph img{width:70%;height:auto;object-fit:contain}
+.gift h3{margin:0;font:600 22px/1.2 "Cormorant Garamond",serif;color:var(--ink2)}
+.gift p{margin:0;font-style:italic;font-size:17px;flex:1}
+.gift .row{display:flex;align-items:center;justify-content:space-between;margin-top:12px;gap:10px}
+.price{font:500 20px Cinzel,serif;color:var(--green);white-space:nowrap}
+.buy{font:500 14px Cinzel,serif;letter-spacing:.12em;background:var(--green);color:#fff;border:0;border-radius:99px;padding:11px 20px;cursor:pointer;min-height:44px}
+.buy:hover{filter:brightness(1.07)}
+.buy:focus-visible,.filters button:focus-visible,.btn:focus-visible,input:focus-visible{outline:2px solid var(--green);outline-offset:3px}
+.free input{width:100%;font:500 18px Cinzel,serif;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--bg);color:var(--ink2);margin-top:8px}
+footer{text-align:center;margin-top:48px;font-style:italic}
+footer b{font-style:normal;color:var(--ink2)}
+/* modal */
+.ov{position:fixed;inset:0;background:rgba(20,28,20,.55);display:none;align-items:center;justify-content:center;padding:16px;z-index:10}
+.ov.on{display:flex}
+.modal{background:var(--card);border-radius:22px;max-width:480px;width:100%;padding:28px 24px 24px;text-align:center;max-height:94vh;overflow:auto;position:relative;animation:pop .25s ease}
+@keyframes pop{from{transform:translateY(14px);opacity:0}}
+@media (prefers-reduced-motion:reduce){.modal{animation:none}.gift{transition:none}}
+.x{position:absolute;right:10px;top:10px;width:44px;height:44px;border:0;background:none;font-size:28px;color:var(--ink);cursor:pointer}
+.modal h2{font:500 22px/1.2 Cinzel,serif;color:var(--green);letter-spacing:.08em;margin:4px 0}
+.modal .it{font-style:italic;font-size:20px;color:var(--ink2)}
+.modal .val{font:500 34px Cinzel,serif;color:var(--ink2);margin:6px 0 14px}
+.code{width:100%;height:96px;font:13px/1.4 ui-monospace,Menlo,monospace;border:1px dashed var(--green);border-radius:12px;padding:10px;background:var(--soft);color:var(--ink2);resize:none;word-break:break-all}
+.btn{display:block;width:100%;font:500 15px Cinzel,serif;letter-spacing:.12em;border-radius:99px;padding:14px;cursor:pointer;margin-top:12px;min-height:48px;text-decoration:none}
+.btn.p{background:var(--green);color:#fff;border:0}
+.btn.s{background:none;color:var(--green);border:1px solid var(--green)}
+.steps{text-align:left;font-size:17px;margin:16px 0 4px;padding-left:22px}
+.key{font-size:16px;margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
+.key code{font:14px ui-monospace,Menlo,monospace;color:var(--ink2);overflow-wrap:anywhere}
+.ok{color:var(--green);font-weight:600;min-height:24px;margin-top:8px}
+@media(max-width:600px){.ramo{width:130px;opacity:.45}}
+</style>
+</head>
+<body>
+<img class="ramo l" src="img/ramo-esq.png" alt=""><img class="ramo r" src="img/ramo-dir.png" alt="">
+<div class="wrap">
+  
+  <svg width="0" height="0" style="position:absolute"><defs>
+    <g id="branch"><path d="M20 215C40 160 55 110 95 10"/><path d="M33 180c-20-8-28-26-26-44 16 8 26 24 26 44z"/><path d="M38 168c18-10 34-10 46-4-14 12-30 12-46 4z"/><path d="M48 135c-22-4-34-20-34-38 18 6 30 20 34 38z"/><path d="M54 122c16-14 32-16 46-12-12 14-28 18-46 12z"/><path d="M64 92c-18-8-24-24-22-40 14 8 22 22 22 40z"/><path d="M70 80c12-14 26-18 40-16-10 14-24 18-40 16z"/><path d="M80 52c-12-10-14-24-10-36 12 8 14 22 10 36z"/></g>
+    <g id="leaf"><path d="M12 38C14 26 18 14 30 4"/><path d="M15 28c-8-2-12-9-11-16 7 3 11 9 11 16z"/><path d="M19 20c6-5 12-6 17-4-4 5-10 6-17 4z"/><path d="M23 13c-5-3-6-8-4-12 4 3 5 7 4 12z"/></g>
+  </defs></svg>
+
+  <header>
+    <img class="mono" src="img/monograma.png" alt="Monograma A F">
+    <h1>ANNE CAROLINE &amp; FRANCISCO</h1>
+    <p class="sub">Sua presença já é o maior presente! Mas, se quiser nos mimar com um carinho, escolha um item abaixo — qualquer valor faz diferença e vai direto pra gente via Pix.</p>
+    <div class="info">SÁBADO, 05 DE DEZEMBRO · ÀS 17H</div>
+  </header>
+
+  <nav class="filters" id="filters"></nav>
+  <section class="grid" id="grid"></section>
+
+  <footer>Com carinho e muita gratidão,<br><b>Anne Caroline &amp; Francisco</b></footer>
+</div>
+
+<div class="ov" id="ov" role="dialog" aria-modal="true" aria-labelledby="mt">
+  <div class="modal">
+    <button class="x" id="close" aria-label="Fechar">×</button>
+    <h2 id="mt">PIX COPIA E COLA</h2>
+    <div class="it" id="mItem"></div>
+    <div class="val" id="mVal"></div>
+    <textarea class="code" id="mCode" readonly aria-label="Código Pix copia e cola"></textarea>
+    <button class="btn p" id="copy">COPIAR CÓDIGO PIX</button>
+    <div class="ok" id="ok" aria-live="polite"></div>
+    <ol class="steps">
+      <li>Abra o app do seu banco e vá em <b>Pix</b>.</li>
+      <li>Escolha <b>Pix Copia e Cola</b> e cole o código.</li>
+      <li>Confira o valor e confirme. Pronto!</li>
+    </ol>
+    <div class="key">Prefere digitar a chave? Chave Pix (e-mail · Itaú):<br><code>silvaaraujof080@gmail.com</code>
+      <button class="btn s" id="copyKey">COPIAR CHAVE</button></div>
+  </div>
+</div>
+
+<script>
+{
+const PIX_KEY='silvaaraujof080@gmail.com', NAME='ANNE E FRANCISCO', CITY='SAO PAULO';
+const G=[
+ ['casa','culinaria','Aulas de culinária pro noivo','Pra ele passar do miojo ao arroz soltinho.',30,'center 20%'],
+ ['casa','louca','Vale "hoje a louça é sua"','Cupom oficial pra acabar com qualquer discussão na pia.',15,'center 50%'],
+ ['casa','cobertor','Cota do cobertor de casal','Pra ninguém mais roubar o cobertor de madrugada.',50,'center 35%'],
+ ['casa','boleto','Primeiro boleto do casal','Ajude a pagar a primeira conta da vida a dois.',40,'center'],
+ ['casa','racao','Ração do pet que ainda não chegou','Gato ou cachorro? A briga já começou.',25,'center'],
+ ['divertidos','pizza','Pizza da primeira briga','Toda discussão termina melhor com uma pizza.',35,'center'],
+ ['divertidos','videogame','Noite de videogame a dois','Pra disputar no controle em vez de brigar por ele.',20,'center'],
+ ['divertidos','futebol','Jogo do noivo em paz','90 minutos sem ouvir "amor, já acabou?".',20,'center'],
+ ['divertidos','meias','Meias contra pés gelados','Proteção pro noivo durante o inverno inteiro.',15,'center'],
+ ['divertidos','paciencia','Curso de paciência','Uso compartilhado. Tomar antes de montar móveis juntos.',25,'center'],
+ ['divertidos','caneca','Café de reconciliação','Um cafezinho pra fazer as pazes depois de qualquer DR.',20,'center'],
+ ['festa','gelo','Gelo pras bebidas da festa','Já que cada um traz a sua, a gente garante que fica geladinha!',15,'center'],
+ ['festa','corrida','Corrida de volta da festa','Pros noivos voltarem pra casa em segurança (e cansados).',30,'center'],
+ ['festa','brinde','Brinde dos noivos','Um vinho pra brindar a primeira noite de casados.',40,'center'],
+ ['festa','cafe','Café da manhã pós-festa','Café e pão de queijo pra curar o cansaço do dia seguinte.',25,'center'],
+ ['lua de mel','luademel','Cota da lua de mel','Cada cota é um pedacinho do passeio dos sonhos.',80,'center'],
+ ['lua de mel','coco','Água de coco na praia','Uma água de coco pé na areia em sua homenagem.',15,'center']
+];
+const cats=['todos',...new Set(G.map(g=>g[0]))];
+let cur='todos';
+const brl=v=>v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const photo=(f,pos,alt)=>`<div class="ph"><img src="img/${f}.jpg" alt="${alt}" loading="lazy" style="object-position:${pos}"></div>`;
+const $=id=>document.getElementById(id);
+
+function render(){
+  $('filters').innerHTML=cats.map(c=>`<button aria-pressed="${c===cur}" data-c="${c}">${c[0].toUpperCase()+c.slice(1)}</button>`).join('');
+  const list=G.map((g,i)=>[g,i]).filter(([g])=>cur==='todos'||g[0]===cur);
+  $('grid').innerHTML=list.map(([g,i])=>`<article class="gift">${photo(g[1],g[5],g[2])}<h3>${g[2]}</h3><p>${g[3]}</p>
+    <div class="row"><span class="price">${brl(g[4])}</span><button class="buy" data-i="${i}">PRESENTEAR</button></div></article>`).join('')+
+   `<article class="gift free"><div class="ph mono-ph"><img src="img/monograma.png" alt="Monograma A F"></div><h3>Valor do coração</h3><p>Quer presentear com outro valor? Digite abaixo.</p>
+    <input id="freeVal" inputmode="decimal" placeholder="R$ 0,00" aria-label="Valor livre">
+    <div class="row"><span class="price">Livre</span><button class="buy" data-i="free">PRESENTEAR</button></div></article>`;
+}
+
+// ---- BR Code (Pix copia e cola) ----
+const f=(id,v)=>id+String(v.length).padStart(2,'0')+v;
+function crc16(s){let c=0xFFFF;for(let i=0;i<s.length;i++){c^=s.charCodeAt(i)<<8;for(let j=0;j<8;j++)c=(c&0x8000)?((c<<1)^0x1021)&0xFFFF:(c<<1)&0xFFFF}return c.toString(16).toUpperCase().padStart(4,'0')}
+function pix(v){
+  let p=f('00','01')+f('26',f('00','BR.GOV.BCB.PIX')+f('01',PIX_KEY))+f('52','0000')+f('53','986');
+  if(v>0)p+=f('54',v.toFixed(2));
+  p+=f('58','BR')+f('59',NAME)+f('60',CITY)+f('62',f('05','***'))+'6304';
+  return p+crc16(p);
+}
+
+function open(name,v){
+  $('mItem').textContent=name;$('mVal').textContent=v>0?brl(v):'Valor livre';
+  $('mCode').value=pix(v);$('ok').textContent='';
+  $('ov').classList.add('on');$('copy').focus();
+}
+function close(){$('ov').classList.remove('on')}
+async function copy(txt,msg){
+  try{await navigator.clipboard.writeText(txt);$('ok').textContent=msg}
+  catch(e){const t=$('mCode');const old=t.value;t.value=txt;t.select();let done=false;try{done=document.execCommand('copy')}catch(_){}
+    t.value=old;$('ok').textContent=done?msg:'Selecione o código acima e copie manualmente.';if(!done)t.select()}
+}
+
+$('filters').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;cur=b.dataset.c;render()});
+$('grid').addEventListener('click',e=>{const b=e.target.closest('.buy');if(!b)return;
+  if(b.dataset.i==='free'){const raw=($('freeVal').value||'').replace(/[^\d,\.]/g,'').replace(/\.(?=\d{3})/g,'').replace(',','.');
+    const v=Math.round(parseFloat(raw)*100)/100;if(!(v>0)){$('freeVal').focus();$('freeVal').placeholder='Digite um valor';return}open('Valor do coração',v);return}
+  const g=G[+b.dataset.i];open(g[2],g[4]);});
+$('copy').addEventListener('click',()=>copy($('mCode').value,'Código copiado! Agora é só colar no app do banco.'));
+$('copyKey').addEventListener('click',()=>copy(PIX_KEY,'Chave Pix copiada!'));
+$('close').addEventListener('click',close);
+$('ov').addEventListener('click',e=>{if(e.target.id==='ov')close()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
+render();
+}
+</script>
+</body>
+</html>
