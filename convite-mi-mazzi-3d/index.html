@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Convite Mi Mazzi 3D</title>
+<link rel="artifact-thumbnail" href="thumb.jpg">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="description" content="Convite de 15 anos Mi Mazzi em 3D: abra o convite cartonado. Criado por @ festa com a carol.">
+<meta property="og:title" content="Convite Mi Mazzi · 15 anos">
+<meta property="og:description" content="Abra o convite em 3D · criado por @ festa com a carol">
+<meta property="og:image" content="thumb.jpg">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#FAF8F1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+/* VOICE: delicado e festivo, como a marca Festa com a Carol
+   IDEA: o convite físico sobre a mesa do ateliê, que gira e se abre na sua frente
+   PICTURE: o próprio convite em 3D (texturas das fotos originais), abrindo as portas
+   COLOUR and TYPE: creme #FAF8F1, tinta #4A3B4E, rosa #FF6CA8, lilás/aqua/coral de apoio; Fredoka + Nunito
+   LAYOUT: palco em tela cheia, controles em pílulas embaixo, assinatura @ festa com a carol no fim */
+:root{color-scheme:light;--bg:#FAF8F1;--ink:#4A3B4E;--soft:#7E6E82;--pink:#FF6CA8;--pink-l:#FFE8F1;--lilac:#C7B8F6;--lilac-l:#F2EEFD;--aqua:#ADE8F9;--aqua-l:#EAF8FD;--coral:#FFA999;--mint:#B2E5C1;--line:#EADFE6;
+  --H:560px;--W:calc(var(--H)*919/1157);--WL:calc(var(--W)*476/919);--WR:calc(var(--W) - var(--WL));--T:calc(var(--H)*.02)}
+*{box-sizing:border-box;min-width:0}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Nunito,system-ui,sans-serif;overflow:hidden;-webkit-tap-highlight-color:transparent}
+.bg{position:fixed;inset:0;overflow:hidden;pointer-events:none}
+.blob{position:absolute;border-radius:50%;filter:blur(60px);opacity:.75}
+.b1{width:46vmax;height:46vmax;background:var(--pink-l);left:-12vmax;top:-14vmax}
+.b2{width:40vmax;height:40vmax;background:var(--lilac-l);right:-10vmax;top:10vh}
+.b3{width:38vmax;height:38vmax;background:var(--aqua-l);left:20vw;bottom:-22vmax}
+.dot{position:absolute;border-radius:50%;opacity:.55;animation:drift 9s ease-in-out infinite alternate}
+@keyframes drift{to{transform:translateY(-18px) rotate(40deg)}}
+header{position:fixed;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px max(4vw,16px);z-index:3}
+.tag{font:600 15px Fredoka,Nunito,sans-serif;color:var(--ink);background:#fff;border:1px solid var(--line);padding:8px 14px;border-radius:999px;box-shadow:0 4px 14px rgba(74,59,78,.06)}
+.tag b{color:var(--pink);font-weight:700}
+.hint{font-size:14px;color:var(--soft)}
+.stage{position:fixed;inset:0;perspective:2400px;perspective-origin:50% 40%;display:grid;place-items:center;cursor:grab;touch-action:none;z-index:1}
+.stage:active{cursor:grabbing}
+.float{transform-style:preserve-3d;animation:bob 5s ease-in-out infinite;transition:transform .5s ease-out}
+@keyframes bob{50%{translate:0 -10px}}
+.rig{transform-style:preserve-3d;will-change:transform}
+.inv{position:relative;width:var(--W);height:var(--H);transform-style:preserve-3d}
+.shadow{position:absolute;inset:4% calc(-2% - var(--o,0)*50%);background:rgba(74,59,78,.35);filter:blur(28px);transform:translateZ(-80px);border-radius:12px;}
+.box{position:absolute;inset:0;transform-style:preserve-3d}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.box>.front{transform:translateZ(var(--T))}
+.box>.back{transform:rotateY(180deg)}
+.ed{position:absolute;background:linear-gradient(90deg,#0b1736,#22386e 45%,#0e1c42);}
+.ed.t{left:0;top:0;width:100%;height:var(--T);transform-origin:50% 0;transform:rotateX(90deg)}
+.ed.b{left:0;bottom:0;width:100%;height:var(--T);transform-origin:50% 100%;transform:rotateX(-90deg)}
+.ed.l{left:0;top:0;height:100%;width:var(--T);transform-origin:0 50%;transform:rotateY(-90deg);background:linear-gradient(180deg,#22386e,#0b1736)}
+.ed.r{right:0;top:0;height:100%;width:var(--T);transform-origin:100% 50%;transform:rotateY(90deg);background:linear-gradient(180deg,#22386e,#0b1736)}
+.base{transform:translateZ(calc(var(--T) * -1))}
+.base>.front{background:url(water.jpg) center/cover;box-shadow:inset 0 0 0 1px rgba(0,0,0,.18)}
+.base>.back{background:#13234d}
+.card{position:absolute;left:7%;right:7%;top:50%;aspect-ratio:1;transform:translateY(-50%) translateZ(1px);background:url(card.jpg) center/100% 100%;box-shadow:0 2px 6px rgba(0,0,0,.35)}
+.door{position:absolute;top:0;height:100%;transform-style:preserve-3d}
+.door.l{--d:var(--oL,0);left:0;width:var(--WL);transform-origin:0 50% 0;transform:translateZ(1px) rotateY(calc(var(--d)*-180deg))}
+.door.r{--d:var(--oR,0);right:0;width:var(--WR);transform-origin:100% 50% 0;transform:translateZ(1px) rotateY(calc(var(--d)*180deg))}
+.door .front{background-size:100% 100%;box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
+.door.l .front{background-image:url(cover-l.jpg)}
+.door.r .front{background-image:url(cover-r.jpg)}
+.door .back{background:url(water.jpg) center/cover}
+.door.l .back{background-position:right center}
+.door.r .back{background-position:left center}
+.door.l .ed.r,.door.r .ed.l{filter:brightness(.8)}
+.stage.clickable .inv{cursor:pointer}
+.door .front{transform-style:preserve-3d}
+.mono{position:absolute;inset:0;transform-style:preserve-3d;pointer-events:none;--D:calc(var(--T)*1.1)}
+.mono i{position:absolute;inset:0;background-size:100% 100%;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.mono .s{transform:translateZ(calc(var(--D)*var(--k)))}
+.mono .t{transform:translateZ(var(--D))}
+.mono .sh{background:#000;-webkit-mask-size:100% 100%;mask-size:100% 100%;filter:blur(calc(var(--T)*.45));opacity:.6;transform:translate(calc(var(--T)*.5),calc(var(--T)*.8)) translateZ(.3px)}
+.door.l .mono .s{background-image:url(mono-side-l.png)}.door.r .mono .s{background-image:url(mono-side-r.png)}
+.door.l .mono .t{background-image:url(mono-top-l.png)}.door.r .mono .t{background-image:url(mono-top-r.png)}
+.door.l .mono .sh{-webkit-mask-image:url(mono-l.png);mask-image:url(mono-l.png)}.door.r .mono .sh{-webkit-mask-image:url(mono-r.png);mask-image:url(mono-r.png)}
+.mono .t .shine{opacity:1}
+.mono .gl{background:linear-gradient(135deg,rgba(255,255,255,.35),rgba(255,255,255,0) 40%,rgba(255,255,255,0) 60%,rgba(255,255,255,.2));-webkit-mask-size:100% 100%;mask-size:100% 100%;transform:translateZ(calc(var(--D) + .2px))}
+.door.l .mono .gl{-webkit-mask-image:url(mono-l.png);mask-image:url(mono-l.png)}.door.r .mono .gl{-webkit-mask-image:url(mono-r.png);mask-image:url(mono-r.png)}
+.shine{position:absolute;inset:0;pointer-events:none;-webkit-mask-size:100% 100%;mask-size:100% 100%;
+  background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.95) 48%,rgba(255,240,250,.6) 52%,transparent 62%);background-size:320% 100%;background-position:var(--sx,120%) 0;opacity:.85}
+.door.l .shine{-webkit-mask-image:url(m-l.png);mask-image:url(m-l.png)}
+.door.r .shine{-webkit-mask-image:url(m-r.png);mask-image:url(m-r.png)}
+.card .shine{-webkit-mask-image:url(m-card.png);mask-image:url(m-card.png)}
+.sweep .shine{animation:sweep 2.4s ease-in-out}
+@keyframes sweep{from{background-position:130% 0}to{background-position:-30% 0}}
+.dim{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none}
+.door .back .dim{opacity:calc(.35 - var(--d)*.35)}
+.door .front .dim{opacity:calc(var(--d)*.5)}
+.sign{position:fixed;left:0;right:0;bottom:calc(132px + 2vh);text-align:center;z-index:2;pointer-events:none;opacity:0;transform:translateY(16px);transition:opacity 1s,transform 1s cubic-bezier(.2,.8,.2,1)}
+.end .sign{opacity:1;transform:none}
+.end.shut .sign{opacity:0;transform:translateY(16px)}
+.sign small{display:block;font:700 12px Nunito,sans-serif;color:var(--soft);letter-spacing:.02em;margin-bottom:2px}
+.sign strong{display:inline-flex;align-items:center;gap:.12em;font:600 clamp(17px,2.4vw,22px)/1.1 Fredoka,Nunito,sans-serif;color:var(--ink);background:#fff;padding:.35em .9em .4em;border-radius:999px;border:1.5px solid var(--pink-l);box-shadow:0 10px 30px rgba(255,108,168,.18)}
+.sign strong span{color:var(--pink)}
+.slider{position:fixed;left:50%;bottom:calc(max(18px,2vh) + 58px);transform:translateX(-50%);width:min(440px,calc(100vw - 32px));display:flex;align-items:center;gap:12px;z-index:3;background:#fff;border:1.5px solid var(--line);border-radius:999px;padding:6px 18px;box-shadow:0 4px 14px rgba(74,59,78,.07);font:700 13px Nunito,sans-serif;color:var(--soft)}
+.slider label{white-space:nowrap}
+.slider input{flex:1;-webkit-appearance:none;appearance:none;height:32px;background:transparent;cursor:pointer;margin:0}
+.slider input::-webkit-slider-runnable-track{height:8px;border-radius:99px;background:linear-gradient(90deg,var(--pink) var(--p,0%),var(--line) var(--p,0%))}
+.slider input::-moz-range-track{height:8px;border-radius:99px;background:var(--line)}
+.slider input::-moz-range-progress{height:8px;border-radius:99px;background:var(--pink)}
+.slider input::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;margin-top:-9px;border-radius:50%;background:#fff;border:3px solid var(--pink);box-shadow:0 2px 8px rgba(255,108,168,.35)}
+.slider input::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:#fff;border:3px solid var(--pink)}
+.slider input:focus-visible{outline:3px solid var(--lilac);outline-offset:4px;border-radius:99px}
+.controls{position:fixed;left:0;right:0;bottom:max(18px,2vh);display:flex;justify-content:center;flex-wrap:wrap;gap:10px;z-index:3;padding:0 16px}
+button{font:700 15px Nunito,sans-serif;min-height:44px;padding:0 20px;border-radius:999px;border:1.5px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;box-shadow:0 4px 14px rgba(74,59,78,.07);transition:transform .15s,background .2s}
+button:hover{transform:translateY(-1px)}
+button.main{background:var(--pink);border-color:var(--pink);color:#fff}
+button:focus-visible{outline:3px solid var(--lilac);outline-offset:2px}
+@media (max-width:600px){.hint{display:none}.sign{bottom:136px}.slider{bottom:74px}.controls{flex-wrap:nowrap}#front{display:none}button{padding:0 16px;font-size:14px}}
+@media (prefers-reduced-motion:reduce){.float{animation:none}.dot{animation:none}}
+</style>
+</head>
+<body>
+<div class="bg" aria-hidden="true">
+  <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+  <div id="dots"></div>
+</div>
+
+<header>
+  <div class="tag">Convite <b>Mi Mazzi</b> · 15 anos</div>
+  <div class="hint">Use a barra para abrir · arraste para girar</div>
+</header>
+
+<div class="stage" id="stage" aria-label="Simulação 3D do convite. Arraste para girar.">
+  <div class="float" id="float">
+    <div class="rig" id="rig">
+      <div class="inv" id="inv">
+        <div class="shadow"></div>
+        <div class="box base">
+          <div class="face back"></div><div class="ed t"></div><div class="ed b"></div><div class="ed l"></div><div class="ed r"></div>
+          <div class="face front"><div class="card"><div class="shine"></div></div></div>
+        </div>
+        <div class="door l"><div class="box">
+          <div class="face back"><div class="dim"></div></div><div class="ed t"></div><div class="ed b"></div><div class="ed l"></div><div class="ed r"></div>
+          <div class="face front"><div class="dim"></div><div class="mono"></div></div>
+        </div></div>
+        <div class="door r"><div class="box">
+          <div class="face back"><div class="dim"></div></div><div class="ed t"></div><div class="ed b"></div><div class="ed l"></div><div class="ed r"></div>
+          <div class="face front"><div class="dim"></div><div class="mono"></div></div>
+        </div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sign" id="sign"><small>convite criado por</small><strong><span>@</span>&nbsp;festa com a carol</strong></div>
+
+<div class="slider"><label for="range">Fechado</label><input type="range" id="range" min="0" max="100" value="0" aria-label="Abrir e fechar o convite"><label for="range">Aberto</label></div>
+
+<div class="controls">
+  <button class="main" id="play">▶ Repetir animação</button>
+  <button id="toggle">Abrir convite</button>
+  <button id="front">Centralizar</button>
+</div>
+
+<script>
+{
+const root=document.documentElement, body=document.body;
+const inv=document.getElementById('inv'), rig=document.getElementById('rig'), flt=document.getElementById('float');
+const stage=document.getElementById('stage'), tgl=document.getElementById('toggle');
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// monograma de acrílico em camadas (volume)
+const N=22;
+document.querySelectorAll('.mono').forEach(m=>{
+  let h='<i class="sh"></i>';
+  for(let i=0;i<N;i++){const k=i/N;h+=`<i class="s" style="--k:${k.toFixed(3)};filter:brightness(${(0.7+0.45*k).toFixed(2)})"></i>`}
+  h+='<i class="t"><span class="shine"></span></i><i class="gl"></i>';
+  m.innerHTML=h;
+});
+// confete nas cores do site
+const cols=['#FF6CA8','#C7B8F6','#ADE8F9','#FFA999','#B2E5C1'];
+document.getElementById('dots').innerHTML=Array.from({length:22},(_,i)=>{
+  const s=6+Math.random()*10;
+  return `<i class="dot" style="width:${s}px;height:${s}px;left:${Math.random()*100}%;top:${Math.random()*100}%;background:${cols[i%5]};animation-delay:${-Math.random()*9}s"></i>`}).join('');
+
+// tamanho: fechado ocupa a altura; aberto (2x largura) cabe na tela
+let open=false, H=560, o=0, ot=0, kNow=1;
+const range=document.getElementById('range');
+function size(){
+  const vw=innerWidth, vh=innerHeight;
+  H=Math.min(vh*0.6, vw*0.62/(919/1157), 720);
+  root.style.setProperty('--H',H+'px');
+  fit();
+}
+function fit(){
+  const vw=innerWidth, vh=innerHeight, W=H*919/1157;
+  const kOpen=Math.min(1,(vw*0.92)/(W*2),(vh*0.56)/H);
+  const ease=o*o*(3-2*o), k=1+(kOpen-1)*ease;
+  const up=-Math.min(70,vh*0.08)*(body.classList.contains('end')?1:ease*0.6);
+  flt.style.transform=`translateY(${up}px) scale(${k})`;
+}
+addEventListener('resize',size);size();
+
+// rotação: base animada + arrasto do usuário
+let rx=14, ry=-30, trx=14, tryv=-30, drag=null, last=performance.now();
+function frame(t){
+  const dt=Math.min(50,t-last); last=t;
+  const e=1-Math.pow(0.0025,dt/1000);
+  rx+=(trx-rx)*e; ry+=(tryv-ry)*e;
+  rig.style.transform=`rotateX(${rx}deg) rotateY(${ry}deg)`;
+  inv.style.setProperty('--sx',(50-ry*2.2)+'%');
+  if(Math.abs(ot-o)>0.0005){
+    const step=dt/1900; o=ot>o?Math.min(ot,o+step):Math.max(ot,o-step);
+    applyO();
+  }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+stage.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,rx:trx,ry:tryv};stage.setPointerCapture(e.pointerId);stop()});
+stage.addEventListener('pointermove',e=>{if(!drag)return;
+  tryv=Math.max(-70,Math.min(70,drag.ry+(e.clientX-drag.x)*0.35));
+  trx=Math.max(-25,Math.min(55,drag.rx-(e.clientY-drag.y)*0.3));});
+const endDrag=e=>{if(drag&&e&&e.type==='pointerup'&&Math.hypot(e.clientX-drag.x,e.clientY-drag.y)<6)tgl.click();drag=null};
+stage.addEventListener('pointerup',endDrag);stage.addEventListener('pointercancel',endDrag);
+
+const sm=x=>{x=Math.max(0,Math.min(1,x));return x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2};
+function applyO(){
+  inv.style.setProperty('--o',o);
+  inv.style.setProperty('--oL',sm(o*1.18));
+  inv.style.setProperty('--oR',sm(o*1.18-0.18));
+  range.value=Math.round(o*100);range.style.setProperty('--p',o*100+'%');
+  body.classList.toggle('shut',o<0.85);
+  const now=o>0.5; if(now!==open){open=now;tgl.textContent=open?'Fechar convite':'Abrir convite'}
+  fit();
+}
+function setOpen(v){ot=v?1:0}
+range.addEventListener('input',()=>{stop();ot=o=range.value/100;applyO()});
+stage.addEventListener('wheel',e=>{e.preventDefault();stop();ot=o=Math.max(0,Math.min(1,o+e.deltaY/900));applyO()},{passive:false});
+function sweep(){inv.classList.remove('sweep');void inv.offsetWidth;inv.classList.add('sweep');}
+
+// linha do tempo
+let timers=[];
+function stop(){timers.forEach(clearTimeout);timers=[]}
+function at(ms,fn){timers.push(setTimeout(fn,ms))}
+function play(){
+  stop();body.classList.remove('end');ot=o=0;applyO();trx=14;tryv=-30;
+  if(reduce){ot=o=1;applyO();trx=10;tryv=0;body.classList.add('end');fit();return}
+  at(300,()=>{tryv=24;trx=10});
+  at(1500,sweep);
+  at(2600,()=>{tryv=0;trx=8});
+  at(3500,()=>setOpen(true));
+  at(5600,()=>{trx=16;tryv=-8});
+  at(6600,()=>{sweep();tryv=6;trx=6});
+  at(8400,()=>{tryv=0;trx=4;body.classList.add('end');fit()});
+}
+document.getElementById('play').onclick=play;
+tgl.onclick=()=>{stop();const v=ot<0.5;setOpen(v);if(v)at(1900,sweep)};
+document.getElementById('front').onclick=()=>{stop();trx=open?4:6;tryv=0;sweep()};
+addEventListener('keydown',e=>{if(e.key==='ArrowLeft')tryv-=10;if(e.key==='ArrowRight')tryv+=10;if(e.key===' '&&e.target===body){e.preventDefault();tgl.click()}});
+play();
+}
+</script>
+</body>
